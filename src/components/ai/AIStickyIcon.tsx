@@ -20,9 +20,9 @@ export function AIStickyIcon({ onClick, isOpen }: AIStickyIconProps) {
         className={cn(
           "w-16 h-16 rounded-full shadow-xl transition-all duration-300 ease-out",
           "bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 hover:from-blue-600 hover:via-indigo-600 hover:to-purple-600",
-          "hover:shadow-2xl hover:scale-110 animate-pulse",
+          "hover:shadow-2xl hover:scale-110",
           isOpen && "rotate-180 scale-110",
-          !isOpen && "animate-pulse"
+          !isOpen && "animate-pulse-slow"
         )}
         size="lg"
       >
