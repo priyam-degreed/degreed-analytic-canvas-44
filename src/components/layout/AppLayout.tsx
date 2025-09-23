@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Menu, Bell, Search, User, ChevronLeft, ChevronRight } from "lucide-react";
 import { AppSidebar } from "./AppSidebar";
 import { AIStickyIcon } from "@/components/ai/AIStickyIcon";
-import { AIChatModal } from "@/components/ai/AIChatModal";
+import { AIAssistant } from "@/components/ai/AIAssistant";
 import { cn } from "@/lib/utils";
 
 export function AppLayout() {
@@ -59,7 +59,7 @@ export function AppLayout() {
         onClick={() => setAiChatOpen(!aiChatOpen)} 
         isOpen={aiChatOpen}
       />
-      <AIChatModal 
+      <AIAssistant 
         isOpen={aiChatOpen} 
         onClose={() => setAiChatOpen(false)} 
       />
