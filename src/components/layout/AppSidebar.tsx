@@ -1,6 +1,7 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { ShareDashboardDialog } from "@/components/dashboard/ShareDashboardDialog";
 import {
   BarChart3,
   BookOpen,
@@ -97,6 +98,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     "Analysis Template": false,
   });
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [selectedDashboard, setSelectedDashboard] = useState<Dashboard | null>(null);
   const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const isActive = (path: string) => location.pathname === path;
@@ -131,6 +134,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         break;
       case 'share':
         // Open share dialog
+        setSelectedDashboard(dashboard);
+        setShareDialogOpen(true);
         break;
       case 'export':
         // Trigger export functionality
@@ -369,6 +374,16 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
           </NavLink>
         </div>
       </div>
+
+      {/* Share Dashboard Dialog */}
+      <ShareDashboardDialog
+        isOpen={shareDialogOpen}
+        onClose={() => {
+          setShareDialogOpen(false);
+          setSelectedDashboard(null);
+        }}
+        dashboardName={selectedDashboard?.name || "Dashboard"}
+      />
     </div>
   );
 }
