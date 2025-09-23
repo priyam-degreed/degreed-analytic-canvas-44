@@ -13,8 +13,6 @@ export function AppLayout() {
 
   const tabs = [
     { value: "guidebook", label: "Guidebook", path: "/" },
-    { value: "explore", label: "Explore", path: "/explore" },
-    { value: "captures", label: "Captures", path: "/captures" },
     { value: "analyses", label: "Analyses", path: "/analyses" },
     { value: "search", label: "Search", path: "/search" }
   ];
@@ -24,8 +22,6 @@ export function AppLayout() {
     const path = location.pathname;
     
     // Check specific paths first (more specific matches)
-    if (path === "/explore") return "explore";
-    if (path === "/captures") return "captures";
     if (path === "/analyses") return "analyses";
     if (path === "/search") return "search";
     
