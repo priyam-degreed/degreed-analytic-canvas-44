@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -88,6 +88,7 @@ const navigationItems = [
 
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "Overview": false,
     "Learning Overview Dashboard": false,
@@ -125,7 +126,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     // Implement actual functionality here based on action
     switch (action) {
       case 'edit':
-        // Navigate to edit mode or open edit dialog
+        // Navigate to edit mode
+        navigate(`/dashboard-builder/${dashboard.id}/edit`);
         break;
       case 'share':
         // Open share dialog
@@ -194,6 +196,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 size="sm"
                 className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
                 title="Create Dashboard"
+                onClick={() => navigate('/dashboard-builder')}
               >
                 <Plus className="h-3 w-3" />
               </Button>
