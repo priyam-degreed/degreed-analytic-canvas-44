@@ -56,39 +56,32 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Greeting */}
-          <div className="text-center">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Hi there,<br />How can I help you?
-            </h3>
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start"
-              size="sm"
-            >
-              <Search className="h-4 w-4 mr-2" />
-              Search for a dashboard or visualization
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start"
-              size="sm"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create a new visualization
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full justify-start"
-              size="sm"
-            >
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Answer a business question
-            </Button>
+          {/* Suggestions */}
+          <div>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Suggestions:</h3>
+            <div className="space-y-2">
+              <Button 
+                variant="outline" 
+                className="w-full text-left justify-start text-blue-600 bg-blue-50 border-blue-200 hover:bg-blue-100 h-auto py-3 px-4"
+                onClick={() => setQuery("What are the top 5 skills trending in Q3?")}
+              >
+                What are the top 5 skills trending in Q3?
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full text-left justify-start text-blue-600 bg-blue-50 border-blue-200 hover:bg-blue-100 h-auto py-3 px-4"
+                onClick={() => setQuery("Which content pathways have the highest completion rates?")}
+              >
+                Which content pathways have the highest completion rates?
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full text-left justify-start text-blue-600 bg-blue-50 border-blue-200 hover:bg-blue-100 h-auto py-3 px-4"
+                onClick={() => setQuery("Show me the skill gaps for our engineering team vs market demand")}
+              >
+                Show me the skill gaps for our engineering team vs market demand
+              </Button>
+            </div>
           </div>
 
           {/* Input Field */}
