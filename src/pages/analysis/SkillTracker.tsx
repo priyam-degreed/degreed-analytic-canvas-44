@@ -69,9 +69,16 @@ const focusSkillBusinessUnits = [
 
 // Self Ratings Data
 const selfRatingsData = [
-  { name: 'Hotel One', rating: 1 },
-  { name: 'Unknown', rating: 4 },
-  { name: 'ExperienceUpdated', rating: 5 }
+  { name: 'Technology', rating: 4.2 },
+  { name: 'Metropolis', rating: 3.8 },
+  { name: 'Gotham City', rating: 4.1 },
+  { name: 'Central City', rating: 3.9 },
+  { name: 'Star City', rating: 4.3 },
+  { name: 'Coast City', rating: 3.7 },
+  { name: 'Midway City', rating: 4.0 },
+  { name: 'Hotel One', rating: 1.0 },
+  { name: 'Unknown', rating: 4.0 },
+  { name: 'ExperienceUpdated', rating: 5.0 }
 ];
 
 // Peer Ratings Data  
