@@ -3,8 +3,10 @@ import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Play, BookOpen, Star, TrendingUp, Users, Clock, Award, Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Play, BookOpen, Star, TrendingUp, Users, Clock, Award, Heart, Share, Edit, Download } from "lucide-react";
 import { contentPerformanceData } from "@/data/mockData";
+import { FilterBar } from "@/components/filters/FilterBar";
 import { 
   BarChart, 
   Bar, 
@@ -35,7 +37,29 @@ export default function ContentPerformance() {
             Analyze learning content usage, ratings, and effectiveness across modalities
           </p>
         </div>
+        
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm">
+            <Share className="h-4 w-4 mr-2" />
+            Share
+          </Button>
+          <Button variant="outline" size="sm">
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PDF
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PPT
+          </Button>
+        </div>
       </div>
+
+      {/* Filter Bar */}
+      <FilterBar />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

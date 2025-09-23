@@ -3,8 +3,9 @@ import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, AlertTriangle, Target, Brain, Award, Users, ArrowUp, ArrowDown } from "lucide-react";
+import { TrendingUp, AlertTriangle, Target, Brain, Award, Users, ArrowUp, ArrowDown, Share, Edit, Download } from "lucide-react";
 import { skillGrowthData, strategicOverviewData } from "@/data/mockData";
+import { FilterBar } from "@/components/filters/FilterBar";
 import { 
   BarChart, 
   Bar, 
@@ -43,7 +44,29 @@ export default function SkillInsights() {
             Analyze skill development, gaps, and market alignment across your workforce
           </p>
         </div>
+        
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm">
+            <Share className="h-4 w-4 mr-2" />
+            Share
+          </Button>
+          <Button variant="outline" size="sm">
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PDF
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PPT
+          </Button>
+        </div>
       </div>
+
+      {/* Filter Bar */}
+      <FilterBar />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

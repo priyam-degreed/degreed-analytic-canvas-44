@@ -3,7 +3,8 @@ import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Users, Target, Heart, Clock, Award } from "lucide-react";
+import { TrendingUp, Users, Target, Heart, Clock, Award, Share, Edit, Download } from "lucide-react";
+import { FilterBar } from "@/components/filters/FilterBar";
 
 export default function EngagementOverviewDashboard() {
   return (
@@ -16,7 +17,29 @@ export default function EngagementOverviewDashboard() {
             Monitor learner engagement and interaction patterns across the platform
           </p>
         </div>
+        
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm">
+            <Share className="h-4 w-4 mr-2" />
+            Share
+          </Button>
+          <Button variant="outline" size="sm">
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PDF
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PPT
+          </Button>
+        </div>
       </div>
+
+      {/* Filter Bar */}
+      <FilterBar />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

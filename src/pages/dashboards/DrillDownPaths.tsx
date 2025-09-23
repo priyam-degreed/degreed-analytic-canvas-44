@@ -3,7 +3,8 @@ import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Users, Target, ArrowDown, Filter, Search, BarChart3 } from "lucide-react";
+import { TrendingUp, Users, Target, ArrowDown, Filter, Search, BarChart3, Share, Edit, Download } from "lucide-react";
+import { FilterBar } from "@/components/filters/FilterBar";
 
 export default function DrillDownPaths() {
   return (
@@ -16,7 +17,29 @@ export default function DrillDownPaths() {
             Explore detailed learning pathways and progression analytics
           </p>
         </div>
+        
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm">
+            <Share className="h-4 w-4 mr-2" />
+            Share
+          </Button>
+          <Button variant="outline" size="sm">
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PDF
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PPT
+          </Button>
+        </div>
       </div>
+
+      {/* Filter Bar */}
+      <FilterBar />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

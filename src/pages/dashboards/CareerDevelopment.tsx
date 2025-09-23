@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Users, Award, Target, ArrowUpRight, CheckCircle, Clock, Briefcase } from "lucide-react";
+import { TrendingUp, Users, Award, Target, ArrowUpRight, CheckCircle, Clock, Briefcase, Share, Edit, Download } from "lucide-react";
 import { careerDevelopmentData } from "@/data/mockData";
+import { FilterBar } from "@/components/filters/FilterBar";
 import { 
   BarChart, 
   Bar, 
@@ -42,7 +43,29 @@ export default function CareerDevelopment() {
             Track career progression, internal mobility, and professional growth across your organization
           </p>
         </div>
+        
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm">
+            <Share className="h-4 w-4 mr-2" />
+            Share
+          </Button>
+          <Button variant="outline" size="sm">
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PDF
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PPT
+          </Button>
+        </div>
       </div>
+
+      {/* Filter Bar */}
+      <FilterBar />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
