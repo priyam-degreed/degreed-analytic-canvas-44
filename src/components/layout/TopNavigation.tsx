@@ -2,66 +2,39 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  ChevronDown,
-  Search,
-  Bell,
-  User,
-  Settings,
-  HelpCircle,
-  LogOut,
-  BarChart3,
-  Database,
-  TrendingUp,
-  Activity
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Search, Bell, User, Settings, HelpCircle, LogOut, BarChart3, Database, TrendingUp, Activity } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-
 export function TopNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
-
-  const navigationItems = [
-    {
-      id: "dashboards",
-      label: "Dashboards",
-      icon: BarChart3,
-      path: "/",
-      active: location.pathname === "/" || location.pathname.startsWith("/dashboards")
-    },
-    {
-      id: "analyze", 
-      label: "Analyze",
-      icon: TrendingUp,
-      path: "/analyses",
-      active: location.pathname.startsWith("/analyses")
-    },
-    {
-      id: "metrics",
-      label: "Metrics", 
-      icon: Activity,
-      path: "/metrics",
-      active: location.pathname.startsWith("/metrics")
-    }
-  ];
-
+  const navigationItems = [{
+    id: "dashboards",
+    label: "Dashboards",
+    icon: BarChart3,
+    path: "/",
+    active: location.pathname === "/" || location.pathname.startsWith("/dashboards")
+  }, {
+    id: "analyze",
+    label: "Analyze",
+    icon: TrendingUp,
+    path: "/analyses",
+    active: location.pathname.startsWith("/analyses")
+  }, {
+    id: "metrics",
+    label: "Metrics",
+    icon: Activity,
+    path: "/metrics",
+    active: location.pathname.startsWith("/metrics")
+  }];
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
-
-  return (
-    <nav className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-50 shadow-sm">
+  return <nav className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-50 shadow-sm">
       <div className="flex items-center justify-between">
         {/* Left Section - Logo and Navigation */}
         <div className="flex items-center space-x-8">
@@ -79,25 +52,13 @@ export function TopNavigation() {
 
           {/* Navigation Menu */}
           <div className="flex items-center space-x-1">
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Button
-                  key={item.id}
-                  variant="ghost"
-                  className={cn(
-                    "flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-colors",
-                    item.active
-                      ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  )}
-                  onClick={() => navigate(item.path)}
-                >
+            {navigationItems.map(item => {
+            const Icon = item.icon;
+            return <Button key={item.id} variant="ghost" className={cn("flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-colors", item.active ? "text-blue-600 bg-blue-50 hover:bg-blue-100" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100")} onClick={() => navigate(item.path)}>
                   <Icon className="h-4 w-4" />
                   <span>{item.label}</span>
-                </Button>
-              );
-            })}
+                </Button>;
+          })}
           </div>
         </div>
 
@@ -106,30 +67,17 @@ export function TopNavigation() {
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              type="search"
-              placeholder="Search dashboards, metrics..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-80 bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            <Input type="search" placeholder="Search dashboards, metrics..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-4 py-2 w-80 bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
             <kbd className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium text-muted-foreground">
               Ctrl K
             </kbd>
           </form>
 
           {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="h-5 w-5 text-gray-600" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-              3
-            </span>
-          </Button>
+          
 
           {/* Help */}
-          <Button variant="ghost" size="sm">
-            <HelpCircle className="h-5 w-5 text-gray-600" />
-          </Button>
+          
 
           {/* User Profile Dropdown */}
           <DropdownMenu>
@@ -165,6 +113,5 @@ export function TopNavigation() {
           </DropdownMenu>
         </div>
       </div>
-    </nav>
-  );
+    </nav>;
 }
