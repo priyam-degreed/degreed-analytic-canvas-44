@@ -90,7 +90,7 @@ export function AppLayout() {
       </header>
 
       {/* Main Tab Navigation */}
-      <div className="border-b bg-background">
+      <div className="sticky top-16 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="px-6">
           <Tabs value={getActiveTab()} onValueChange={handleTabChange} className="w-full">
             <TabsList className="h-12 w-full justify-start bg-transparent p-0 border-b-0">
