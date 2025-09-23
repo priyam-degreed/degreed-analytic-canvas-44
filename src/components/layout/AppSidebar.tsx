@@ -55,6 +55,12 @@ const navigationItems = [
     ]
   },
   {
+    title: "Analysis Template",
+    items: [
+      { name: "Skill Tracker", path: "/analysis/skill-tracker", icon: PieChart },
+    ]
+  },
+  {
     title: "AI Assistant",
     items: [
       { name: "AI Insights", path: "/ai/insights", icon: Brain },

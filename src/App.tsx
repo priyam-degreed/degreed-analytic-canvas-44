@@ -9,6 +9,7 @@ import StrategicOverview from "./pages/overview/StrategicOverview";
 import ExecutiveOverview from "./pages/learning/ExecutiveOverview";
 import SkillsAdoption from "./pages/skills/SkillsAdoption";
 import AIInsights from "./pages/ai/AIInsights";
+import SkillTracker from "./pages/analysis/SkillTracker";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="skills/planning" element={<Dashboard />} />
             <Route path="ai/insights" element={<AIInsights />} />
             <Route path="ai/search" element={<AIInsights />} />
+            <Route path="analysis/skill-tracker" element={<SkillTracker />} />
             <Route path="settings" element={<Dashboard />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
