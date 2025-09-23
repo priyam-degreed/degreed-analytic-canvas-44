@@ -70,7 +70,6 @@ export default function SkillInsights() {
           value={skillGrowthData.skillDecayAlerts.length.toString()}
           change={{ value: -12.4, type: "negative" }}
           icon={<AlertTriangle className="h-5 w-5" />}
-          isNegativeGood={true}
         />
       </div>
 

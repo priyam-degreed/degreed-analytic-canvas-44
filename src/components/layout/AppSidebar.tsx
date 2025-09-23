@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
   BarChart3,
@@ -18,7 +18,13 @@ import {
   Home,
   PieChart,
   Activity,
-  Plus
+  Plus,
+  MoreVertical,
+  Edit,
+  Share,
+  Download,
+  Trash2,
+  Copy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -27,6 +33,20 @@ interface AppSidebarProps {
   collapsed: boolean;
   onToggle: () => void;
 }
+
+interface Dashboard {
+  id: string;
+  name: string;
+  path: string;
+}
+
+const dashboards: Dashboard[] = [
+  { id: "01", name: "Learning Dashboard", path: "/dashboards/learning-engagement" },
+  { id: "02", name: "Skills Dashboard", path: "/dashboards/skill-insights" },
+  { id: "03", name: "Drill Down Paths", path: "/dashboards/drill-down" },
+  { id: "04", name: "Performance Dashboard", path: "/dashboards/content-performance" },
+  { id: "05", name: "Engagement Overview", path: "/dashboards/engagement-overview" }
+];
 
 const navigationItems = [
   {
@@ -83,6 +103,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     "Analysis Template": false,
     "AI Assistant": false,
   });
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const isActive = (path: string) => location.pathname === path;
   
@@ -98,6 +120,49 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   const isGroupActive = (group: typeof navigationItems[0]) => {
     return group.items.some(item => isActive(item.path));
   };
+
+  const handleMenuToggle = (dashboardId: string, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setOpenMenuId(openMenuId === dashboardId ? null : dashboardId);
+  };
+
+  const handleMenuAction = (action: string, dashboard: Dashboard) => {
+    console.log(`${action} dashboard:`, dashboard.name);
+    setOpenMenuId(null);
+    // Implement actual functionality here based on action
+    switch (action) {
+      case 'edit':
+        // Navigate to edit mode or open edit dialog
+        break;
+      case 'share':
+        // Open share dialog
+        break;
+      case 'export':
+        // Trigger export functionality
+        break;
+      case 'save-as-new':
+        // Create a copy of the dashboard
+        break;
+      case 'delete':
+        // Show confirmation dialog and delete
+        break;
+    }
+  };
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openMenuId && !Object.values(menuRefs.current).some(ref => ref?.contains(event.target as Node))) {
+        setOpenMenuId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openMenuId]);
 
   return (
     <div className={cn(
@@ -144,6 +209,91 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             )}
           </Button>
         </div>
+
+        {/* Dashboard List */}
+        {!collapsed && (
+          <div className="mb-6">
+            <h3 className="text-xs font-semibold text-muted-foreground mb-3 px-3 uppercase tracking-wider">
+              DASHBOARDS
+            </h3>
+            <div className="space-y-1">
+              {dashboards.map((dashboard) => (
+                <div key={dashboard.id} className="relative">
+                  <NavLink
+                    to={dashboard.path}
+                    className={({ isActive }) => cn(
+                      "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-fast group",
+                      isActive 
+                        ? "bg-primary text-primary-foreground shadow-primary font-medium" 
+                        : "text-foreground hover:bg-accent/50"
+                    )}
+                  >
+                    <BarChart3 className="h-4 w-4 shrink-0" />
+                    <span className="flex-1 font-medium">{dashboard.id} {dashboard.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/20",
+                        isActive(dashboard.path) && "text-primary-foreground hover:bg-white/20"
+                      )}
+                      onClick={(e) => handleMenuToggle(dashboard.id, e)}
+                    >
+                      <MoreVertical className="h-3 w-3" />
+                    </Button>
+                  </NavLink>
+                  
+                  {/* Dropdown Menu */}
+                  {openMenuId === dashboard.id && (
+                    <div
+                      ref={(el) => menuRefs.current[dashboard.id] = el}
+                      className="absolute right-3 top-full mt-1 w-40 bg-popover border border-border rounded-md shadow-lg z-50"
+                    >
+                      <div className="py-1">
+                        <button
+                          onClick={() => handleMenuAction('edit', dashboard)}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+                        >
+                          <Edit className="h-3 w-3" />
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleMenuAction('share', dashboard)}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+                        >
+                          <Share className="h-3 w-3" />
+                          Share
+                        </button>
+                        <button
+                          onClick={() => handleMenuAction('export', dashboard)}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+                        >
+                          <Download className="h-3 w-3" />
+                          Export
+                        </button>
+                        <button
+                          onClick={() => handleMenuAction('save-as-new', dashboard)}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+                        >
+                          <Copy className="h-3 w-3" />
+                          Save As New
+                        </button>
+                        <hr className="my-1 border-border" />
+                        <button
+                          onClick={() => handleMenuAction('delete', dashboard)}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors text-left"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Navigation Groups */}
         <div className="flex-1 space-y-2 overflow-y-auto">

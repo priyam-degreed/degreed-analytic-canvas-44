@@ -10,6 +10,12 @@ import ExecutiveOverview from "./pages/learning/ExecutiveOverview";
 import SkillsAdoption from "./pages/skills/SkillsAdoption";
 import AIInsights from "./pages/ai/AIInsights";
 import SkillTracker from "./pages/analysis/SkillTracker";
+import LearningEngagement from "./pages/dashboards/LearningEngagement";
+import SkillInsights from "./pages/dashboards/SkillInsights";
+import ContentPerformance from "./pages/dashboards/ContentPerformance";
+import CareerDevelopment from "./pages/dashboards/CareerDevelopment";
+import DrillDownPaths from "./pages/dashboards/DrillDownPaths";
+import EngagementOverviewDashboard from "./pages/dashboards/EngagementOverviewDashboard";
 import NotFound from "./pages/NotFound";
 import Explore from "./pages/Explore";
 import Captures from "./pages/Captures";
@@ -27,6 +33,14 @@ const App = () => (
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route index element={<Dashboard />} />
+            {/* Dashboard Routes */}
+            <Route path="dashboards/learning-engagement" element={<LearningEngagement />} />
+            <Route path="dashboards/skill-insights" element={<SkillInsights />} />
+            <Route path="dashboards/content-performance" element={<ContentPerformance />} />
+            <Route path="dashboards/career-development" element={<CareerDevelopment />} />
+            <Route path="dashboards/drill-down" element={<DrillDownPaths />} />
+            <Route path="dashboards/engagement-overview" element={<EngagementOverviewDashboard />} />
+            {/* Existing Routes */}
             <Route path="overview/strategic" element={<StrategicOverview />} />
             <Route path="overview/operational" element={<Dashboard />} />
             <Route path="learning/executive" element={<ExecutiveOverview />} />
