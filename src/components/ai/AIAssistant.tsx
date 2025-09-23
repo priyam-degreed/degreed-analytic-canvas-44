@@ -465,7 +465,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                     ))}
                   </div>
 
-                  <div className="pt-4">
+                  {/* <div className="pt-4">
                     <p className="text-sm font-medium text-gray-700 mb-2">Answer a business question</p>
                     <div className="space-y-2">
                       {sampleQueries.slice(0, 2).map((sample, idx) => (
@@ -478,7 +478,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                         </button>
                       ))}
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               )}
 
