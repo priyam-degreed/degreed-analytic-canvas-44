@@ -25,7 +25,10 @@ export function AppLayout() {
         />
         
         {/* Main Content */}
-        <main className="flex-1 p-6">
+        <main className={cn(
+          "flex-1 p-6 transition-all duration-300 ease-in-out",
+          sidebarCollapsed ? "ml-16" : "ml-64"
+        )}>
           <Outlet />
         </main>
       </div>
