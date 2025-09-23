@@ -43,7 +43,7 @@ const navigationItems = [
     ]
   },
   {
-    title: "Skills Analytics", 
+    title: "Guided Analysis",
     items: [
       { name: "Skills Adoption", path: "/skills/adoption", icon: Target },
       { name: "Skills Planning", path: "/skills/planning", icon: Calendar },
