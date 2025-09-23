@@ -75,8 +75,8 @@ const navigationItems = [
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   const location = useLocation();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    "Overview": true,
-    "Learning Overview Dashboard": true,
+    "Overview": false,
+    "Learning Overview Dashboard": false,
     "Learning Guided Insights": false,
     "Guided Analysis": false,
     "Analysis Template": false,
@@ -152,14 +152,14 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 {!collapsed ? (
                   <CollapsibleTrigger asChild>
                     <button className={cn(
-                      "flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors",
+                      "flex items-center gap-2 w-full px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors text-left",
                       isGroupActive(group) && "text-primary"
                     )}>
-                      <span>{group.title}</span>
                       <ChevronDown className={cn(
-                        "h-3 w-3 transition-transform",
+                        "h-3 w-3 transition-transform shrink-0",
                         openGroups[group.title] ? "rotate-180" : ""
                       )} />
+                      <span>{group.title}</span>
                     </button>
                   </CollapsibleTrigger>
                 ) : (
