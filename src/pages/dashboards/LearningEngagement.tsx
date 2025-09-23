@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, Clock, BookOpen, Play, Award, Target, Share, Edit, Download } from "lucide-react";
 import { learningEngagementData } from "@/data/mockData";
 import { FilterBar } from "@/components/filters/FilterBar";
-import degreedIcon from "@/assets/degreed-icon.png";
 import { 
   AreaChart, 
   Area, 
@@ -28,11 +27,8 @@ export default function LearningEngagement() {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-3xl font-bold">Learning Engagement</h1>
-          <img src={degreedIcon} alt="Degreed" className="h-8 w-8" />
-        </div>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-bold">Learning Engagement</h1>
+        <p className="text-muted-foreground mt-1">
           Track learning activity, participation, and engagement across your organization
         </p>
       </div>
