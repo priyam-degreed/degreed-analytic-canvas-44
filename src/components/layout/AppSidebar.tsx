@@ -124,22 +124,6 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
 
       {/* Navigation Content */}
       <div className="flex flex-col h-full p-3 gap-2">
-        {/* Home/Dashboard Link */}
-        <NavLink
-          to="/"
-          className={({ isActive }) => cn(
-            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-fast",
-            "hover:bg-accent/50",
-            isActive ? "bg-primary text-primary-foreground shadow-primary" : "text-foreground",
-            collapsed && "justify-center px-2"
-          )}
-        >
-          <Home className="h-5 w-5 shrink-0" />
-          {!collapsed && <span>Dashboard</span>}
-        </NavLink>
-
-        <div className="h-px bg-border my-2" />
-
         {/* Navigation Groups */}
         <div className="flex-1 space-y-2 overflow-y-auto">
           {navigationItems.map((group) => (
