@@ -182,8 +182,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         </Button>
       </div>
 
-      {/* Navigation Content */}
-      <div className="flex flex-col h-full p-3 gap-2">
+      {/* Navigation Content - positioned below navbar */}
+      <div className="flex flex-col h-full pt-3 p-3 gap-2 mt-16">
         {/* Dashboard List */}
         {!collapsed && (
           <div className="mb-6">
