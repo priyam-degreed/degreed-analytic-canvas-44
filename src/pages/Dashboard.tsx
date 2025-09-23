@@ -1,7 +1,7 @@
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Button } from "@/components/ui/button";
-import { Calendar, Filter, Download, TrendingUp, Users, Target, BookOpen } from "lucide-react";
+import { Calendar, Filter, Download, TrendingUp, Users, Target, BookOpen, Share, Edit } from "lucide-react";
 import { 
   strategicOverviewData, 
   learningOverviewData, 
@@ -88,16 +88,20 @@ export default function Dashboard() {
         
         <div className="flex items-center gap-3">
           <Button variant="outline" size="sm">
-            <Calendar className="h-4 w-4 mr-2" />
-            Last 30 days
+            <Share className="h-4 w-4 mr-2" />
+            Share
           </Button>
           <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
-            Filters
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
           </Button>
           <Button variant="default" size="sm">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            Export PDF
+          </Button>
+          <Button variant="default" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export PPT
           </Button>
         </div>
       </div>

@@ -17,7 +17,8 @@ import {
   ChevronDown,
   Home,
   PieChart,
-  Activity
+  Activity,
+  Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -100,7 +101,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
 
   return (
     <div className={cn(
-      "fixed left-0 top-28 h-[calc(100vh-7rem)] bg-card border-r border-border transition-all duration-300 ease-in-out z-40",
+      "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-card border-r border-border transition-all duration-300 ease-in-out z-40",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Toggle Button */}
@@ -124,6 +125,26 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
 
       {/* Navigation Content */}
       <div className="flex flex-col h-full p-3 gap-2">
+        {/* Create Dashboard Button */}
+        <div className="mb-4">
+          <Button 
+            className={cn(
+              "w-full justify-start bg-primary hover:bg-primary/90 text-primary-foreground",
+              collapsed && "justify-center px-2"
+            )}
+            title={collapsed ? "Create Dashboard" : undefined}
+          >
+            {collapsed ? (
+              <Plus className="h-4 w-4" />
+            ) : (
+              <>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Dashboard
+              </>
+            )}
+          </Button>
+        </div>
+
         {/* Navigation Groups */}
         <div className="flex-1 space-y-2 overflow-y-auto">
           {navigationItems.map((group) => (

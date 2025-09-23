@@ -73,27 +73,6 @@ export function AppLayout() {
         </div>
       </header>
 
-      {/* Main Tab Navigation */}
-      <div className="sticky top-16 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="px-6">
-          <Tabs value={getActiveTab()} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="h-12 w-full justify-start bg-transparent p-0 border-b-0">
-              {tabs.map((tab) => (
-                <TabsTrigger
-                  key={tab.value}
-                  value={tab.value}
-                  className={cn(
-                    "relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-6 font-medium text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none",
-                    getActiveTab() === tab.value && "border-primary text-foreground"
-                  )}
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
-      </div>
 
       <div className="flex">
         {/* Sidebar - only show for Guidebook tab */}
@@ -107,7 +86,7 @@ export function AppLayout() {
         {/* Main Content */}
         <main className={cn(
           "flex-1 transition-all duration-300 ease-in-out",
-          "min-h-[calc(100vh-8rem)]", // Account for header and tab height
+          "min-h-[calc(100vh-4rem)]", // Account for header height only
           getActiveTab() === "guidebook" ? (sidebarCollapsed ? "ml-16" : "ml-64") : "ml-0"
         )}>
           <div className="p-6">
