@@ -163,27 +163,27 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
       "fixed left-0 top-0 h-screen bg-card border-r border-border transition-all duration-300 ease-in-out z-30",
       collapsed ? "w-16" : "w-64"
     )}>
-      {/* Toggle Button */}
-      <div className="hidden md:block">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggle}
-          className={cn(
-            "absolute -right-3 top-4 z-50 h-6 w-6 rounded-full border bg-background shadow-md transition-fast",
-            "hover:bg-accent"
-          )}
-        >
-          {collapsed ? (
-            <ChevronRight className="h-3 w-3" />
-          ) : (
-            <ChevronLeft className="h-3 w-3" />
-          )}
-        </Button>
-      </div>
+      {/* Toggle Button - Enhanced visibility and positioning */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onToggle}
+        className={cn(
+          "absolute -right-4 top-20 z-50 h-8 w-8 rounded-full bg-white shadow-lg transition-all duration-200",
+          "hover:bg-gray-50 hover:shadow-xl border-2 border-gray-300 hover:border-primary",
+          "flex items-center justify-center"
+        )}
+        title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+      >
+        {collapsed ? (
+          <ChevronRight className="h-4 w-4 text-gray-700" />
+        ) : (
+          <ChevronLeft className="h-4 w-4 text-gray-700" />
+        )}
+      </Button>
 
-      {/* Navigation Content - positioned below navbar */}
-      <div className="flex flex-col h-full pt-3 p-3 gap-2 mt-16">
+      {/* Navigation Content - positioned below navbar with better spacing */}
+      <div className="flex flex-col h-full pt-24 p-3 gap-2">
         {/* Dashboard List */}
         {!collapsed && (
           <div className="mb-6">
@@ -347,19 +347,24 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
           ))}
         </div>
 
-        {/* Settings */}
-        <div className="border-t pt-3">
+        {/* Settings - Enhanced visibility with better styling */}
+        <div className="border-t pt-4 mt-auto">
           <NavLink
             to="/settings"
             className={({ isActive }) => cn(
-              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-fast",
-              "hover:bg-accent/50",
-              isActive ? "bg-primary text-primary-foreground shadow-primary" : "text-foreground",
-              collapsed && "justify-center px-2"
+              "flex items-center gap-3 px-3 py-3 mx-1 rounded-lg text-sm font-medium transition-all duration-200 border",
+              "hover:bg-accent/70 hover:shadow-sm hover:border-gray-300",
+              isActive 
+                ? "bg-primary text-primary-foreground shadow-md border-primary/30" 
+                : "text-foreground border-transparent hover:border-gray-200 bg-gray-50/50",
+              collapsed && "justify-center px-2 mx-2"
             )}
             title={collapsed ? "Settings" : undefined}
           >
-            <Settings className="h-4 w-4 shrink-0" />
+            <Settings className={cn(
+              "h-4 w-4 shrink-0",
+              isActive(location.pathname) && location.pathname === "/settings" ? "text-primary-foreground" : "text-gray-600"
+            )} />
             {!collapsed && <span>Settings</span>}
           </NavLink>
         </div>
