@@ -82,17 +82,17 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (isOpen && chatMessages.length === 0) {
-      // Initialize with welcome message
-      setChatMessages([{
-        id: '1',
-        type: 'assistant',
-        content: 'Hi there,\n\nHow can I help you?',
-        timestamp: new Date()
-      }]);
-    }
-  }, [isOpen]);
+  // useEffect(() => {
+  //   if (isOpen && chatMessages.length === 0) {
+  //     // Initialize with welcome message
+  //     setChatMessages([{
+  //       id: '1',
+  //       type: 'assistant',
+  //       content: 'Hi there,\n\nHow can I help you?',
+  //       timestamp: new Date()
+  //     }]);
+  //   }
+  // }, [isOpen]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
