@@ -402,16 +402,16 @@ export default function SkillTracker() {
                 <p className="text-xs text-muted-foreground">Sep 2025</p>
               </CardHeader>
               <CardContent className="pb-4">
-                <ResponsiveContainer width="100%" height={200}>
+                <ResponsiveContainer width="100%" height={350}>
                   <BarChart 
                     data={selfRatingsData} 
                     layout="horizontal"
-                    margin={{ top: 10, right: 20, left: 100, bottom: 10 }}
+                    margin={{ top: 10, right: 30, left: 120, bottom: 10 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis 
                       type="number" 
-                      domain={[0, 5]}
+                      domain={[0, 6]}
                       fontSize={10}
                       tick={{ fill: '#64748b' }}
                       axisLine={{ stroke: '#e2e8f0' }}
@@ -422,7 +422,7 @@ export default function SkillTracker() {
                       fontSize={10}
                       tick={{ fill: '#64748b' }}
                       axisLine={{ stroke: '#e2e8f0' }}
-                      width={95}
+                      width={115}
                     />
                     <Tooltip 
                       contentStyle={{ 
