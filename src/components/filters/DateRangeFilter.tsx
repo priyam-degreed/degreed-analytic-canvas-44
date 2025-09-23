@@ -1,8 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { ChevronDown, Calendar as CalendarIcon } from "lucide-react";
-import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronDown, Calendar as CalendarIcon, Clock } from "lucide-react";
+import { format, subDays, subWeeks, subMonths, subYears, subHours, subMinutes, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfDay, endOfDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 
@@ -11,88 +15,128 @@ interface DateRangeFilterProps {
   onChange: (range: DateRange) => void;
 }
 
-const presets = [
-  {
-    label: "Last 7 Days",
-    getValue: () => ({
-      from: subDays(new Date(), 6),
-      to: new Date()
-    })
-  },
-  {
-    label: "Last 30 Days",
-    getValue: () => ({
-      from: subDays(new Date(), 29),
-      to: new Date()
-    })
-  },
-  {
-    label: "Last 90 Days",
-    getValue: () => ({
-      from: subDays(new Date(), 89),
-      to: new Date()
-    })
-  },
-  {
-    label: "This Week",
-    getValue: () => ({
-      from: startOfWeek(new Date()),
-      to: endOfWeek(new Date())
-    })
-  },
-  {
-    label: "This Month",
-    getValue: () => ({
-      from: startOfMonth(new Date()),
-      to: endOfMonth(new Date())
-    })
-  },
-  {
-    label: "This Year",
-    getValue: () => ({
-      from: startOfYear(new Date()),
-      to: endOfYear(new Date())
-    })
-  }
+type PeriodType = "all-time" | "static" | "relative";
+
+interface RelativePeriod {
+  label: string;
+  category: string;
+  getValue: () => DateRange;
+}
+
+const relativePeriods: RelativePeriod[] = [
+  // YEAR
+  { label: "This year", category: "YEAR", getValue: () => ({ from: startOfYear(new Date()), to: endOfYear(new Date()) }) },
+  { label: "Last year", category: "YEAR", getValue: () => ({ from: startOfYear(subYears(new Date(), 1)), to: endOfYear(subYears(new Date(), 1)) }) },
+  
+  // QUARTER
+  { label: "This quarter", category: "QUARTER", getValue: () => ({ from: startOfMonth(new Date()), to: endOfMonth(new Date()) }) },
+  { label: "Last quarter", category: "QUARTER", getValue: () => ({ from: startOfMonth(subMonths(new Date(), 3)), to: endOfMonth(subMonths(new Date(), 1)) }) },
+  { label: "Last 4 quarters", category: "QUARTER", getValue: () => ({ from: subMonths(new Date(), 12), to: new Date() }) },
+  
+  // MONTH
+  { label: "This month", category: "MONTH", getValue: () => ({ from: startOfMonth(new Date()), to: endOfMonth(new Date()) }) },
+  { label: "Last month", category: "MONTH", getValue: () => ({ from: startOfMonth(subMonths(new Date(), 1)), to: endOfMonth(subMonths(new Date(), 1)) }) },
+  { label: "Last 12 months", category: "MONTH", getValue: () => ({ from: subMonths(new Date(), 12), to: new Date() }) },
+  
+  // WEEK
+  { label: "This week", category: "WEEK", getValue: () => ({ from: startOfWeek(new Date()), to: endOfWeek(new Date()) }) },
+  { label: "Last week", category: "WEEK", getValue: () => ({ from: startOfWeek(subWeeks(new Date(), 1)), to: endOfWeek(subWeeks(new Date(), 1)) }) },
+  { label: "Last 2 weeks", category: "WEEK", getValue: () => ({ from: subWeeks(new Date(), 2), to: new Date() }) },
+  
+  // DAY
+  { label: "Today", category: "DAY", getValue: () => ({ from: startOfDay(new Date()), to: endOfDay(new Date()) }) },
+  { label: "Yesterday", category: "DAY", getValue: () => ({ from: startOfDay(subDays(new Date(), 1)), to: endOfDay(subDays(new Date(), 1)) }) },
+  { label: "Last 7 days", category: "DAY", getValue: () => ({ from: subDays(new Date(), 7), to: new Date() }) },
+  { label: "Last 30 days", category: "DAY", getValue: () => ({ from: subDays(new Date(), 30), to: new Date() }) },
+  { label: "Last 90 days", category: "DAY", getValue: () => ({ from: subDays(new Date(), 90), to: new Date() }) },
+  
+  // HOUR
+  { label: "Last hour", category: "HOUR", getValue: () => ({ from: subHours(new Date(), 1), to: new Date() }) },
+  { label: "Last 8 hours", category: "HOUR", getValue: () => ({ from: subHours(new Date(), 8), to: new Date() }) },
+  { label: "Last 12 hours", category: "HOUR", getValue: () => ({ from: subHours(new Date(), 12), to: new Date() }) },
+  { label: "Last 24 hours", category: "HOUR", getValue: () => ({ from: subHours(new Date(), 24), to: new Date() }) },
+  
+  // MINUTE
+  { label: "Last 15 minutes", category: "MINUTE", getValue: () => ({ from: subMinutes(new Date(), 15), to: new Date() }) },
+  { label: "Last 30 minutes", category: "MINUTE", getValue: () => ({ from: subMinutes(new Date(), 30), to: new Date() }) },
+  { label: "Last 45 minutes", category: "MINUTE", getValue: () => ({ from: subMinutes(new Date(), 45), to: new Date() }) },
+  { label: "Last 60 minutes", category: "MINUTE", getValue: () => ({ from: subMinutes(new Date(), 60), to: new Date() }) },
 ];
+
+const categories = ["YEAR", "QUARTER", "MONTH", "WEEK", "DAY", "HOUR", "MINUTE"];
 
 export function DateRangeFilter({ value, onChange }: DateRangeFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [periodType, setPeriodType] = useState<PeriodType>("relative");
   const [tempRange, setTempRange] = useState<DateRange>(value);
+  const [excludeOpenPeriod, setExcludeOpenPeriod] = useState(false);
+  const [startDate, setStartDate] = useState<Date | undefined>(value.from);
+  const [endDate, setEndDate] = useState<Date | undefined>(value.to);
+  const [startTime, setStartTime] = useState("00:00");
+  const [endTime, setEndTime] = useState("23:59");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const getDisplayText = () => {
+    if (periodType === "all-time") return "All time";
     if (!value.from) return "Last 30 Days";
     if (!value.to) return format(value.from, "PPP");
     
-    // Check if it matches a preset
-    const matchingPreset = presets.find(preset => {
-      const presetRange = preset.getValue();
-      return value.from?.getTime() === presetRange.from?.getTime() && 
-             value.to?.getTime() === presetRange.to?.getTime();
+    // Check if it matches a relative period
+    const matchingPeriod = relativePeriods.find(period => {
+      const periodRange = period.getValue();
+      return value.from?.getTime() === periodRange.from?.getTime() && 
+             value.to?.getTime() === periodRange.to?.getTime();
     });
     
-    if (matchingPreset) return matchingPreset.label;
+    if (matchingPeriod) return matchingPeriod.label;
     
     return `${format(value.from, "MMM d")} - ${format(value.to, "MMM d, yyyy")}`;
   };
 
-  const handlePresetClick = (preset: typeof presets[0]) => {
-    const range = preset.getValue();
+  const handlePeriodClick = (period: RelativePeriod) => {
+    const range = period.getValue();
     setTempRange(range);
-    onChange(range);
-    setIsOpen(false);
+    setStartDate(range.from);
+    setEndDate(range.to);
+  };
+
+  const handleStaticDateChange = () => {
+    if (startDate && endDate) {
+      // Combine date with time
+      const from = new Date(startDate);
+      const [startHours, startMinutes] = startTime.split(':').map(Number);
+      from.setHours(startHours, startMinutes);
+      
+      const to = new Date(endDate);
+      const [endHours, endMinutes] = endTime.split(':').map(Number);
+      to.setHours(endHours, endMinutes);
+      
+      setTempRange({ from, to });
+    }
   };
 
   const handleApply = () => {
-    onChange(tempRange);
+    if (periodType === "all-time") {
+      onChange({ from: undefined, to: undefined });
+    } else {
+      onChange(tempRange);
+    }
     setIsOpen(false);
   };
 
   const handleCancel = () => {
     setTempRange(value);
+    setStartDate(value.from);
+    setEndDate(value.to);
     setIsOpen(false);
   };
+
+  // Update static dates when they change
+  useEffect(() => {
+    if (periodType === "static") {
+      handleStaticDateChange();
+    }
+  }, [startDate, endDate, startTime, endTime, periodType]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -122,56 +166,170 @@ export function DateRangeFilter({ value, onChange }: DateRangeFilterProps) {
       </Button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-popover border border-border rounded-md shadow-lg z-50">
-          <div className="flex">
-            {/* Presets */}
-            <div className="w-48 p-3 border-r">
-              <h4 className="text-sm font-medium mb-2">Quick Select</h4>
-              <div className="space-y-1">
-                {presets.map((preset) => (
-                  <Button
-                    key={preset.label}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handlePresetClick(preset)}
-                    className="w-full justify-start text-sm h-8"
-                  >
-                    {preset.label}
-                  </Button>
-                ))}
+        <div className="absolute top-full left-0 mt-1 bg-popover border border-border rounded-md shadow-lg z-50 w-96">
+          <div className="p-4">
+            {/* Period Type Selection */}
+            <div className="space-y-3 mb-4">
+              <div className="flex flex-col space-y-2">
+                <Button
+                  variant={periodType === "all-time" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setPeriodType("all-time")}
+                  className="w-full justify-start"
+                >
+                  All time
+                </Button>
+                <Button
+                  variant={periodType === "static" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setPeriodType("static")}
+                  className="w-full justify-start"
+                >
+                  Static period
+                </Button>
+                <Button
+                  variant={periodType === "relative" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setPeriodType("relative")}
+                  className="w-full justify-start text-blue-600"
+                >
+                  Relative period
+                </Button>
               </div>
             </div>
 
-            {/* Calendar */}
-            <div className="p-3">
-              <div className="mb-3">
-                <h4 className="text-sm font-medium mb-2">Custom Range</h4>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CalendarIcon className="h-4 w-4" />
-                  <span>
-                    {tempRange.from ? format(tempRange.from, "MMM d, yyyy") : "Start date"} - {" "}
-                    {tempRange.to ? format(tempRange.to, "MMM d, yyyy") : "End date"}
-                  </span>
+            {/* Static Period Content */}
+            {periodType === "static" && (
+              <div className="space-y-4 mb-4">
+                <Tabs defaultValue="months" className="w-full">
+                  <TabsList className="grid w-full grid-cols-7 text-xs">
+                    <TabsTrigger value="years">Years</TabsTrigger>
+                    <TabsTrigger value="quarters">Quarters</TabsTrigger>
+                    <TabsTrigger value="months">Months</TabsTrigger>
+                    <TabsTrigger value="weeks">Weeks</TabsTrigger>
+                    <TabsTrigger value="days">Days</TabsTrigger>
+                    <TabsTrigger value="hours">Hours</TabsTrigger>
+                    <TabsTrigger value="minutes">Minutes</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-sm">Period start</Label>
+                      <Input placeholder="Type or select" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label className="text-sm">Period end</Label>
+                      <Input placeholder="Type or select" className="mt-1" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-sm">Start date</Label>
+                        <div className="relative mt-1">
+                          <Input
+                            type="date"
+                            value={startDate ? format(startDate, "yyyy-MM-dd") : ""}
+                            onChange={(e) => setStartDate(e.target.value ? new Date(e.target.value) : undefined)}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-sm">Start time</Label>
+                        <div className="relative mt-1">
+                          <Input
+                            type="time"
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-sm">End date</Label>
+                        <div className="relative mt-1">
+                          <Input
+                            type="date"
+                            value={endDate ? format(endDate, "yyyy-MM-dd") : ""}
+                            onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : undefined)}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-sm">End time</Label>
+                        <div className="relative mt-1">
+                          <Input
+                            type="time"
+                            value={endTime}
+                            onChange={(e) => setEndTime(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <div>Use date format M/d/y</div>
+                      <div>Use time format HH:MM, max value is 23:59</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-              <Calendar
-                mode="range"
-                selected={tempRange}
-                onSelect={(range) => setTempRange(range || { from: undefined, to: undefined })}
-                numberOfMonths={2}
-                className="pointer-events-auto"
-              />
+            )}
 
-              {/* Actions */}
-              <div className="flex justify-end space-x-2 pt-3 border-t mt-3">
-                <Button variant="outline" size="sm" onClick={handleCancel}>
-                  Cancel
-                </Button>
-                <Button size="sm" onClick={handleApply}>
-                  Apply
-                </Button>
+            {/* Relative Period Content */}
+            {periodType === "relative" && (
+              <div className="space-y-4 mb-4 max-h-80 overflow-y-auto">
+                {categories.map((category) => {
+                  const categoryPeriods = relativePeriods.filter(p => p.category === category);
+                  if (categoryPeriods.length === 0) return null;
+                  
+                  return (
+                    <div key={category}>
+                      <h5 className="text-xs font-medium text-muted-foreground mb-2">{category}</h5>
+                      <div className="space-y-1">
+                        {categoryPeriods.map((period) => (
+                          <Button
+                            key={period.label}
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handlePeriodClick(period)}
+                            className="w-full justify-start text-sm h-8"
+                          >
+                            {period.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            )}
+
+            {/* Exclude Open Period */}
+            <div className="flex items-center space-x-2 mb-4">
+              <Checkbox
+                id="exclude-open"
+                checked={excludeOpenPeriod}
+                onCheckedChange={(checked) => setExcludeOpenPeriod(checked as boolean)}
+              />
+              <Label htmlFor="exclude-open" className="text-sm">
+                Exclude open period
+              </Label>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end space-x-2 pt-3 border-t">
+              <Button variant="outline" size="sm" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleApply}>
+                Apply
+              </Button>
             </div>
           </div>
         </div>
