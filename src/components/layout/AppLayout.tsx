@@ -12,25 +12,13 @@ export function AppLayout() {
   const navigate = useNavigate();
 
   const tabs = [
-    { value: "guidebook", label: "Guidebook", path: "/" },
-    { value: "analyses", label: "Analyses", path: "/analyses" },
-    { value: "search", label: "Search", path: "/search" }
+    { value: "guidebook", label: "Guidebook", path: "/" }
   ];
 
   // Determine active tab based on current path
   const getActiveTab = () => {
-    const path = location.pathname;
-    
-    // Check specific paths first (more specific matches)
-    if (path === "/analyses") return "analyses";
-    if (path === "/search") return "search";
-    
-    // Default to guidebook for root path and all dashboard-related paths
-    if (path === "/" || path.startsWith("/overview") || path.startsWith("/learning") || path.startsWith("/skills") || path.startsWith("/ai") || path.startsWith("/analysis") || path.startsWith("/settings")) {
-      return "guidebook";
-    }
-    
-    return "guidebook"; // fallback
+    // Only guidebook tab exists now
+    return "guidebook";
   };
 
   const handleTabChange = (value: string) => {
