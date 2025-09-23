@@ -10,7 +10,7 @@ interface CanvasProps {
 
 function CanvasComponent({ component, onRemove }: { component: any; onRemove: () => void }) {
   const getIcon = () => {
-    switch (component.id || component.componentType) {
+    switch (component.componentType || component.id) {
       case "visualization":
       case "saved-visualization":
         return BarChart3;
@@ -27,30 +27,72 @@ function CanvasComponent({ component, onRemove }: { component: any; onRemove: ()
 
   const Icon = getIcon();
   const title = component.name || component.id;
+  const isRichText = component.componentType === "rich-text";
+  const isKPI = component.type === "KPI Metric";
 
   return (
-    <Card className="p-4 relative group hover:shadow-md transition-shadow">
+    <Card className={`relative group hover:shadow-md transition-shadow ${
+      isRichText ? 'p-4 bg-accent/30' : 'p-6'
+    } ${isKPI ? 'bg-primary/5' : ''}`}>
       <Button
         variant="ghost"
         size="sm"
-        className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity z-10"
         onClick={onRemove}
       >
         <X className="h-3 w-3" />
       </Button>
       
-      <div className="flex items-center gap-3">
-        <Icon className="h-8 w-8 text-muted-foreground" />
+      {isRichText ? (
         <div>
-          <h3 className="font-medium">{title}</h3>
-          {component.type && (
-            <p className="text-sm text-muted-foreground">{component.type}</p>
-          )}
+          <h3 className="font-semibold text-lg mb-2">{title}</h3>
           {component.description && (
-            <p className="text-xs text-muted-foreground mt-1">{component.description}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">{component.description}</p>
           )}
         </div>
-      </div>
+      ) : isKPI ? (
+        <div className="text-center">
+          <h3 className="font-medium text-sm text-muted-foreground mb-2">{title}</h3>
+          <div className="space-y-1">
+            <p className="text-3xl font-bold">{component.data?.value || "740"}</p>
+            {component.data?.change && (
+              <div className="flex items-center justify-center gap-1 text-sm">
+                <span className={component.data.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}>
+                  {component.data.change}
+                </span>
+                <span className="text-muted-foreground">{component.data.period}</span>
+              </div>
+            )}
+          </div>
+          {component.description && (
+            <p className="text-xs text-muted-foreground mt-3">{component.description}</p>
+          )}
+        </div>
+      ) : (
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <Icon className="h-8 w-8 text-primary" />
+            <div>
+              <h3 className="font-medium">{title}</h3>
+              {component.type && (
+                <p className="text-sm text-muted-foreground">{component.type}</p>
+              )}
+            </div>
+          </div>
+          
+          {/* Mock chart visualization */}
+          <div className="h-32 bg-gradient-to-br from-primary/10 to-primary/20 rounded border-2 border-dashed border-primary/30 flex items-center justify-center">
+            <div className="text-center">
+              <Icon className="h-8 w-8 text-primary mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">Chart Preview</p>
+            </div>
+          </div>
+          
+          {component.description && (
+            <p className="text-xs text-muted-foreground mt-3">{component.description}</p>
+          )}
+        </div>
+      )}
     </Card>
   );
 }

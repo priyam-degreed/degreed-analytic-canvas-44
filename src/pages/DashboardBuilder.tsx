@@ -7,6 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ComponentPanel } from "@/components/dashboard-builder/ComponentPanel";
 import { Canvas } from "@/components/dashboard-builder/Canvas";
+import { DateRangeFilter } from "@/components/filters/DateRangeFilter";
+import { MultiSelectFilter } from "@/components/filters/MultiSelectFilter";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -17,9 +19,56 @@ interface DashboardBuilderProps {
 
 export default function DashboardBuilder({ mode = "create", dashboardId }: DashboardBuilderProps) {
   const navigate = useNavigate();
-  const [dashboardName, setDashboardName] = useState(mode === "edit" ? "Existing Dashboard" : "");
+  const [dashboardName, setDashboardName] = useState(mode === "edit" ? "01 Learning Dashboard" : "");
   const [isPublic, setIsPublic] = useState(false);
-  const [canvasComponents, setCanvasComponents] = useState<any[]>([]);
+  
+  // Pre-populate with existing dashboard content when in edit mode
+  const [canvasComponents, setCanvasComponents] = useState<any[]>(
+    mode === "edit" ? [
+      {
+        id: 1,
+        componentType: "visualization",
+        name: "Learning Completions",
+        type: "KPI Metric",
+        description: "Total completions: 740",
+        data: { value: 740, change: "+19%", period: "vs last month" }
+      },
+      {
+        id: 2,
+        componentType: "visualization",
+        name: "Completions Trend",
+        type: "Bar Chart", 
+        description: "Learning completions by period"
+      },
+      {
+        id: 3,
+        componentType: "visualization",
+        name: "Learning Duration",
+        type: "KPI Metric",
+        description: "Average: 14d 22h",
+        data: { value: "14d 22h", change: "-55%", period: "vs baseline" }
+      },
+      {
+        id: 4,
+        componentType: "visualization", 
+        name: "Duration Heatmap",
+        type: "Heatmap",
+        description: "Learning duration by provider and content type"
+      },
+      {
+        id: 5,
+        componentType: "rich-text",
+        name: "Learning Completions",
+        description: "Which learning provider has gained the most usage in the selected date range?"
+      },
+      {
+        id: 6,
+        componentType: "rich-text", 
+        name: "Learning Duration Section",
+        description: "This section provides an overview of the learning duration estimates by content type and learning provider"
+      }
+    ] : []
+  );
 
   const handleSave = () => {
     if (!dashboardName.trim()) {
@@ -58,7 +107,7 @@ export default function DashboardBuilder({ mode = "create", dashboardId }: Dashb
       <div className="h-screen flex flex-col bg-background">
         {/* Top Bar */}
         <div className="border-b border-border bg-card px-6 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <Input
@@ -95,12 +144,46 @@ export default function DashboardBuilder({ mode = "create", dashboardId }: Dashb
               </Button>
             </div>
           </div>
+
+          {/* Filter Bar - only show in edit mode when there are existing components */}
+          {mode === "edit" && (
+            <div className="flex items-center gap-4">
+              <DateRangeFilter
+                value={{ from: new Date(), to: new Date() }}
+                onChange={() => {}}
+              />
+              <MultiSelectFilter
+                label="Content Type"
+                options={["All", "Video", "Article", "Pathway"]}
+                selected={[]}
+                onChange={() => {}}
+                placeholder="Content Type"
+              />
+              <MultiSelectFilter
+                label="Provider"
+                options={["All", "Degreed", "LinkedIn Learning", "Coursera"]}
+                selected={[]}
+                onChange={() => {}}
+                placeholder="Provider"
+              />
+              <MultiSelectFilter
+                label="Skills"
+                options={["All", "Leadership", "Technical", "Analytics"]}
+                selected={[]}
+                onChange={() => {}}
+                placeholder="Skills"
+              />
+            </div>
+          )}
         </div>
 
         {/* Main Content */}
         <div className="flex-1 flex">
           {/* Left Panel */}
-          <ComponentPanel onAddComponent={addComponentToCanvas} />
+          <ComponentPanel 
+            onAddComponent={addComponentToCanvas} 
+            showSavedVisualizations={true}
+          />
           
           {/* Canvas Area */}
           <Canvas 

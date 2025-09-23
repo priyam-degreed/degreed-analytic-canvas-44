@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 
 interface ComponentPanelProps {
   onAddComponent: (component: any) => void;
+  showSavedVisualizations?: boolean;
 }
 
 const componentTypes = [
@@ -44,7 +45,7 @@ const componentTypes = [
   }
 ];
 
-const savedVisualizations = [
+const savedVisualizationsList = [
   { id: 1, name: "Learning Completions", type: "Area Chart", date: "Oct 24, 2024" },
   { id: 2, name: "Content Overview", type: "Bar Chart", date: "Oct 18, 2024" },
   { id: 3, name: "Learning Insights", type: "Line Chart", date: "Oct 16, 2024" },
@@ -121,11 +122,12 @@ function DraggableVisualization({ visualization, onAdd }: { visualization: any; 
   );
 }
 
-export function ComponentPanel({ onAddComponent }: ComponentPanelProps) {
+
+export function ComponentPanel({ onAddComponent, showSavedVisualizations = false }: ComponentPanelProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSavedExpanded, setIsSavedExpanded] = useState(true);
 
-  const filteredVisualizations = savedVisualizations.filter(viz =>
+  const filteredVisualizations = savedVisualizationsList.filter(viz =>
     viz.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
