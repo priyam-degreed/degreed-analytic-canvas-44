@@ -21,6 +21,8 @@ import Explore from "./pages/Explore";
 import Captures from "./pages/Captures";
 import Analyses from "./pages/Analyses";
 import SearchPage from "./pages/SearchPage";
+import Metrics from "./pages/Metrics";
+import Data from "./pages/Data";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route index element={<Dashboard />} />
+            {/* Main Navigation Routes */}
+            <Route path="metrics" element={<Metrics />} />
+            <Route path="data" element={<Data />} />
             {/* Dashboard Routes */}
             <Route path="dashboards/learning-engagement" element={<LearningEngagement />} />
             <Route path="dashboards/skill-insights" element={<SkillInsights />} />
