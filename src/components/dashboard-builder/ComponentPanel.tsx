@@ -56,7 +56,7 @@ const savedVisualizationsList = [
 
 function DraggableComponent({ component, onAdd }: { component: any; onAdd: (comp: any) => void }) {
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'component',
+    type: component.id === 'visualization' ? 'visualization' : 'component',
     item: component,
     end: (item, monitor) => {
       const dropResult = monitor.getDropResult();
