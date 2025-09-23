@@ -89,8 +89,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         id: '1',
         type: 'assistant',
         content: 'Hi there,\n\nHow can I help you?',
-        timestamp: new Date(),
-        suggestions: sampleQueries.slice(0, 3)
+        timestamp: new Date()
       }]);
     }
   }, [isOpen]);
@@ -502,7 +501,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                     
                     {renderVisualization(message)}
                     
-                    {message.suggestions && message.suggestions.length > 0 && (
+                    {/* {message.suggestions && message.suggestions.length > 0 && (
                       <div className="space-y-2">
                         <p className="text-xs text-gray-500 font-medium">Suggestions:</p>
                         <div className="flex flex-wrap gap-2">
@@ -517,7 +516,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                           ))}
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
                   
                   {message.type === "user" && (
