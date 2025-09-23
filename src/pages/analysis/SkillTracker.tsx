@@ -69,16 +69,9 @@ const focusSkillBusinessUnits = [
 
 // Self Ratings Data
 const selfRatingsData = [
-  { name: 'Technology', rating: 4.2 },
-  { name: 'Metropolis', rating: 3.8 },
-  { name: 'Gotham City', rating: 4.1 },
-  { name: 'Central City', rating: 3.9 },
-  { name: 'Star City', rating: 4.3 },
-  { name: 'Coast City', rating: 3.7 },
-  { name: 'Midway City', rating: 4.0 },
-  { name: 'Hotel One', rating: 1.0 },
-  { name: 'Unknown', rating: 4.0 },
-  { name: 'ExperienceUpdated', rating: 5.0 }
+  { name: 'Hotel One', rating: 1 },
+  { name: 'Unknown', rating: 4 },
+  { name: 'ExperienceUpdated', rating: 5 }
 ];
 
 // Peer Ratings Data  
@@ -402,7 +395,7 @@ export default function SkillTracker() {
                 <p className="text-xs text-muted-foreground">Sep 2025</p>
               </CardHeader>
               <CardContent className="pb-4">
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height={250}>
                   <BarChart 
                     data={selfRatingsData} 
                     layout="horizontal"
@@ -411,7 +404,7 @@ export default function SkillTracker() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis 
                       type="number" 
-                      domain={[0, 6]}
+                      domain={[0, 5]}
                       fontSize={10}
                       tick={{ fill: '#64748b' }}
                       axisLine={{ stroke: '#e2e8f0' }}
@@ -431,7 +424,11 @@ export default function SkillTracker() {
                         borderRadius: '6px'
                       }}
                     />
-                    <Bar dataKey="rating" fill="#3b82f6" />
+                    <Bar 
+                      dataKey="rating" 
+                      fill="#60a5fa"
+                      label={{ position: 'right', fill: '#60a5fa', fontSize: 12, fontWeight: 'bold' }}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
                 <div className="text-center mt-6">
