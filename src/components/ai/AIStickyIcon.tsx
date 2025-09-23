@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Brain, MessageSquare, Sparkles, Search } from "lucide-react";
+import { MessageSquare, Sparkles, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AIStickyIconProps {
@@ -21,17 +21,16 @@ export function AIStickyIcon({ onClick, isOpen }: AIStickyIconProps) {
           "w-16 h-16 rounded-full shadow-xl transition-all duration-300 ease-out",
           "bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 hover:from-blue-600 hover:via-indigo-600 hover:to-purple-600",
           "hover:shadow-2xl hover:scale-110",
-          isOpen && "rotate-180 scale-110",
-          !isOpen && "animate-pulse-slow"
+          isOpen && "rotate-180 scale-110"
         )}
         size="lg"
       >
         {isOpen ? (
-          <MessageSquare className="h-8 w-8 text-white animate-pulse" />
+          <MessageSquare className="h-8 w-8 text-white" />
         ) : (
           <div className="relative">
-            <Brain className="h-8 w-8 text-white" />
-            <Sparkles className="h-4 w-4 text-white absolute -top-1 -right-1 animate-bounce" />
+            <MessageSquare className="h-8 w-8 text-white" />
+            <Sparkles className="h-4 w-4 text-white absolute -top-1 -right-1" />
           </div>
         )}
       </Button>
@@ -47,7 +46,7 @@ export function AIStickyIcon({ onClick, isOpen }: AIStickyIconProps) {
       
       {/* Floating action hints */}
       {!isOpen && (
-        <div className="absolute -top-12 -left-8 opacity-70 animate-bounce">
+        <div className="absolute -top-12 -left-8 opacity-70">
           <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full shadow-lg">
             <Search className="h-3 w-3 inline mr-1" />
             Ask me anything
