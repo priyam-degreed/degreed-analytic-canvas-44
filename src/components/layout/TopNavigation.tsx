@@ -68,7 +68,7 @@ export function TopNavigation() {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-30 shadow-sm">
+    <nav className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-50 shadow-sm">
       <div className="flex items-center justify-between">
         {/* Left Section - Logo and Navigation */}
         <div className="flex items-center space-x-8">

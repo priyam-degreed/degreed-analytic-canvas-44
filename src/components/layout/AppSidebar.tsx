@@ -160,7 +160,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
 
   return (
     <div className={cn(
-      "fixed left-0 top-0 h-screen bg-card border-r border-border transition-all duration-300 ease-in-out z-40",
+      "fixed left-0 top-0 h-screen bg-card border-r border-border transition-all duration-300 ease-in-out z-30",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Toggle Button */}
