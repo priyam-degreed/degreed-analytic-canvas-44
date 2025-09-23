@@ -26,32 +26,11 @@ export default function LearningEngagement() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Learning Engagement</h1>
-          <p className="text-muted-foreground mt-1">
-            Track learning activity, participation, and engagement across your organization
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm">
-            <Share className="h-4 w-4 mr-2" />
-            Share
-          </Button>
-          <Button variant="outline" size="sm">
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-          <Button variant="default" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export PDF
-          </Button>
-          <Button variant="default" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export PPT
-          </Button>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold">Learning Engagement</h1>
+        <p className="text-muted-foreground mt-1">
+          Track learning activity, participation, and engagement across your organization
+        </p>
       </div>
 
       {/* Filter Bar */}
