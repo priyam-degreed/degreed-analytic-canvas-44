@@ -22,11 +22,19 @@ export function AppLayout() {
   // Determine active tab based on current path
   const getActiveTab = () => {
     const path = location.pathname;
+    
+    // Check specific paths first (more specific matches)
+    if (path === "/explore") return "explore";
+    if (path === "/captures") return "captures";
+    if (path === "/analyses") return "analyses";
+    if (path === "/search") return "search";
+    
+    // Default to guidebook for root path and all dashboard-related paths
     if (path === "/" || path.startsWith("/overview") || path.startsWith("/learning") || path.startsWith("/skills") || path.startsWith("/ai") || path.startsWith("/analysis") || path.startsWith("/settings")) {
       return "guidebook";
     }
-    const matchingTab = tabs.find(tab => path.startsWith(tab.path));
-    return matchingTab?.value || "guidebook";
+    
+    return "guidebook"; // fallback
   };
 
   const handleTabChange = (value: string) => {
