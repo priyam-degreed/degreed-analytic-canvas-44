@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Sparkles, Search } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AIStickyIconProps {
@@ -25,34 +25,8 @@ export function AIStickyIcon({ onClick, isOpen }: AIStickyIconProps) {
         )}
         size="lg"
       >
-        {isOpen ? (
-          <MessageSquare className="h-8 w-8 text-white" />
-        ) : (
-          <div className="relative">
-            <MessageSquare className="h-8 w-8 text-white" />
-            <Sparkles className="h-4 w-4 text-white absolute -top-1 -right-1" />
-          </div>
-        )}
+        <Sparkles className="h-8 w-8 text-white" />
       </Button>
-      
-      {/* Tooltip */}
-      {isHovered && !isOpen && (
-        <div className="absolute bottom-full right-0 mb-3 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl whitespace-nowrap animate-fade-in">
-          <div className="font-medium">AI Analytics Assistant</div>
-          <div className="text-xs text-gray-300">Ask me about learning data</div>
-          <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
-        </div>
-      )}
-      
-      {/* Floating action hints */}
-      {!isOpen && (
-        <div className="absolute -top-12 -left-8 opacity-70">
-          <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full shadow-lg">
-            <Search className="h-3 w-3 inline mr-1" />
-            Ask me anything
-          </div>
-        </div>
-      )}
     </div>
   );
 }
