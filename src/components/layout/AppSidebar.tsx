@@ -83,13 +83,6 @@ const navigationItems = [
     items: [
       { name: "Skill Tracker", path: "/analysis/skill-tracker", icon: PieChart },
     ]
-  },
-  {
-    title: "AI Assistant",
-    items: [
-      { name: "AI Insights", path: "/ai/insights", icon: Brain },
-      { name: "Smart Search", path: "/ai/search", icon: MessageSquare },
-    ]
   }
 ];
 
@@ -101,7 +94,6 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     "Learning Guided Insights": false,
     "Guided Analysis": false,
     "Analysis Template": false,
-    "AI Assistant": false,
   });
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -166,7 +158,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
 
   return (
     <div className={cn(
-      "fixed left-0 top-16 h-[calc(100vh-4rem)] bg-card border-r border-border transition-all duration-300 ease-in-out z-40",
+      "fixed left-0 top-0 h-screen bg-card border-r border-border transition-all duration-300 ease-in-out z-40",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Toggle Button */}

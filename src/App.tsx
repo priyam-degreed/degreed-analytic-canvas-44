@@ -8,7 +8,6 @@ import Dashboard from "./pages/Dashboard";
 import StrategicOverview from "./pages/overview/StrategicOverview";
 import ExecutiveOverview from "./pages/learning/ExecutiveOverview";
 import SkillsAdoption from "./pages/skills/SkillsAdoption";
-import AIInsights from "./pages/ai/AIInsights";
 import SkillTracker from "./pages/analysis/SkillTracker";
 import LearningEngagement from "./pages/dashboards/LearningEngagement";
 import SkillInsights from "./pages/dashboards/SkillInsights";
@@ -50,8 +49,6 @@ const App = () => (
             <Route path="learning/operations" element={<Dashboard />} />
             <Route path="skills/adoption" element={<SkillsAdoption />} />
             <Route path="skills/planning" element={<Dashboard />} />
-            <Route path="ai/insights" element={<AIInsights />} />
-            <Route path="ai/search" element={<AIInsights />} />
             <Route path="analysis/skill-tracker" element={<SkillTracker />} />
             <Route path="settings" element={<Dashboard />} />
             <Route path="explore" element={<Explore />} />
