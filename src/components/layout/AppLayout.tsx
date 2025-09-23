@@ -13,24 +13,20 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Top Navigation */}
+      {/* Top Navigation - Fixed at top */}
       <TopNavigation />
       
+      {/* Content area with sidebar and main content */}
       <div className="flex-1 flex">
-        {/* Sidebar */}
+        {/* Sidebar - starts below navigation */}
         <AppSidebar 
           collapsed={sidebarCollapsed} 
           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
         
         {/* Main Content */}
-        <main className={cn(
-          "flex-1 transition-all duration-300",
-          sidebarCollapsed ? "ml-16" : "ml-64"
-        )}>
-          <div className="p-6">
-            <Outlet />
-          </div>
+        <main className="flex-1 p-6">
+          <Outlet />
         </main>
       </div>
 
