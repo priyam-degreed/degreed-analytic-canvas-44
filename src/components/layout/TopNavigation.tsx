@@ -53,9 +53,22 @@ export function TopNavigation() {
           {/* Navigation Menu */}
           <div className="flex items-center space-x-1">
             {navigationItems.map(item => {
-            const Icon = item.icon;
-            return;
-          })}
+              const Icon = item.icon;
+              return (
+                <Button
+                  key={item.id}
+                  variant={item.active ? "default" : "ghost"}
+                  className={cn(
+                    "flex items-center space-x-2 px-3 py-2",
+                    item.active ? "bg-blue-600 text-white" : "text-gray-700 hover:text-gray-900"
+                  )}
+                  onClick={() => navigate(item.path)}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="text-sm font-medium">{item.label}</span>
+                </Button>
+              );
+            })}
           </div>
         </div>
 

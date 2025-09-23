@@ -5,7 +5,7 @@ import {
   Search, 
   Plus,
   X,
-  Play,
+  MessageCircle,
   Send
 } from "lucide-react";
 
@@ -71,7 +71,7 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
               size="sm"
             >
               <Search className="h-4 w-4 mr-2" />
-              Search dashboards
+              Search for a dashboard or visualization
             </Button>
             <Button 
               variant="outline" 
@@ -79,22 +79,22 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
               size="sm"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Create visualization
+              Create a new visualization
             </Button>
             <Button 
               variant="outline" 
               className="w-full justify-start"
               size="sm"
             >
-              <Play className="h-4 w-4 mr-2" />
-              Take a Tour
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Answer a business question
             </Button>
           </div>
 
           {/* Input Field */}
           <div className="relative">
             <Input
-              placeholder="Ask me anything..."
+              placeholder="What is the number of returns for product category?"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -112,7 +112,7 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
 
           {/* Disclaimer */}
           <p className="text-xs text-gray-500 text-center">
-            AI can make mistakes. Check important info.
+            AI assistants can make mistakes. Check before relying on these answers.
           </p>
         </div>
       </div>
