@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   BarChart3,
@@ -13,11 +14,13 @@ import {
   Brain,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Home,
   PieChart,
   Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface AppSidebarProps {
   collapsed: boolean;
@@ -71,8 +74,29 @@ const navigationItems = [
 
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   const location = useLocation();
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    "Overview": true,
+    "Learning Overview Dashboard": true,
+    "Learning Guided Insights": false,
+    "Guided Analysis": false,
+    "Analysis Template": false,
+    "AI Assistant": false,
+  });
 
   const isActive = (path: string) => location.pathname === path;
+  
+  const toggleGroup = (groupTitle: string) => {
+    if (!collapsed) {
+      setOpenGroups(prev => ({
+        ...prev,
+        [groupTitle]: !prev[groupTitle]
+      }));
+    }
+  };
+
+  const isGroupActive = (group: typeof navigationItems[0]) => {
+    return group.items.some(item => isActive(item.path));
+  };
 
   return (
     <div className={cn(
@@ -117,36 +141,69 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         <div className="h-px bg-border my-2" />
 
         {/* Navigation Groups */}
-        <div className="flex-1 space-y-4 overflow-y-auto">
+        <div className="flex-1 space-y-2 overflow-y-auto">
           {navigationItems.map((group) => (
-            <div key={group.title} className="space-y-1">
-              {!collapsed && (
-                <h4 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  {group.title}
-                </h4>
-              )}
+            <Collapsible 
+              key={group.title}
+              open={collapsed ? true : openGroups[group.title]}
+              onOpenChange={() => toggleGroup(group.title)}
+            >
               <div className="space-y-1">
-                {group.items.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={({ isActive }) => cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-fast",
-                      "hover:bg-accent/50",
-                      isActive ? "bg-primary text-primary-foreground shadow-primary" : "text-foreground",
-                      collapsed && "justify-center px-2"
-                    )}
-                    title={collapsed ? item.name : undefined}
-                  >
-                    <item.icon className="h-4 w-4 shrink-0" />
-                    {!collapsed && <span>{item.name}</span>}
-                  </NavLink>
-                ))}
+                {!collapsed ? (
+                  <CollapsibleTrigger asChild>
+                    <button className={cn(
+                      "flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors",
+                      isGroupActive(group) && "text-primary"
+                    )}>
+                      <span>{group.title}</span>
+                      <ChevronDown className={cn(
+                        "h-3 w-3 transition-transform",
+                        openGroups[group.title] ? "rotate-180" : ""
+                      )} />
+                    </button>
+                  </CollapsibleTrigger>
+                ) : (
+                  <div className="space-y-1">
+                    {group.items.map((item) => (
+                      <NavLink
+                        key={item.path}
+                        to={item.path}
+                        className={({ isActive }) => cn(
+                          "flex items-center justify-center px-2 py-2 rounded-lg text-sm font-medium transition-fast",
+                          "hover:bg-accent/50",
+                          isActive ? "bg-primary text-primary-foreground shadow-primary" : "text-foreground"
+                        )}
+                        title={item.name}
+                      >
+                        <item.icon className="h-4 w-4 shrink-0" />
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+                
+                {!collapsed && (
+                  <CollapsibleContent className="space-y-1">
+                    {group.items.map((item) => (
+                      <NavLink
+                        key={item.path}
+                        to={item.path}
+                        className={({ isActive }) => cn(
+                          "flex items-center gap-3 px-3 py-2 ml-2 rounded-lg text-sm font-medium transition-fast",
+                          "hover:bg-accent/50",
+                          isActive ? "bg-primary text-primary-foreground shadow-primary" : "text-foreground"
+                        )}
+                      >
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        <span>{item.name}</span>
+                      </NavLink>
+                    ))}
+                  </CollapsibleContent>
+                )}
               </div>
               {!collapsed && group !== navigationItems[navigationItems.length - 1] && (
                 <div className="h-px bg-border/50 my-3" />
               )}
-            </div>
+            </Collapsible>
           ))}
         </div>
 
