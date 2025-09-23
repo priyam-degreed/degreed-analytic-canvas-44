@@ -225,7 +225,6 @@ export default function Dashboard() {
         <ChartCard
           title="Quick Navigation"
           subtitle="Jump to detailed views"
-          actions={false}
         >
           <div className="space-y-3">
             <Link to="/overview/strategic">
