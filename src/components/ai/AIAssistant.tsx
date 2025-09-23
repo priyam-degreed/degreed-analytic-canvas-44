@@ -83,15 +83,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isOpen && chatMessages.length === 0) {
-      // Initialize with welcome message
-      setChatMessages([{
-        id: '1',
-        type: 'assistant',
-        content: 'Hi there,\n\nHow can I help you?',
-        timestamp: new Date()
-      }]);
-    }
+    // No initial message needed - welcome screen handles greeting
   }, [isOpen]);
 
   useEffect(() => {
@@ -442,7 +434,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           <div className="flex flex-col h-[calc(100%-64px)]">
             {/* Messages Area */}
             <div className="flex-1 p-4 overflow-y-auto space-y-4">
-              {chatMessages.length === 1 && chatMessages[0].type === 'assistant' && (
+              {chatMessages.length === 0 && (
                 <div className="text-center space-y-4 py-6">
                   <div className="space-y-2">
                     <h3 className="font-semibold text-xl text-gray-800">Hi there,</h3>
