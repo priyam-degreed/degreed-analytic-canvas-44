@@ -11,6 +11,10 @@ import SkillsAdoption from "./pages/skills/SkillsAdoption";
 import AIInsights from "./pages/ai/AIInsights";
 import SkillTracker from "./pages/analysis/SkillTracker";
 import NotFound from "./pages/NotFound";
+import Explore from "./pages/Explore";
+import Captures from "./pages/Captures";
+import Analyses from "./pages/Analyses";
+import SearchPage from "./pages/SearchPage";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +40,10 @@ const App = () => (
             <Route path="ai/search" element={<AIInsights />} />
             <Route path="analysis/skill-tracker" element={<SkillTracker />} />
             <Route path="settings" element={<Dashboard />} />
+            <Route path="explore" element={<Explore />} />
+            <Route path="captures" element={<Captures />} />
+            <Route path="analyses" element={<Analyses />} />
+            <Route path="search" element={<SearchPage />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Menu, Bell, Search, User, ChevronLeft, ChevronRight } from "lucide-react";
 import { AppSidebar } from "./AppSidebar";
 import { cn } from "@/lib/utils";
@@ -8,6 +9,32 @@ import { cn } from "@/lib/utils";
 export function AppLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const tabs = [
+    { value: "guidebook", label: "Guidebook", path: "/" },
+    { value: "explore", label: "Explore", path: "/explore" },
+    { value: "captures", label: "Captures", path: "/captures" },
+    { value: "analyses", label: "Analyses", path: "/analyses" },
+    { value: "search", label: "Search", path: "/search" }
+  ];
+
+  // Determine active tab based on current path
+  const getActiveTab = () => {
+    const path = location.pathname;
+    if (path === "/" || path.startsWith("/overview") || path.startsWith("/learning") || path.startsWith("/skills") || path.startsWith("/ai") || path.startsWith("/analysis") || path.startsWith("/settings")) {
+      return "guidebook";
+    }
+    const matchingTab = tabs.find(tab => path.startsWith(tab.path));
+    return matchingTab?.value || "guidebook";
+  };
+
+  const handleTabChange = (value: string) => {
+    const tab = tabs.find(t => t.value === value);
+    if (tab) {
+      navigate(tab.path);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-muted/30 via-background to-muted/50">
@@ -54,18 +81,42 @@ export function AppLayout() {
         </div>
       </header>
 
+      {/* Main Tab Navigation */}
+      <div className="border-b bg-background">
+        <div className="px-6">
+          <Tabs value={getActiveTab()} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="h-12 w-full justify-start bg-transparent p-0 border-b-0">
+              {tabs.map((tab) => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className={cn(
+                    "relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-6 font-medium text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none",
+                    getActiveTab() === tab.value && "border-primary text-foreground"
+                  )}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
+
       <div className="flex">
-        {/* Sidebar */}
-        <AppSidebar 
-          collapsed={sidebarCollapsed} 
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
-        />
+        {/* Sidebar - only show for Guidebook tab */}
+        {getActiveTab() === "guidebook" && (
+          <AppSidebar 
+            collapsed={sidebarCollapsed} 
+            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+          />
+        )}
 
         {/* Main Content */}
         <main className={cn(
           "flex-1 transition-all duration-300 ease-in-out",
-          "min-h-[calc(100vh-4rem)]", // Account for header height
-          sidebarCollapsed ? "ml-16" : "ml-64"
+          "min-h-[calc(100vh-8rem)]", // Account for header and tab height
+          getActiveTab() === "guidebook" ? (sidebarCollapsed ? "ml-16" : "ml-64") : "ml-0"
         )}>
           <div className="p-6">
             <Outlet />
