@@ -33,11 +33,16 @@ const navigationItems = [
     ]
   },
   {
-    title: "Learning Analytics",
+    title: "Learning Overview Dashboard",
     items: [
       { name: "Executive Overview", path: "/learning/executive", icon: BarChart3 },
       { name: "Engagement Overview", path: "/learning/engagement", icon: Users },
       { name: "Impact Overview", path: "/learning/impact", icon: Target },
+    ]
+  },
+  {
+    title: "Learning Guided Insights",
+    items: [
       { name: "Assignment Deep Dive", path: "/learning/assignments", icon: BookOpen },
       { name: "Operations Deep Dive", path: "/learning/operations", icon: FileText },
     ]
