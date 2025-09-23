@@ -87,7 +87,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       // Initialize with welcome message
       setChatMessages([{
         id: '1',
-        type: 'assistant',
+      //  type: 'assistant',
         //content: 'Hi there,\n\nHow can I help you?',
         timestamp: new Date()
       }]);
