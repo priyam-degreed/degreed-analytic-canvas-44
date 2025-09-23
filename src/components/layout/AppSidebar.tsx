@@ -192,8 +192,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         {/* Dashboard List */}
         {!collapsed && (
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-3 px-3">
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <div className="flex items-center justify-between mb-4 px-4 py-3">
+              <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
                 DASHBOARDS
               </h3>
               <Button
