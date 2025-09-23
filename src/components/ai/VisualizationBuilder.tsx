@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useDrop } from "react-dnd";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   BarChart3, 
   LineChart, 
@@ -21,14 +24,17 @@ import {
   Download,
   Settings,
   X,
-  Plus
+  Plus,
+  TableProperties,
+  Filter,
+  Layers
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface VisualizationConfig {
   id: string;
   name: string;
-  type: "column" | "bar" | "line" | "pie" | "area" | "heatmap";
+  type: "column" | "bar" | "line" | "pie" | "area" | "heatmap" | "table" | "scatter" | "funnel";
   metrics: string[];
   dimensions: string[];
   filters: FilterConfig[];
@@ -75,13 +81,16 @@ const chartTypes = [
   { type: "bar", label: "Bar Chart", icon: BarChart3 },
   { type: "line", label: "Line Chart", icon: LineChart },
   { type: "area", label: "Area Chart", icon: Activity },
-  { type: "pie", label: "Pie Chart", icon: PieChart }
+  { type: "pie", label: "Pie Chart", icon: PieChart },
+  { type: "table", label: "Table", icon: TableProperties },
+  { type: "scatter", label: "Scatter", icon: Activity },
+  { type: "funnel", label: "Funnel", icon: Filter }
 ];
 
 export function VisualizationBuilder({ isOpen, onClose, initialConfig, onSave }: VisualizationBuilderProps) {
   const [config, setConfig] = useState<VisualizationConfig>({
     id: initialConfig?.id || `viz-${Date.now()}`,
-    name: initialConfig?.name || "",
+    name: initialConfig?.name || "Untitled visualization",
     type: initialConfig?.type || "column",
     metrics: initialConfig?.metrics || [],
     dimensions: initialConfig?.dimensions || [],
@@ -89,68 +98,50 @@ export function VisualizationBuilder({ isOpen, onClose, initialConfig, onSave }:
     timeRange: initialConfig?.timeRange || "last_30_days"
   });
 
-  const [previewData] = useState([
-    { name: "Engineering", value: 234, change: 12 },
-    { name: "Product", value: 189, change: 8 },
-    { name: "Design", value: 156, change: -3 },
-    { name: "Marketing", value: 134, change: 15 },
-    { name: "Sales", value: 98, change: 7 }
-  ]);
-
-  const handleMetricToggle = (metricId: string) => {
-    setConfig(prev => ({
-      ...prev,
-      metrics: prev.metrics.includes(metricId) 
-        ? prev.metrics.filter(m => m !== metricId)
-        : [...prev.metrics, metricId]
-    }));
-  };
-
-  const handleDimensionToggle = (dimensionId: string) => {
-    setConfig(prev => ({
-      ...prev,
-      dimensions: prev.dimensions.includes(dimensionId)
-        ? prev.dimensions.filter(d => d !== dimensionId)
-        : [...prev.dimensions, dimensionId]
-    }));
-  };
+  const [rowItems, setRowItems] = useState<string[]>([]);
+  const [columnItems, setColumnItems] = useState<string[]>([]);
 
   const handleSave = () => {
-    onSave(config);
+    const finalConfig = {
+      ...config,
+      metrics: [...config.metrics],
+      dimensions: [...config.dimensions, ...rowItems, ...columnItems]
+    };
+    onSave(finalConfig);
     onClose();
   };
 
-  const renderPreview = () => {
-    const maxValue = Math.max(...previewData.map(d => d.value));
-    
-    return (
-      <div className="h-48 bg-white border rounded-lg p-4">
-        <div className="h-full flex items-end justify-around gap-1">
-          {previewData.map((item, idx) => {
-            const height = (item.value / maxValue) * 140;
-            return (
-              <div key={idx} className="flex flex-col items-center flex-1">
-                <div 
-                  className="bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-sm w-full mb-1 flex items-end justify-center text-xs text-white font-medium"
-                  style={{ height: `${height}px`, minHeight: '20px' }}
-                >
-                  {item.value}
-                </div>
-                <div className="text-xs text-center text-gray-600 px-1">
-                  {item.name}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
+  const handleClear = () => {
+    setConfig(prev => ({
+      ...prev,
+      name: "Untitled visualization",
+      type: "column",
+      metrics: [],
+      dimensions: []
+    }));
+    setRowItems([]);
+    setColumnItems([]);
+  };
+
+  const removeFromMetrics = (item: string) => {
+    setConfig(prev => ({
+      ...prev,
+      metrics: prev.metrics.filter(m => m !== item)
+    }));
+  };
+
+  const removeFromRows = (item: string) => {
+    setRowItems(prev => prev.filter(i => i !== item));
+  };
+
+  const removeFromColumns = (item: string) => {
+    setColumnItems(prev => prev.filter(i => i !== item));
   };
 
   if (!isOpen) return null;
 
   return (
-    <>
+    <DndProvider backend={HTML5Backend}>
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" 
@@ -158,224 +149,286 @@ export function VisualizationBuilder({ isOpen, onClose, initialConfig, onSave }:
       />
       
       {/* Modal */}
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-[90vh] bg-white rounded-xl shadow-2xl border z-50 flex">
-        {/* Configuration Panel */}
-        <div className="w-80 border-r bg-gray-50 p-6 overflow-y-auto">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Build Visualization</h2>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="space-y-6">
-            {/* Basic Info */}
-            <div className="space-y-3">
-              <Label>Visualization Name</Label>
+      <div className="fixed inset-0 bg-background z-50 flex flex-col">
+        {/* Header */}
+        <div className="border-b bg-card px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
               <Input
                 value={config.name}
                 onChange={(e) => setConfig(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Enter visualization name"
+                className="text-lg font-medium border-none p-0 h-auto focus-visible:ring-0 bg-transparent"
               />
             </div>
-
-            {/* Chart Type */}
-            <div className="space-y-3">
-              <Label>Chart Type</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {chartTypes.map((type) => (
-                  <Button
-                    key={type.type}
-                    variant={config.type === type.type ? "default" : "outline"}
-                    size="sm"
-                    className="justify-start"
-                    onClick={() => setConfig(prev => ({ ...prev, type: type.type as any }))}
-                  >
-                    <type.icon className="h-4 w-4 mr-2" />
-                    <span className="text-xs">{type.label}</span>
-                  </Button>
-                ))}
-              </div>
+            
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={handleClear}>
+                Clear
+              </Button>
+              <Button variant="ghost" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
+                Save
+              </Button>
             </div>
+          </div>
 
-            {/* Metrics */}
-            <div className="space-y-3">
-              <Label>Metrics ({config.metrics.length} selected)</Label>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {availableMetrics.map((metric) => (
-                  <div
-                    key={metric.id}
-                    className={cn(
-                      "flex items-center gap-3 p-2 rounded border cursor-pointer transition-colors",
-                      config.metrics.includes(metric.id) 
-                        ? "bg-blue-50 border-blue-200" 
-                        : "hover:bg-gray-50"
-                    )}
-                    onClick={() => handleMetricToggle(metric.id)}
-                  >
-                    <metric.icon className="h-4 w-4 text-gray-600" />
-                    <span className="text-sm">{metric.label}</span>
-                    {config.metrics.includes(metric.id) && (
-                      <Badge variant="default" className="ml-auto text-xs">
-                        Selected
-                      </Badge>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Dimensions */}
-            <div className="space-y-3">
-              <Label>Dimensions ({config.dimensions.length} selected)</Label>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {availableDimensions.map((dimension) => (
-                  <div
-                    key={dimension.id}
-                    className={cn(
-                      "flex items-center gap-3 p-2 rounded border cursor-pointer transition-colors",
-                      config.dimensions.includes(dimension.id) 
-                        ? "bg-green-50 border-green-200" 
-                        : "hover:bg-gray-50"
-                    )}
-                    onClick={() => handleDimensionToggle(dimension.id)}
-                  >
-                    <dimension.icon className="h-4 w-4 text-gray-600" />
-                    <span className="text-sm">{dimension.label}</span>
-                    {config.dimensions.includes(dimension.id) && (
-                      <Badge variant="secondary" className="ml-auto text-xs">
-                        Selected
-                      </Badge>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Time Range */}
-            <div className="space-y-3">
-              <Label>Time Range</Label>
-              <Select
-                value={config.timeRange}
-                onValueChange={(value) => setConfig(prev => ({ ...prev, timeRange: value }))}
+          {/* Chart Type Selection */}
+          <div className="flex items-center gap-2 mt-4">
+            {chartTypes.map((type) => (
+              <Button
+                key={type.type}
+                variant={config.type === type.type ? "default" : "outline"}
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setConfig(prev => ({ ...prev, type: type.type as any }))}
+                title={type.label}
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="last_7_days">Last 7 days</SelectItem>
-                  <SelectItem value="last_30_days">Last 30 days</SelectItem>
-                  <SelectItem value="last_90_days">Last 90 days</SelectItem>
-                  <SelectItem value="last_6_months">Last 6 months</SelectItem>
-                  <SelectItem value="last_year">Last year</SelectItem>
-                  <SelectItem value="all_time">All time</SelectItem>
-                </SelectContent>
-              </Select>
+                <type.icon className="h-4 w-4" />
+              </Button>
+            ))}
+          </div>
+
+          {/* Filters Section */}
+          <div className="mt-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Filter className="h-4 w-4" />
+              <span>FILTERS</span>
             </div>
           </div>
         </div>
 
-        {/* Preview Panel */}
-        <div className="flex-1 flex flex-col">
-          {/* Header */}
-          <div className="border-b p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold">
-                  {config.name || "Untitled Visualization"}
-                </h3>
-                <div className="text-sm text-gray-600 mt-1">
-                  {config.metrics.length} metrics • {config.dimensions.length} dimensions
+        {/* Main Content */}
+        <div className="flex-1 flex">
+          {/* Left Data Panel */}
+          <div className="w-64 border-r bg-muted/30 p-4">
+            <div className="mb-4">
+              <Input
+                placeholder="Search data..."
+                className="h-8"
+              />
+            </div>
+
+            <ScrollArea className="h-[calc(100vh-200px)]">
+              {/* Metrics */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium mb-3 text-muted-foreground">METRICS</h4>
+                <div className="space-y-1">
+                  {availableMetrics.map((metric) => (
+                    <div
+                      key={metric.id}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData('text/plain', JSON.stringify({
+                          type: 'metric',
+                          id: metric.id,
+                          label: metric.label
+                        }));
+                      }}
+                      className="flex items-center gap-2 p-2 rounded hover:bg-background cursor-move transition-colors"
+                    >
+                      <div className="w-3 h-3 bg-orange-500 rounded-sm flex-shrink-0" />
+                      <span className="text-sm">{metric.label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Settings className="h-4 w-4 mr-1" />
-                  Advanced
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-1" />
-                  Export
-                </Button>
-                <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-                  <Save className="h-4 w-4 mr-1" />
-                  Save Visualization
-                </Button>
+
+              {/* Dimensions */}
+              <div>
+                <h4 className="text-sm font-medium mb-3 text-muted-foreground">DIMENSIONS</h4>
+                <div className="space-y-1">
+                  {availableDimensions.map((dimension) => (
+                    <div
+                      key={dimension.id}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData('text/plain', JSON.stringify({
+                          type: 'dimension',
+                          id: dimension.id,
+                          label: dimension.label
+                        }));
+                      }}
+                      className="flex items-center gap-2 p-2 rounded hover:bg-background cursor-move transition-colors"
+                    >
+                      <div className="w-3 h-3 bg-blue-500 rounded-sm flex-shrink-0" />
+                      <span className="text-sm">{dimension.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            </ScrollArea>
           </div>
 
-          {/* Preview Content */}
+          {/* Center Canvas */}
           <div className="flex-1 p-6">
-            <div className="space-y-6">
-              {/* Configuration Summary */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm">Configuration Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <span className="text-sm font-medium">Chart Type: </span>
-                    <Badge variant="outline">{config.type}</Badge>
-                  </div>
-                  
-                  {config.metrics.length > 0 && (
-                    <div>
-                      <span className="text-sm font-medium">Metrics: </span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {config.metrics.map(metricId => {
-                          const metric = availableMetrics.find(m => m.id === metricId);
-                          return (
-                            <Badge key={metricId} variant="default" className="text-xs">
-                              {metric?.label}
-                            </Badge>
-                          );
-                        })}
-                      </div>
+            <div className="grid grid-cols-2 gap-6 mb-6">
+              {/* Metrics Drop Zone */}
+              <div
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                  if (data.type === 'metric') {
+                    setConfig(prev => ({
+                      ...prev,
+                      metrics: [...prev.metrics.filter(m => m !== data.id), data.id]
+                    }));
+                  }
+                }}
+                onDragOver={(e) => e.preventDefault()}
+                className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 min-h-[120px]"
+              >
+                <h4 className="font-medium text-sm mb-3 text-muted-foreground">METRICS (IN COLUMNS)</h4>
+                <div className="space-y-2">
+                  {config.metrics.length === 0 ? (
+                    <div className="text-center py-6">
+                      <div className="text-blue-500 font-medium">123</div>
+                      <div className="text-muted-foreground text-sm mt-1">or</div>
+                      <div className="text-orange-500 font-medium">ABC</div>
+                      <div className="text-muted-foreground text-sm mt-1">here</div>
+                      <p className="text-sm text-muted-foreground/60 mt-2">
+                        They are located in the panel on the left.
+                      </p>
                     </div>
-                  )}
-                  
-                  {config.dimensions.length > 0 && (
-                    <div>
-                      <span className="text-sm font-medium">Dimensions: </span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {config.dimensions.map(dimensionId => {
-                          const dimension = availableDimensions.find(d => d.id === dimensionId);
-                          return (
-                            <Badge key={dimensionId} variant="secondary" className="text-xs">
-                              {dimension?.label}
-                            </Badge>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Chart Preview */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm">Preview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {config.metrics.length > 0 && config.dimensions.length > 0 ? (
-                    renderPreview()
                   ) : (
-                    <div className="h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                      <div className="text-center text-gray-500">
-                        <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                        <p className="text-sm">Select metrics and dimensions to see preview</p>
-                      </div>
-                    </div>
+                    config.metrics.map((item, idx) => {
+                      const metric = availableMetrics.find(m => m.id === item);
+                      return (
+                        <div key={idx} className="flex items-center justify-between bg-background border rounded px-3 py-2">
+                          <span className="text-sm">{metric?.label}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFromMetrics(item)}
+                            className="h-5 w-5 p-0"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      );
+                    })
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
+
+              {/* Rows Drop Zone */}
+              <div
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                  if (data.type === 'dimension') {
+                    setRowItems(prev => [...prev.filter(i => i !== data.id), data.id]);
+                  }
+                }}
+                onDragOver={(e) => e.preventDefault()}
+                className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 min-h-[120px]"
+              >
+                <h4 className="font-medium text-sm mb-3 text-muted-foreground">ROWS</h4>
+                <div className="space-y-2">
+                  {rowItems.length === 0 ? (
+                    <div className="text-center py-6">
+                      <div className="text-blue-500 font-medium">ABC</div>
+                      <div className="text-muted-foreground text-sm mt-1">or</div>
+                      <div className="text-blue-500 font-medium">123</div>
+                      <div className="text-muted-foreground text-sm mt-1">here</div>
+                    </div>
+                  ) : (
+                    rowItems.map((item, idx) => {
+                      const dimension = availableDimensions.find(d => d.id === item);
+                      return (
+                        <div key={idx} className="flex items-center justify-between bg-background border rounded px-3 py-2">
+                          <span className="text-sm">{dimension?.label}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFromRows(item)}
+                            className="h-5 w-5 p-0"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Columns Drop Zone */}
+              <div
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                  if (data.type === 'dimension') {
+                    setColumnItems(prev => [...prev.filter(i => i !== data.id), data.id]);
+                  }
+                }}
+                onDragOver={(e) => e.preventDefault()}
+                className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 min-h-[120px]"
+              >
+                <h4 className="font-medium text-sm mb-3 text-muted-foreground">COLUMNS</h4>
+                <div className="space-y-2">
+                  {columnItems.length === 0 ? (
+                    <div className="text-center py-6">
+                      <div className="text-blue-500 font-medium">ABC</div>
+                      <div className="text-muted-foreground text-sm mt-1">or</div>
+                      <div className="text-blue-500 font-medium">123</div>
+                      <div className="text-muted-foreground text-sm mt-1">here</div>
+                    </div>
+                  ) : (
+                    columnItems.map((item, idx) => {
+                      const dimension = availableDimensions.find(d => d.id === item);
+                      return (
+                        <div key={idx} className="flex items-center justify-between bg-background border rounded px-3 py-2">
+                          <span className="text-sm">{dimension?.label}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFromColumns(item)}
+                            className="h-5 w-5 p-0"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Configuration */}
+              <div className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 min-h-[120px]">
+                <div className="flex items-center gap-2 mb-3">
+                  <Settings className="h-4 w-4 text-muted-foreground" />
+                  <h4 className="font-medium text-sm text-muted-foreground">CONFIGURATION</h4>
+                </div>
+                <div className="space-y-3">
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Chart Type: </span>
+                    <span className="capitalize">{config.type}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview Area */}
+            <div className="border rounded-lg p-6 bg-card min-h-[300px] flex items-center justify-center">
+              {config.metrics.length > 0 || rowItems.length > 0 ? (
+                <div className="text-center">
+                  <div className="text-6xl font-bold text-primary mb-4">123</div>
+                  <p className="text-muted-foreground">Drag metrics and dimensions to see preview</p>
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground">
+                  <BarChart3 className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <p>Drag 123, ABC, or HERE</p>
+                  <p className="text-sm mt-1">They are located in the panel on the left.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </>
+    </DndProvider>
   );
 }

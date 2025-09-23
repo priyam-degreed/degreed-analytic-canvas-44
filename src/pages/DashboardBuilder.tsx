@@ -9,6 +9,7 @@ import { ComponentPanel } from "@/components/dashboard-builder/ComponentPanel";
 import { Canvas } from "@/components/dashboard-builder/Canvas";
 import { DateRangeFilter } from "@/components/filters/DateRangeFilter";
 import { MultiSelectFilter } from "@/components/filters/MultiSelectFilter";
+import { VisualizationBuilder } from "@/components/ai/VisualizationBuilder";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -21,6 +22,7 @@ export default function DashboardBuilder({ mode = "create", dashboardId }: Dashb
   const navigate = useNavigate();
   const [dashboardName, setDashboardName] = useState(mode === "edit" ? "01 Learning Dashboard" : "");
   const [isPublic, setIsPublic] = useState(false);
+  const [isVisualizationBuilderOpen, setIsVisualizationBuilderOpen] = useState(false);
   
   // Pre-populate with existing dashboard content when in edit mode
   const [canvasComponents, setCanvasComponents] = useState<any[]>(
@@ -100,6 +102,23 @@ export default function DashboardBuilder({ mode = "create", dashboardId }: Dashb
 
   const removeComponentFromCanvas = (id: number) => {
     setCanvasComponents(prev => prev.filter(comp => comp.id !== id));
+  };
+
+  const handleCanvasVisualizationDrop = () => {
+    setIsVisualizationBuilderOpen(true);
+  };
+
+  const handleVisualizationSave = (config: any) => {
+    const newComponent = {
+      id: Date.now(),
+      componentType: "visualization",
+      name: config.name || "Untitled Visualization",
+      type: config.type,
+      description: `${config.metrics.length} metrics, ${config.dimensions.length} dimensions`,
+      config: config
+    };
+    addComponentToCanvas(newComponent);
+    setIsVisualizationBuilderOpen(false);
   };
 
   return (
@@ -189,8 +208,16 @@ export default function DashboardBuilder({ mode = "create", dashboardId }: Dashb
           <Canvas 
             components={canvasComponents}
             onRemoveComponent={removeComponentFromCanvas}
+            onVisualizationDrop={handleCanvasVisualizationDrop}
           />
         </div>
+
+        {/* Visualization Builder Modal */}
+        <VisualizationBuilder
+          isOpen={isVisualizationBuilderOpen}
+          onClose={() => setIsVisualizationBuilderOpen(false)}
+          onSave={handleVisualizationSave}
+        />
       </div>
     </DndProvider>
   );

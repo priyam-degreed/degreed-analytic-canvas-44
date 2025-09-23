@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 interface CanvasProps {
   components: any[];
   onRemoveComponent: (id: number) => void;
+  onVisualizationDrop?: () => void;
 }
 
 function CanvasComponent({ component, onRemove }: { component: any; onRemove: () => void }) {
@@ -97,10 +98,16 @@ function CanvasComponent({ component, onRemove }: { component: any; onRemove: ()
   );
 }
 
-export function Canvas({ components, onRemoveComponent }: CanvasProps) {
+export function Canvas({ components, onRemoveComponent, onVisualizationDrop }: CanvasProps) {
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ['component', 'visualization'],
-    drop: () => ({ dropped: true }),
+    drop: (item: any) => {
+      if (item.componentType === 'visualization' && onVisualizationDrop) {
+        onVisualizationDrop();
+        return { dropped: true };
+      }
+      return { dropped: true };
+    },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
