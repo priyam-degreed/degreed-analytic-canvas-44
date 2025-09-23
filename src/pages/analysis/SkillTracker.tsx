@@ -4,19 +4,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Download, Filter, Calendar, Plus } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, CartesianGrid, Tooltip } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, CartesianGrid, Tooltip, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 // Data matching the Word document exactly
-const skillFollowingBusinessUnits = [
-  { name: 'Unknown', users: 1400 },
-  { name: 'Central City', users: 1200 },
-  { name: 'Gotham City', users: 1000 },
-  { name: 'Metropolis', users: 800 },
-  { name: 'Technology', users: 600 }
-];
-
 const skillFollowingTimeline = [
   { month: 'Nov 2024', users: 1100 },
   { month: 'Dec 2024', users: 1150 },
@@ -31,15 +23,19 @@ const skillFollowingTimeline = [
   { month: 'Sep 2025', users: 1310 }
 ];
 
-const skillMovementData = [
-  { category: 'Incoming skills', value: 18 },
-  { category: 'Discrepancies', value: 51 },
-  { category: 'Net change', value: 50 }
+const skillFollowingBusinessUnits = [
+  { name: 'Unknown', users: 1400 },
+  { name: 'Central City', users: 1200 },
+  { name: 'Gotham City', users: 1000 },
+  { name: 'Metropolis', users: 800 },
+  { name: 'Technology', users: 600 }
 ];
 
-const focusSkillBusinessUnits = [
-  { name: 'Unknown', users: 300 },
-  { name: 'Hotel One', users: 2 }
+// Skill Movement Bars with specific colors
+const skillMovementBars = [
+  { category: 'Incoming skills', value: 33, color: 'hsl(var(--success))' },
+  { category: 'Discrepancies', value: 18, color: 'hsl(var(--muted))' },
+  { category: 'Net change', value: 51, color: 'hsl(var(--primary))' }
 ];
 
 const focusSkillTimeline = [
@@ -56,10 +52,22 @@ const focusSkillTimeline = [
   { month: 'Sep 2025', users: 302 }
 ];
 
-const medianRatingsBusinessUnits = [
-  { name: 'Unknown', selfRating: 4, peerRating: 4 },
-  { name: 'ExperienceUpdated', selfRating: null, peerRating: 5 },
-  { name: 'Hotel One', selfRating: null, peerRating: null }
+const focusSkillBusinessUnits = [
+  { name: 'Unknown', users: 300 },
+  { name: 'ExperienceUpdated', users: 1 },
+  { name: 'Hotel One', users: 2 }
+];
+
+// Self Ratings Data
+const selfRatingsData = [
+  { name: 'ExperienceUpdated', rating: 5 },
+  { name: 'Unknown', rating: 4 },
+  { name: 'Hotel One', rating: 1 }
+];
+
+// Peer Ratings Data  
+const peerRatingsData = [
+  { name: 'Unknown', rating: 4 }
 ];
 
 const availableSkills = [
@@ -130,50 +138,57 @@ export default function SkillTracker() {
         </h2>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left: Users Following this Skill */}
+          {/* Left: Line Chart - Users Following this Skill Over Time */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Users Following this Skill</CardTitle>
-              <p className="text-sm text-muted-foreground">Sep 2025</p>
+              <p className="text-sm text-muted-foreground">Sep 2025 | Number of Skills Being Followed: ≥1</p>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="text-2xl font-bold">1.31k</div>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={skillFollowingBusinessUnits} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                  <LineChart data={skillFollowingTimeline} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="name" 
-                      angle={-45}
-                      textAnchor="end"
-                      height={60}
-                      fontSize={12}
-                    />
+                    <XAxis dataKey="month" fontSize={12} />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="users" fill="hsl(var(--chart-1))" />
-                  </BarChart>
+                    <Line type="monotone" dataKey="users" stroke="hsl(var(--primary))" strokeWidth={3} />
+                  </LineChart>
                 </ResponsiveContainer>
+                <div className="text-center">
+                  <div className="text-sm text-muted-foreground">Users</div>
+                  <div className="text-2xl font-bold text-primary">1.31k</div>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Right: Number of Users in Each Business Unit */}
+          {/* Right: Horizontal Bar Chart - Business Units */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Number of Users in Each Business Unit who are Following this Skill</CardTitle>
-              <p className="text-sm text-muted-foreground">Sep 2025 Number of Skills Being Followed: ≥1</p>
+              <p className="text-sm text-muted-foreground">Sep 2025 | Number of Skills Being Followed: ≥1</p>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={skillFollowingTimeline} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" fontSize={12} />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="users" stroke="hsl(var(--chart-1))" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="space-y-4">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart 
+                    data={skillFollowingBusinessUnits} 
+                    layout="horizontal"
+                    margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis dataKey="name" type="category" fontSize={12} />
+                    <Tooltip />
+                    <Bar dataKey="users" fill="hsl(var(--primary))" />
+                  </BarChart>
+                </ResponsiveContainer>
+                <div className="text-center">
+                  <div className="text-sm text-muted-foreground">Users</div>
+                  <div className="text-2xl font-bold text-primary">1.31k</div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -186,59 +201,47 @@ export default function SkillTracker() {
         </h2>
         <p className="text-lg font-semibold">Sep 2025</p>
         
-        <Card>
-          <CardContent className="pt-6">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-center">Incoming skills</TableHead>
-                  <TableHead className="text-center">Discrepancies</TableHead>
-                  <TableHead className="text-center">Net change</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="text-center font-bold">+18</TableCell>
-                  <TableCell className="text-center font-bold">+51</TableCell>
-                  <TableCell className="text-center font-bold">+50</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-center font-bold">+40</TableCell>
-                  <TableCell className="text-center font-bold">+33</TableCell>
-                  <TableCell className="text-center font-bold">+30</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-center font-bold">+20</TableCell>
-                  <TableCell className="text-center font-bold">+10</TableCell>
-                  <TableCell className="text-center font-bold">0</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        {/* Skill Movement Bar Charts */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {skillMovementBars.map((item, index) => (
+            <Card key={index}>
+              <CardContent className="pt-6">
+                <div className="text-center space-y-4">
+                  <div className="text-lg font-semibold">{item.category}</div>
+                  <div className="h-32 flex items-end justify-center">
+                    <div 
+                      className="w-16 rounded-t flex items-end justify-center text-white font-bold"
+                      style={{ 
+                        height: `${(item.value / 60) * 100}%`, 
+                        backgroundColor: item.color,
+                        minHeight: '40px'
+                      }}
+                    >
+                      +{item.value}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
         <div className="mt-8">
           <h3 className="text-xl font-bold mb-4">Acquired Skills Count change</h3>
-          <Card>
-            <CardContent className="pt-6">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-center"></TableHead>
-                    <TableHead className="text-center">Starting Acquired Skills Count</TableHead>
-                    <TableHead className="text-center">Ending Acquired Skills Count</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="text-center font-bold text-2xl text-green-600">+51</TableCell>
-                    <TableCell className="text-center font-bold text-2xl">3.78k</TableCell>
-                    <TableCell className="text-center font-bold text-2xl">3.84k</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div>
+              <div className="text-sm text-muted-foreground">Acquired Skills Count change</div>
+              <div className="text-4xl font-bold text-success">+51</div>
+            </div>
+            <div>
+              <div className="text-sm text-muted-foreground">Starting Acquired Skills Count</div>
+              <div className="text-4xl font-bold">3.78k</div>
+            </div>
+            <div>
+              <div className="text-sm text-muted-foreground">Ending Acquired Skills Count</div>
+              <div className="text-4xl font-bold">3.84k</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -249,52 +252,59 @@ export default function SkillTracker() {
         </h2>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left: Users with Focus Skill */}
+          {/* Left: Line Chart - Focus Skill Timeline */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Users with Focus Skill</CardTitle>
+              <p className="text-sm text-muted-foreground">Sep 2025 | Focus Skill</p>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={focusSkillBusinessUnits} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45}
-                    textAnchor="end"
-                    height={60}
-                    fontSize={12}
-                  />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="users" fill="hsl(var(--chart-2))" />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="space-y-4">
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={focusSkillTimeline} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" fontSize={12} />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="users" stroke="hsl(var(--primary))" strokeWidth={3} />
+                  </LineChart>
+                </ResponsiveContainer>
+                <div className="text-center">
+                  <div className="text-sm text-muted-foreground">Users</div>
+                  <div className="text-2xl font-bold text-primary">302</div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Right: Users with Focus Skill by Business Unit */}
+          {/* Right: Horizontal Bar Chart - Focus Skill by Business Unit */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Users with Focus Skill by Business Unit</CardTitle>
               <div className="text-sm text-muted-foreground">
-                <div>Sep 2025 Focus Skill | Sep 2025 | Focus Skill</div>
-                <div className="mt-2">
-                  <div>Unknown: 300</div>
-                  <div>Hotel One: 2</div>
-                </div>
+                <div>Sep 2025 | Focus Skill</div>
               </div>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={focusSkillTimeline} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" fontSize={12} />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="users" stroke="hsl(var(--chart-2))" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="space-y-4">
+                <ResponsiveContainer width="100%" height={280}>
+                  <BarChart 
+                    data={focusSkillBusinessUnits} 
+                    layout="horizontal"
+                    margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis dataKey="name" type="category" fontSize={12} />
+                    <Tooltip />
+                    <Bar dataKey="users" fill="hsl(var(--primary))" />
+                  </BarChart>
+                </ResponsiveContainer>
+                <div className="text-center">
+                  <div className="text-sm text-muted-foreground">Users</div>
+                  <div className="text-2xl font-bold text-primary">302</div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -311,19 +321,26 @@ export default function SkillTracker() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Median Self Rating by Business Unit</CardTitle>
+              <p className="text-sm text-muted-foreground">Sep 2025</p>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="text-sm text-muted-foreground">Sep 2025</div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Unknown</span>
-                    <span className="font-bold">4</span>
-                  </div>
-                </div>
-                <div className="mt-6 text-center">
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart 
+                    data={selfRatingsData} 
+                    layout="horizontal"
+                    margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" domain={[0, 5]} />
+                    <YAxis dataKey="name" type="category" fontSize={12} />
+                    <Tooltip />
+                    <Bar dataKey="rating" fill="hsl(var(--primary))" />
+                  </BarChart>
+                </ResponsiveContainer>
+                <div className="text-center mt-6">
                   <div className="text-sm text-muted-foreground">Median Self Rating</div>
-                  <div className="text-3xl font-bold">4</div>
+                  <div className="text-3xl font-bold text-primary">4</div>
                 </div>
               </div>
             </CardContent>
@@ -333,27 +350,26 @@ export default function SkillTracker() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Median Peer Rating by Business Unit</CardTitle>
+              <p className="text-sm text-muted-foreground">Sep 2025</p>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="text-sm text-muted-foreground">Sep 2025</div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>ExperienceUpdated</span>
-                    <span className="font-bold">5</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Unknown</span>
-                    <span className="font-bold">4</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Hotel One</span>
-                    <span className="font-bold">-</span>
-                  </div>
-                </div>
-                <div className="mt-6 text-center">
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart 
+                    data={peerRatingsData} 
+                    layout="horizontal"
+                    margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" domain={[0, 5]} />
+                    <YAxis dataKey="name" type="category" fontSize={12} />
+                    <Tooltip />
+                    <Bar dataKey="rating" fill="hsl(var(--primary))" />
+                  </BarChart>
+                </ResponsiveContainer>
+                <div className="text-center mt-6">
                   <div className="text-sm text-muted-foreground">Median Peer Rating</div>
-                  <div className="text-3xl font-bold">4</div>
+                  <div className="text-3xl font-bold text-primary">4</div>
                 </div>
               </div>
             </CardContent>
@@ -373,9 +389,9 @@ export default function SkillTracker() {
             <p className="text-sm text-muted-foreground">Sep 2025</p>
           </CardHeader>
           <CardContent>
-            <div className="text-center">
-              <div className="text-6xl font-bold text-primary">25</div>
-              <p className="text-sm text-muted-foreground mt-2">Users making progress</p>
+            <div className="text-center py-8">
+              <div className="text-8xl font-bold text-primary mb-4">25</div>
+              <p className="text-lg text-muted-foreground">Users making progress</p>
             </div>
           </CardContent>
         </Card>
