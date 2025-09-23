@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { X, User, Users } from "lucide-react";
+import { X, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface User {
@@ -12,7 +12,6 @@ interface User {
   name: string;
   email: string;
   avatar?: string;
-  type: 'user' | 'group';
 }
 
 interface ShareDashboardDialogProps {
@@ -21,38 +20,23 @@ interface ShareDashboardDialogProps {
   dashboardName: string;
 }
 
-// Mock users and groups data
+// Mock users data
 const mockUsers: User[] = [
   {
     id: "1",
     name: "Omkar Guruju",
     email: "oguruju@degreed.com",
-    avatar: "/api/placeholder/32/32",
-    type: "user"
+    avatar: "/api/placeholder/32/32"
   },
   {
     id: "2", 
     name: "Tatiana Oka",
-    email: "toka@degreed.com",
-    type: "user"
-  },
-  {
-    id: "3",
-    name: "Marketing Team",
-    email: "marketing@company.com",
-    type: "group"
+    email: "toka@degreed.com"
   },
   {
     id: "4",
     name: "Sarah Johnson",
-    email: "sarah.johnson@company.com",
-    type: "user"
-  },
-  {
-    id: "5",
-    name: "Data Analytics Group",
-    email: "analytics@company.com", 
-    type: "group"
+    email: "sarah.johnson@company.com"
   }
 ];
 
@@ -133,7 +117,7 @@ export function ShareDashboardDialog({ isOpen, onClose, dashboardName }: ShareDa
               <Input
                 id="share-search"
                 type="text"
-                placeholder="Search users or groups..."
+                placeholder="Search users..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full"
@@ -151,11 +135,7 @@ export function ShareDashboardDialog({ isOpen, onClose, dashboardName }: ShareDa
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={user.avatar} alt={user.name} />
                         <AvatarFallback className="bg-gray-100">
-                          {user.type === 'group' ? (
-                            <Users className="h-4 w-4 text-gray-600" />
-                          ) : (
-                            <User className="h-4 w-4 text-gray-600" />
-                          )}
+                          <User className="h-4 w-4 text-gray-600" />
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
@@ -166,11 +146,6 @@ export function ShareDashboardDialog({ isOpen, onClose, dashboardName }: ShareDa
                           {user.email}
                         </div>
                       </div>
-                      {user.type === 'group' && (
-                        <Badge variant="secondary" className="text-xs">
-                          Group
-                        </Badge>
-                      )}
                     </button>
                   ))}
                 </div>
@@ -189,11 +164,7 @@ export function ShareDashboardDialog({ isOpen, onClose, dashboardName }: ShareDa
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user.avatar} alt={user.name} />
                     <AvatarFallback className="bg-gray-100">
-                      {user.type === 'group' ? (
-                        <Users className="h-4 w-4 text-gray-600" />
-                      ) : (
-                        <User className="h-4 w-4 text-gray-600" />
-                      )}
+                      <User className="h-4 w-4 text-gray-600" />
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
@@ -204,11 +175,6 @@ export function ShareDashboardDialog({ isOpen, onClose, dashboardName }: ShareDa
                       {user.email}
                     </div>
                   </div>
-                  {user.type === 'group' && (
-                    <Badge variant="secondary" className="text-xs">
-                      Group
-                    </Badge>
-                  )}
                   <button
                     onClick={() => handleUserRemove(user.id)}
                     className="p-1 rounded-full hover:bg-gray-100 transition-colors"
