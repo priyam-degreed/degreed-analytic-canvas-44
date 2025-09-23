@@ -50,13 +50,6 @@ export function TopNavigation() {
       icon: Activity,
       path: "/metrics",
       active: location.pathname.startsWith("/metrics")
-    },
-    {
-      id: "data",
-      label: "Data",
-      icon: Database, 
-      path: "/data",
-      active: location.pathname.startsWith("/data")
     }
   ];
 
