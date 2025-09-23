@@ -182,32 +182,22 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
 
       {/* Navigation Content */}
       <div className="flex flex-col h-full p-3 gap-2">
-        {/* Create Dashboard Button */}
-        <div className="mb-4">
-          <Button 
-            className={cn(
-              "w-full justify-start bg-primary hover:bg-primary/90 text-primary-foreground",
-              collapsed && "justify-center px-2"
-            )}
-            title={collapsed ? "Create Dashboard" : undefined}
-          >
-            {collapsed ? (
-              <Plus className="h-4 w-4" />
-            ) : (
-              <>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Dashboard
-              </>
-            )}
-          </Button>
-        </div>
-
         {/* Dashboard List */}
         {!collapsed && (
           <div className="mb-6">
-            <h3 className="text-xs font-semibold text-muted-foreground mb-3 px-3 uppercase tracking-wider">
-              DASHBOARDS
-            </h3>
+            <div className="flex items-center justify-between mb-3 px-3">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                DASHBOARDS
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
+                title="Create Dashboard"
+              >
+                <Plus className="h-3 w-3" />
+              </Button>
+            </div>
             <div className="space-y-1">
               {dashboards.map((dashboard) => (
                 <div key={dashboard.id} className="relative">
