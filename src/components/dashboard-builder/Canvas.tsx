@@ -1,3 +1,4 @@
+import React from "react";
 import { useDrop } from "react-dnd";
 import { BarChart3, X, Filter, ToggleLeft, Type } from "lucide-react";
 import { Card } from "@/components/ui/card";
