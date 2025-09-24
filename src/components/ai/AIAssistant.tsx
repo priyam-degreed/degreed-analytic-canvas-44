@@ -155,21 +155,21 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       };
     }
     
-    if (lowerQuery.includes("engagement") && lowerQuery.includes("department") && lowerQuery.includes("time")) {
+    if (lowerQuery.includes("trend") || lowerQuery.includes("time") || lowerQuery.includes("engagement")) {
       return {
         id: `viz-${Date.now()}`,
-        type: "line", 
-        title: "Learning Engagement by Department Over Time",
-        metrics: ["Engagement Score %", "Learning Hours"],
-        attributes: ["Department", "Time Period"],
-        filters: ["Past 6 months", "All Departments"],
+        type: "column", 
+        title: "Learning Engagement Trends Over Past 6 Months",
+        metrics: ["Learning Hours", "Course Completions"],
+        attributes: ["Department", "Date - Month/Year"],
+        filters: ["Past 6 months"],
         data: [
-          { month: "Apr", Engineering: 78, Marketing: 65, Sales: 62, HR: 58, value: 78 },
-          { month: "May", Engineering: 82, Marketing: 69, Sales: 64, HR: 61, value: 82 },
-          { month: "Jun", Engineering: 85, Marketing: 72, Sales: 67, HR: 64, value: 85 },
-          { month: "Jul", Engineering: 88, Marketing: 76, Sales: 70, HR: 68, value: 88 },
-          { month: "Aug", Engineering: 91, Marketing: 78, Sales: 72, HR: 70, value: 91 },
-          { month: "Sep", Engineering: 94, Marketing: 81, Sales: 75, HR: 73, value: 94 }
+          { month: "Apr", hours: 2340, completions: 456, engagement: 78 },
+          { month: "May", hours: 2567, completions: 523, engagement: 82 },
+          { month: "Jun", hours: 2890, completions: 612, engagement: 85 },
+          { month: "Jul", hours: 3245, completions: 734, engagement: 88 },
+          { month: "Aug", hours: 3567, completions: 823, engagement: 91 },
+          { month: "Sep", hours: 3890, completions: 945, engagement: 94 }
         ],
         canModify: true,
         saveOptions: true
@@ -180,56 +180,16 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return {
         id: `viz-${Date.now()}`,
         type: "column",
-        title: "Top 5 Trending Skills for 6 Months Period",
-        metrics: ["Learner Growth %", "Active Learners"],
+        title: "Top 5 Trending Skills in Q3",
+        metrics: ["Learner Growth", "Market Demand Score"],
         attributes: ["Skill Name"],
-        filters: ["6 Months Period", "Trending Skills"],
+        filters: ["Q3 2024", "Trending Skills"],
         data: [
-          { name: "Artificial Intelligence", growth: 145, learners: 2340, value: 145 },
-          { name: "Cybersecurity", growth: 123, learners: 1543, value: 123 },
-          { name: "Cloud Computing", growth: 89, learners: 1987, value: 89 },
-          { name: "Data Science", growth: 67, learners: 1765, value: 67 },
-          { name: "Agile Methodology", growth: 56, learners: 1432, value: 56 }
-        ],
-        canModify: true,
-        saveOptions: true
-      };
-    }
-    
-    if (lowerQuery.includes("leadership") && lowerQuery.includes("preparing")) {
-      return {
-        id: `viz-${Date.now()}`,
-        type: "pie",
-        title: "Learners Preparing for Leadership Roles by Track",
-        metrics: ["Learner Count", "Preparation Stage"],
-        attributes: ["Leadership Track"],
-        filters: ["Active Leadership Programs"],
-        data: [
-          { name: "Management Fundamentals", value: 234, stage: "Active" },
-          { name: "Team Leadership", value: 187, stage: "Active" },
-          { name: "Strategic Leadership", value: 156, stage: "Advanced" },
-          { name: "Executive Development", value: 98, stage: "Advanced" },
-          { name: "People Management", value: 201, stage: "Intermediate" }
-        ],
-        canModify: true,
-        saveOptions: true
-      };
-    }
-    
-    if (lowerQuery.includes("satisfaction") && lowerQuery.includes("content")) {
-      return {
-        id: `viz-${Date.now()}`,
-        type: "bar",
-        title: "Content Satisfaction Scores by Category",
-        metrics: ["Average Rating", "Completion Count"],
-        attributes: ["Content Category"],
-        filters: ["All Active Content"],
-        data: [
-          { name: "AI Ethics", rating: 4.8, completions: 2341, value: 4.8 },
-          { name: "Agile Leadership", rating: 4.7, completions: 1756, value: 4.7 },
-          { name: "Cloud Security", rating: 4.6, completions: 1987, value: 4.6 },
-          { name: "Data Analytics", rating: 4.5, completions: 2103, value: 4.5 },
-          { name: "DevOps Practices", rating: 4.4, completions: 1654, value: 4.4 }
+          { name: "Artificial Intelligence", growth: 145, demand: 95, learners: 2340 },
+          { name: "Cloud Computing", growth: 89, demand: 92, learners: 1987 },
+          { name: "Data Science", growth: 67, demand: 88, learners: 1765 },
+          { name: "Cybersecurity", growth: 123, demand: 85, learners: 1543 },
+          { name: "Agile Methodology", growth: 56, demand: 76, learners: 1432 }
         ],
         canModify: true,
         saveOptions: true
@@ -250,20 +210,12 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return "Analyzing skill gaps for engineering team vs market demand...\n\nHere is a bar chart showing the Skill Gaps in Engineering Team.\n\nCritical findings:\n• Kubernetes shows the largest gap (55 point deficit)\n• Machine Learning skills need development (33 point gap)\n• React/Frontend skills are well-aligned with market needs";
     }
     
-    if (lowerQuery.includes("engagement") && lowerQuery.includes("department") && lowerQuery.includes("time")) {
-      return "Creating new visualization...\n\nHere is a line chart showing Learning Engagement by Department Over Time.\n\nPositive trends identified:\n• Engineering leads with 94% engagement score\n• All departments show consistent upward trajectory\n• 66% increase in learning hours since April\n• Product teams show strong 81% engagement rates";
+    if (lowerQuery.includes("trend") || lowerQuery.includes("engagement")) {
+      return "Creating new visualization...\n\nHere is a line chart showing the Learning Engagement Trends Over the Past 6 Months.\n\nPositive trends identified:\n• 66% increase in learning hours since April\n• Course completions up 107% year-over-year\n• Engagement scores consistently improving";
     }
     
     if (lowerQuery.includes("top") && lowerQuery.includes("skill")) {
-      return "Analyzing 6 months skill trends...\n\nHere is a column chart showing the Top 5 Trending Skills for 6 months period.\n\nKey findings:\n• AI/ML skills show explosive 145% growth\n• Cybersecurity interest surged by 123%\n• Cloud computing remains consistently in-demand\n• Data science pathways see steady 67% growth";
-    }
-    
-    if (lowerQuery.includes("leadership") && lowerQuery.includes("preparing")) {
-      return "Based on current data analysis:\n\n876 learners are actively engaged in leadership development pathways with strong progression indicators:\n\n• Management Fundamentals: 234 active learners\n• Team Leadership: 187 participants\n• Strategic Leadership: 156 advanced learners\n• Overall leadership readiness score: 78%";
-    }
-    
-    if (lowerQuery.includes("satisfaction") && lowerQuery.includes("content")) {
-      return "Analyzing content satisfaction across all learning materials...\n\nTop performing content by satisfaction:\n\n• AI Ethics: 4.8/5 rating (2,341 completions)\n• Agile Leadership: 4.7/5 rating (1,756 completions)\n• Cloud Security: 4.6/5 rating (1,987 completions)\n\nOverall NPS score: 67 (Industry benchmark: 45)";
+      return "Analyzing Q3 skill trends...\n\nHere is a column chart showing the Top 5 Trending Skills in Q3.\n\nKey findings:\n• AI/ML skills show explosive 145% growth\n• Cybersecurity interest surged by 123%\n• Cloud computing remains consistently in-demand";
     }
     
     if (lowerQuery.includes("leadership")) {
@@ -273,16 +225,10 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     return "I can help you analyze learning data, create visualizations, and provide insights about skills, content performance, and learner engagement. What specific aspect would you like to explore?";
   };
 
-  const getSuggestions = (queryText: string, currentVizType?: string): string[] => {
+  const getSuggestions = (queryText: string): string[] => {
     const lowerQuery = queryText.toLowerCase();
-    
-    // Dynamic chart toggle suggestion based on current type
-    const chartToggleSuggestion = currentVizType === "pie" ? 
-      "Switch to bar chart" : 
-      "Switch to pie chart";
-    
     const allSuggestions = [
-      chartToggleSuggestion,
+      "Switch to a bar chart",
       "Break down by department",
       "Add time filter for last quarter", 
       "Show by learning pathway",
@@ -324,7 +270,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         content: contextualResponse.response,
         timestamp: new Date(),
         visualization,
-        suggestions: visualization ? getSuggestions(query, visualization.type) : contextualResponse.suggestions
+        suggestions: visualization ? getSuggestions(query) : contextualResponse.suggestions
       };
       
       setChatMessages(prev => [...prev, aiMessage]);
