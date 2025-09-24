@@ -358,37 +358,9 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
 
   const handleQuickAction = (actionQuery: string) => {
     setQuery(actionQuery);
-    
-    // Automatically send the query
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      type: "user", 
-      content: actionQuery,
-      timestamp: new Date()
-    };
-    
-    setChatMessages(prev => [...prev, userMessage]);
-    setIsTyping(true);
-    setShowSuggestions(false);
-
-    // Simulate AI processing with realistic delay
-    setTimeout(() => {
-      const contextualResponse = generateContextualResponse(actionQuery);
-      const visualization = generateVisualization(actionQuery);
-      
-      const aiMessage: ChatMessage = {
-        id: `ai-${Date.now()}`,
-        type: "assistant",
-        content: contextualResponse.response,
-        timestamp: new Date(),
-        visualization,
-        suggestions: visualization ? getSuggestions(actionQuery) : contextualResponse.suggestions
-      };
-      
-      setChatMessages(prev => [...prev, aiMessage]);
-      setIsTyping(false);
-      setQuery(""); // Clear the input after sending
-    }, 1500);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
