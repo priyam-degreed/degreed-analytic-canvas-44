@@ -394,8 +394,8 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     }));
     
     toast({
-      title: feedbackType === "up" ? "Positive Feedback" : "Negative Feedback",
-      description: `Thank you for your ${feedbackType === "up" ? "positive" : "negative"} feedback!`,
+      title: "Feedback Received",
+      description: "Thank you for your feedback!",
     });
   };
 
@@ -769,7 +769,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-xl">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-              <Brain className="h-5 w-5" />
+              <Sparkles className="h-5 w-5" />
             </div>
             <div>
               <span className="font-semibold">AI Analytics Assistant</span>
