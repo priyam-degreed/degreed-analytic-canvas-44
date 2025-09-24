@@ -12,7 +12,7 @@ export function AIStickyIcon({ onClick, isOpen }: AIStickyIconProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div className="fixed bottom-6 right-6 z-40">
+    <div className="fixed bottom-6 right-6 z-40 transform-gpu translate-z-0" style={{ willChange: 'transform' }}>
       <Button
         onClick={onClick}
         onMouseEnter={() => setIsHovered(true)}

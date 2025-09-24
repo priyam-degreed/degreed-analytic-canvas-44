@@ -40,7 +40,7 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
       />
       
       {/* Modal */}
-      <div className="fixed bottom-6 right-6 w-96 bg-white rounded-lg shadow-2xl border z-50">
+      <div className="fixed bottom-6 right-6 w-96 bg-white rounded-lg shadow-2xl border z-50 transform-gpu translate-z-0" style={{ willChange: 'transform' }}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <span className="font-medium text-gray-900">AI Assistant</span>
