@@ -429,8 +429,8 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               </div>
             </div>
             
-            {/* 3-dot menu for chart controls */}
-            {viz.canModify && (
+            {/* 3-dot menu for save options */}
+            {viz.saveOptions && (
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -439,32 +439,13 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 </PopoverTrigger>
                 <PopoverContent className="w-56" align="end">
                   <div className="space-y-2">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="w-full justify-start text-sm"
-                      onClick={() => handleChartTypeSwitch(message.id, "pie")}
-                    >
-                      <PieChart className="h-4 w-4 mr-2" />
-                      Switch to pie chart
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <BookmarkPlus className="h-4 w-4 mr-2" />
+                      Save
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="w-full justify-start text-sm"
-                      onClick={() => handleShowTrend(message.id)}
-                    >
-                      <LineChart className="h-4 w-4 mr-2" />
-                      Show trend
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="w-full justify-start text-sm"
-                      onClick={() => handleDepartmentBreakdown(message.id)}
-                    >
-                      <Users className="h-4 w-4 mr-2" />
-                      Break down by department
+                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Open in Analyse
                     </Button>
                   </div>
                 </PopoverContent>
@@ -475,9 +456,42 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           {/* Chart Rendering */}
           {renderChart(viz)}
 
-          {/* Save Options */}
+          {/* Chart Controls */}
+          {viz.canModify && (
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => handleChartTypeSwitch(message.id, "pie")}
+              >
+                <PieChart className="h-3 w-3 mr-1" />
+                Switch to pie chart
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => handleShowTrend(message.id)}
+              >
+                <LineChart className="h-3 w-3 mr-1" />
+                Show trend
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => handleDepartmentBreakdown(message.id)}
+              >
+                <Users className="h-3 w-3 mr-1" />
+                Break down by department
+              </Button>
+            </div>
+          )}
+
+          {/* Thumbs up/down only */}
           {viz.saveOptions && (
-            <div className="flex justify-between items-center pt-2 border-t border-blue-200">
+            <div className="flex justify-start items-center pt-2 border-t border-blue-200">
               <div className="flex gap-2">
                 <Button variant="ghost" size="sm" className="text-xs h-7">
                   <ThumbsUp className="h-3 w-3" />
@@ -486,18 +500,9 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   <ThumbsDown className="h-3 w-3" />
                 </Button>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="text-xs h-7">
-                  <BookmarkPlus className="h-3 w-3 mr-1" />
-                  Save
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs h-7">
-                  <ExternalLink className="h-3 w-3 mr-1" />
-                  Open in Analyse
-                </Button>
-              </div>
             </div>
           )}
+
         </div>
       </div>
     );
