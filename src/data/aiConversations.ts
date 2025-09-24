@@ -15,13 +15,13 @@ export interface ConversationExample {
 
 export const conversationExamples: ConversationExample[] = [
   {
-    id: "skills-trending-q3",
-    query: "What are the top 5 skills trending in Q3?",
+    id: "skills-trending-6months",
+    query: "What are the top 5 skills trending for 6 months period?",
     category: "skills",
-    response: "Analyzing Q3 skill trends...\n\nHere is a column chart showing the Top 5 Trending Skills in Q3.\n\nKey findings:\n• AI/ML skills show explosive 145% growth\n• Cybersecurity interest surged by 123%\n• Cloud computing remains consistently in-demand\n• Data science pathways see steady 67% growth",
+    response: "Analyzing 6 months skill trends...\n\nHere is a column chart showing the Top 5 Trending Skills for 6 months period.\n\nKey findings:\n• AI/ML skills show explosive 145% growth\n• Cybersecurity interest surged by 123%\n• Cloud computing remains consistently in-demand\n• Data science pathways see steady 67% growth",
     visualization: {
       type: "column",
-      title: "Top 5 Trending Skills in Q3 2024",
+      title: "Top 5 Trending Skills for 6 Months Period",
       insights: [
         "Artificial Intelligence leads with 2,340+ active learners",
         "145% growth rate indicates high market demand",

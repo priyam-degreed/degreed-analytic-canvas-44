@@ -62,7 +62,7 @@ interface AIAssistantProps {
 }
 
 const sampleQueries = [
-  "What are the top 5 skills trending in Q3?",
+  "What are the top 5 skills trending for 6 months period?",
   "Which content pathways have the highest completion rates?", 
   "Show me the skill gaps for our engineering team vs market demand",
   "How many learners are preparing for leadership roles?",

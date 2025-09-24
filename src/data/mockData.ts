@@ -305,7 +305,7 @@ export const conversationStarters = [
   {
     category: "Learning Analytics",
     questions: [
-      "What are the top 5 skills trending in Q3?",
+      "What are the top 5 skills trending for 6 months period?",
       "Which content pathways have the highest completion rates?",
       "Show me learning engagement by department",
       "What's the average learning velocity this month?"
