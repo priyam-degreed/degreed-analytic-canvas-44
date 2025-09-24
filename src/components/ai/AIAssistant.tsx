@@ -356,9 +356,10 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           ...message,
           visualization: {
             ...message.visualization,
-            title: message.visualization.title + " by Department",
+            type: "bar", // Horizontal bar chart for department breakdown
+            title: message.visualization.title.replace(/by Pathway|by Engineering|by Skills/gi, "by Department"),
             data: deptData,
-            attributes: ["Department", ...message.visualization.attributes.filter(attr => !attr.includes("Department"))],
+            attributes: ["Department", "Learning Progress"],
             filters: [...message.visualization.filters, "Department Breakdown"]
           }
         };
@@ -556,7 +557,37 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       );
     }
     
-    // Default column/bar chart
+    // Horizontal bar chart for "bar" type
+    if (viz.type === "bar") {
+      return (
+        <div className="bg-white border rounded-lg p-4">
+          <div className="h-48 flex flex-col justify-around gap-1">
+            {viz.data.map((item, idx) => {
+              let value = item.rate || item.gap || item.growth || item.engagement || item.learners/10 || item.value || 50;
+              const width = Math.max((value / maxValue) * 260, 12);
+              
+              return (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="w-20 text-xs text-gray-600 text-right truncate">
+                    {(item.name || item.month || `Item ${idx + 1}`).substring(0, 10)}
+                  </div>
+                  <div className="flex-1 flex items-center">
+                    <div 
+                      className="h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-r-sm flex items-center justify-end pr-2 text-xs text-white font-medium transition-all duration-300 hover:opacity-80"
+                      style={{ width: `${width}px` }}
+                    >
+                      <span className="text-xs">{Math.round(value)}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+    
+    // Default vertical column chart  
     return (
       <div className="bg-white border rounded-lg p-4">
         <div className="h-48 flex items-end justify-around gap-1">
@@ -567,12 +598,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
             return (
               <div key={idx} className="flex flex-col items-center flex-1 max-w-16">
                 <div 
-                  className={cn(
-                    "rounded-t-sm w-full mb-1 flex items-end justify-center text-xs text-white font-medium transition-all duration-300 hover:opacity-80",
-                    viz.type === "bar" ? "bg-gradient-to-r from-blue-500 to-blue-600" :
-                    viz.type === "line" ? "bg-gradient-to-r from-green-500 to-green-600" :
-                    "bg-gradient-to-r from-purple-500 to-purple-600"
-                  )}
+                  className="rounded-t-sm w-full mb-1 flex items-end justify-center text-xs text-white font-medium transition-all duration-300 hover:opacity-80 bg-gradient-to-r from-purple-500 to-purple-600"
                   style={{ height: `${height}px` }}
                 >
                   <span className="text-xs mb-1">{Math.round(value)}</span>
