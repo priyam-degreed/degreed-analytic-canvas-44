@@ -98,13 +98,8 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
 
   useEffect(() => {
     if (isOpen && chatMessages.length === 0) {
-      // Initialize with welcome message
-      setChatMessages([{
-       id: '1',
-       type: 'assistant',
-       content: 'Hi there,\n\nHow can I help you?',
-       timestamp: new Date()
-      }]);
+      // Initialize with empty chat - welcome message shown in main area
+      setChatMessages([]);
     }
   }, [isOpen]);
 
