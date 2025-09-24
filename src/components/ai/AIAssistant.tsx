@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Brain, 
   Search, 
   Send, 
   Plus,
@@ -396,6 +395,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     toast({
       title: "Feedback Received",
       description: "Thank you for your feedback!",
+      duration: 3000,
     });
   };
 
@@ -844,7 +844,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 <div key={message.id} className={cn("flex gap-3", message.type === "user" ? "justify-end" : "justify-start")}>
                   {message.type === "assistant" && (
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center shrink-0 mt-1">
-                      <Brain className="h-4 w-4 text-white" />
+                      <Sparkles className="h-4 w-4 text-white" />
                     </div>
                   )}
                   
@@ -889,7 +889,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               {isTyping && (
                 <div className="flex gap-3 justify-start">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
-                    <Brain className="h-4 w-4 text-white" />
+                    <Sparkles className="h-4 w-4 text-white" />
                   </div>
                   <div className="bg-gray-50 border p-3 rounded-lg rounded-bl-sm">
                     <div className="flex space-x-1">
