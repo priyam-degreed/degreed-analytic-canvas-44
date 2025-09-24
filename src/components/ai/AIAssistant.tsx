@@ -368,17 +368,17 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
 
     // Simulate AI processing with realistic delay
     setTimeout(() => {
-      // Use enhanced contextual response generation
-      const contextualResponse = generateContextualResponse(query);
+      // Use local response generation with specific query matching
+      const responseContent = generateResponse(query);
       const visualization = generateVisualization(query);
       
       const aiMessage: ChatMessage = {
         id: `ai-${Date.now()}`,
         type: "assistant",
-        content: contextualResponse.response,
+        content: responseContent,
         timestamp: new Date(),
         visualization,
-        suggestions: visualization ? getSuggestions(query) : contextualResponse.suggestions
+        suggestions: visualization ? getSuggestions(query) : []
       };
       
       setChatMessages(prev => [...prev, aiMessage]);
