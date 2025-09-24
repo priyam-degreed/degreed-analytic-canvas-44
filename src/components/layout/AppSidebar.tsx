@@ -51,12 +51,13 @@ const adminDashboards: Dashboard[] = [
   { id: "05", name: "Engagement Overview", path: "/dashboards/engagement-overview" }
 ];
 
-// Manager dashboards (limited scope)
+// Manager dashboards (limited scope with realistic data)
 const managerDashboards: Dashboard[] = [
-  { id: "01", name: "Team Learning", path: "/dashboards/learning-engagement" },
-  { id: "02", name: "Team Skills", path: "/dashboards/skill-insights" },
-  { id: "03", name: "Individual Progress", path: "/dashboards/career-development" },
-  { id: "04", name: "Team Performance", path: "/dashboards/engagement-overview" }
+  { id: "M1", name: "Team Learning Progress", path: "/dashboards/learning-engagement" },
+  { id: "M2", name: "Direct Reports Skills", path: "/dashboards/skill-insights" },
+  { id: "M3", name: "Individual Development Plans", path: "/dashboards/career-development" },
+  { id: "M4", name: "Team Engagement Overview", path: "/dashboards/engagement-overview" },
+  { id: "M5", name: "Content Performance (Team)", path: "/dashboards/content-performance" }
 ];
 
 // Admin navigation items (full access)
@@ -98,16 +99,8 @@ const adminNavigationItems = [
   }
 ];
 
-// Manager navigation items (limited scope)
-const managerNavigationItems = [
-  {
-    title: "My Analytics",
-    items: [
-      { name: "Personal Progress", path: "/analysis/skill-tracker", icon: Award },
-      { name: "Team Metrics", path: "/metrics", icon: BarChart3 },
-    ]
-  }
-];
+// Manager navigation items (limited scope) - No additional navigation sections
+const managerNavigationItems: typeof adminNavigationItems = [];
 
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   const location = useLocation();
@@ -124,7 +117,6 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     "Learning Guided Insights": false,
     "Guided Analysis": false,
     "Analysis Template": false,
-    "My Analytics": false,
   });
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -155,10 +147,10 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   const handleMenuAction = (action: string, dashboard: Dashboard) => {
     console.log(`${action} dashboard:`, dashboard.name);
     setOpenMenuId(null);
-    // Implement actual functionality here based on action
+    
     switch (action) {
       case 'edit':
-        // Navigate to edit mode
+        // Navigate to edit mode (admin only)
         navigate(`/dashboard-builder/${dashboard.id}/edit`);
         break;
       case 'share':
@@ -167,13 +159,18 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         setShareDialogOpen(true);
         break;
       case 'export':
-        // Trigger export functionality
+        // Trigger PDF export functionality
+        console.log(`Exporting ${dashboard.name} as PDF`);
+        break;
+      case 'export-ppt':
+        // Trigger PPT export functionality
+        console.log(`Exporting ${dashboard.name} as PowerPoint`);
         break;
       case 'save-as-new':
-        // Create a copy of the dashboard
+        // Create a copy of the dashboard (admin only)
         break;
       case 'delete':
-        // Show confirmation dialog and delete
+        // Show confirmation dialog and delete (admin only)
         break;
     }
   };
@@ -252,28 +249,27 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                   >
                     <BarChart3 className="h-4 w-4 shrink-0" />
                     <span className="flex-1 font-medium">{dashboard.id} {dashboard.name}</span>
-                    {!isManagerView && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className={cn(
-                          "h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/20",
-                          isActive(dashboard.path) && "text-primary-foreground hover:bg-white/20"
-                        )}
-                        onClick={(e) => handleMenuToggle(dashboard.id, e)}
-                      >
-                        <MoreVertical className="h-3 w-3" />
-                      </Button>
-                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/20",
+                        isActive(dashboard.path) && "text-primary-foreground hover:bg-white/20"
+                      )}
+                      onClick={(e) => handleMenuToggle(dashboard.id, e)}
+                    >
+                      <MoreVertical className="h-3 w-3" />
+                    </Button>
                   </NavLink>
                   
-                  {/* Dropdown Menu - Only for admin view */}
-                  {!isManagerView && openMenuId === dashboard.id && (
+                  {/* Dropdown Menu - Different options for admin vs manager */}
+                  {openMenuId === dashboard.id && (
                     <div
                       ref={(el) => menuRefs.current[dashboard.id] = el}
                       className="absolute right-3 top-full mt-1 w-40 bg-popover border border-border rounded-md shadow-lg z-50"
                     >
                       <div className="py-1">
+                        {/* Available for both admin and manager */}
                         <button
                           onClick={() => handleMenuAction('share', dashboard)}
                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
@@ -286,31 +282,43 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                           className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
                         >
                           <Download className="h-3 w-3" />
-                          Export
+                          Export (PDF)
                         </button>
+                        <button
+                          onClick={() => handleMenuAction('export-ppt', dashboard)}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+                        >
+                          <Download className="h-3 w-3" />
+                          Export (PPT)
+                        </button>
+                        
                         {/* Admin-only actions */}
-                        <hr className="my-1 border-border" />
-                        <button
-                          onClick={() => handleMenuAction('edit', dashboard)}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
-                        >
-                          <Edit className="h-3 w-3" />
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleMenuAction('save-as-new', dashboard)}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
-                        >
-                          <Copy className="h-3 w-3" />
-                          Save As New
-                        </button>
-                        <button
-                          onClick={() => handleMenuAction('delete', dashboard)}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors text-left"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                          Delete
-                        </button>
+                        {!isManagerView && (
+                          <>
+                            <hr className="my-1 border-border" />
+                            <button
+                              onClick={() => handleMenuAction('edit', dashboard)}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+                            >
+                              <Edit className="h-3 w-3" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleMenuAction('save-as-new', dashboard)}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors text-left"
+                            >
+                              <Copy className="h-3 w-3" />
+                              Save As New
+                            </button>
+                            <button
+                              onClick={() => handleMenuAction('delete', dashboard)}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors text-left"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                              Delete
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
