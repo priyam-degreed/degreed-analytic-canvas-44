@@ -31,11 +31,12 @@ export function SearchDropdown({ query, isOpen, onClose, onSelect, onSuggestedQu
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (query.length > 0) {
+    if (query.length > 1) { // Search after 2 characters
       setIsLoading(true);
       // Use AI-powered search with realistic delay
       setTimeout(() => {
-        const searchResults = searchWithAI(query, 6);
+        const searchResults = searchWithAI(query, 8);
+        console.log('Search results for:', query, searchResults); // Debug log
         setResults(searchResults);
         setIsLoading(false);
       }, 300);
