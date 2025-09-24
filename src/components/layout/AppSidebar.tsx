@@ -7,7 +7,6 @@ import {
   BookOpen,
   Target,
   MessageSquare,
-  Settings,
   TrendingUp,
   Users,
   Calendar,
@@ -350,28 +349,6 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
               )}
             </Collapsible>
           ))}
-        </div>
-
-        {/* Settings - Enhanced visibility with better styling */}
-        <div className="border-t pt-4 mt-auto">
-          <NavLink
-            to="/settings"
-            className={({ isActive }) => cn(
-              "flex items-center gap-3 px-3 py-3 mx-1 rounded-lg text-sm font-medium transition-all duration-200 border",
-              "hover:bg-accent/70 hover:shadow-sm hover:border-gray-300",
-              isActive 
-                ? "bg-primary text-primary-foreground shadow-md border-primary/30" 
-                : "text-foreground border-transparent hover:border-gray-200 bg-gray-50/50",
-              collapsed && "justify-center px-2 mx-2"
-            )}
-            title={collapsed ? "Settings" : undefined}
-          >
-            <Settings className={cn(
-              "h-4 w-4 shrink-0",
-              isActive(location.pathname) && location.pathname === "/settings" ? "text-primary-foreground" : "text-gray-600"
-            )} />
-            {!collapsed && <span>Settings</span>}
-          </NavLink>
         </div>
       </div>
 
