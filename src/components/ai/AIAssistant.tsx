@@ -365,11 +365,36 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     }, 1500);
   };
 
-  const handleQuickAction = (actionQuery: string) => {
-    setQuery(actionQuery);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+  const handleQuickAction = async (actionQuery: string) => {
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      type: "user", 
+      content: actionQuery,
+      timestamp: new Date()
+    };
+    
+    setChatMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+    setShowSuggestions(false);
+
+    // Simulate AI processing with realistic delay
+    setTimeout(() => {
+      // Use enhanced contextual response generation
+      const contextualResponse = generateContextualResponse(actionQuery);
+      const visualization = generateVisualization(actionQuery);
+      
+      const aiMessage: ChatMessage = {
+        id: `ai-${Date.now()}`,
+        type: "assistant",
+        content: contextualResponse.response,
+        timestamp: new Date(),
+        visualization,
+        suggestions: visualization ? getSuggestions(actionQuery) : contextualResponse.suggestions
+      };
+      
+      setChatMessages(prev => [...prev, aiMessage]);
+      setIsTyping(false);
+    }, 1500);
   };
 
   const handleSuggestionClick = (suggestion: string) => {
