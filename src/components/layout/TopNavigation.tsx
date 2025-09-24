@@ -15,8 +15,12 @@ export function TopNavigation() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
-  const { viewMode, setViewMode, isManagerView } = useViewMode();
-  
+  const {
+    viewMode,
+    setViewMode,
+    isManagerView
+  } = useViewMode();
+
   // Handle Ctrl+K keyboard shortcut
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -31,7 +35,6 @@ export function TopNavigation() {
         setIsSearchOpen(false);
       }
     };
-
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
@@ -43,7 +46,6 @@ export function TopNavigation() {
         setIsSearchOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -71,11 +73,9 @@ export function TopNavigation() {
     setSearchQuery(value);
     setIsSearchOpen(true);
   };
-
   const handleSearchFocus = () => {
     setIsSearchOpen(true);
   };
-
   const handleSuggestedQuery = (query: string) => {
     setSearchQuery(query);
     setIsSearchOpen(true);
@@ -108,45 +108,25 @@ export function TopNavigation() {
               <Shield className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium text-foreground">Admin</span>
             </div>
-            <Switch
-              checked={isManagerView}
-              onCheckedChange={(checked) => setViewMode(checked ? 'manager' : 'admin')}
-              className="data-[state=checked]:bg-accent"
-            />
+            <Switch checked={isManagerView} onCheckedChange={checked => setViewMode(checked ? 'manager' : 'admin')} className="data-[state=checked]:bg-accent" />
             <div className="flex items-center space-x-2">
               <Users className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium text-foreground">Manager</span>
             </div>
-            {isManagerView && (
-              <Badge variant="secondary" className="text-xs">
-                Scope: Direct Reports
-              </Badge>
-            )}
+            {isManagerView}
           </div>
           {/* Search Bar */}
           <div className="relative" ref={searchRef}>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-              <Input 
-                type="text" 
-                placeholder="Search dashboards, metrics..." 
-                value={searchQuery} 
-                onChange={handleSearchChange}
-                onFocus={handleSearchFocus}
-                className="pl-10 pr-16 py-2 w-80 bg-muted/50 border-border focus:bg-background focus:ring-2 focus:ring-ring focus:border-transparent" 
-              />
+              <Input type="text" placeholder="Search dashboards, metrics..." value={searchQuery} onChange={handleSearchChange} onFocus={handleSearchFocus} className="pl-10 pr-16 py-2 w-80 bg-muted/50 border-border focus:bg-background focus:ring-2 focus:ring-ring focus:border-transparent" />
               <kbd className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-xs font-medium text-muted-foreground">
                 Ctrl K
               </kbd>
             </div>
             
             {/* Search Dropdown */}
-            <SearchDropdown
-              query={searchQuery}
-              isOpen={isSearchOpen}
-              onClose={() => setIsSearchOpen(false)}
-              onSuggestedQuery={handleSuggestedQuery}
-            />
+            <SearchDropdown query={searchQuery} isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} onSuggestedQuery={handleSuggestedQuery} />
           </div>
 
           {/* Notifications */}
