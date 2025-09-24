@@ -1,14 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Search, Bell, User, Settings, HelpCircle, LogOut, BarChart3, Database, TrendingUp, Activity } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { SmartSearch } from "@/components/ai/SmartSearch";
 export function TopNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
+  // Handle Ctrl+K keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+      if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
   const navigationItems = [{
     id: "dashboards",
     label: "Dashboards",
@@ -31,8 +49,12 @@ export function TopNavigation() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setIsSearchOpen(true);
     }
+  };
+
+  const handleSearchClick = () => {
+    setIsSearchOpen(true);
   };
   return <nav className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-50 shadow-sm">
       <div className="flex items-center justify-between">
@@ -57,13 +79,26 @@ export function TopNavigation() {
         {/* Right Section - Search and User Actions */}
         <div className="flex items-center space-x-4">
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input type="search" placeholder="Search dashboards, metrics..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-4 py-2 w-80 bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            <kbd className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium text-muted-foreground">
-              Ctrl K
-            </kbd>
-          </form>
+          <div className="relative">
+            <div 
+              className="flex items-center cursor-pointer"
+              onClick={handleSearchClick}
+            >
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <Input 
+                type="text" 
+                placeholder="Search dashboards, metrics..." 
+                value={searchQuery} 
+                onChange={e => setSearchQuery(e.target.value)}
+                onFocus={handleSearchClick}
+                className="pl-10 pr-16 py-2 w-80 bg-muted/50 border-border focus:bg-background focus:ring-2 focus:ring-ring focus:border-transparent cursor-pointer" 
+                readOnly
+              />
+              <kbd className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-xs font-medium text-muted-foreground">
+                Ctrl K
+              </kbd>
+            </div>
+          </div>
 
           {/* Notifications */}
           
@@ -105,5 +140,11 @@ export function TopNavigation() {
           </DropdownMenu>
         </div>
       </div>
+      
+      {/* Smart Search Modal */}
+      <SmartSearch
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
     </nav>;
 }
