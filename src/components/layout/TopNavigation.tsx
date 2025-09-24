@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Search, Bell, User, Settings, HelpCircle, LogOut, BarChart3, Database, TrendingUp, Activity } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { SmartSearch } from "@/components/ai/SmartSearch";
+import { SearchDropdown } from "@/components/ai/SearchDropdown";
 export function TopNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
   
   // Handle Ctrl+K keyboard shortcut
   useEffect(() => {
@@ -18,6 +19,9 @@ export function TopNavigation() {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         setIsSearchOpen(true);
+        // Focus the search input
+        const input = searchRef.current?.querySelector('input');
+        if (input) input.focus();
       }
       if (e.key === 'Escape') {
         setIsSearchOpen(false);
@@ -26,6 +30,18 @@ export function TopNavigation() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   const navigationItems = [{
     id: "dashboards",
@@ -46,14 +62,18 @@ export function TopNavigation() {
     path: "/metrics",
     active: location.pathname.startsWith("/metrics")
   }];
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      setIsSearchOpen(true);
-    }
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setIsSearchOpen(true);
   };
 
-  const handleSearchClick = () => {
+  const handleSearchFocus = () => {
+    setIsSearchOpen(true);
+  };
+
+  const handleSuggestedQuery = (query: string) => {
+    setSearchQuery(query);
     setIsSearchOpen(true);
   };
   return <nav className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-50 shadow-sm">
@@ -79,25 +99,29 @@ export function TopNavigation() {
         {/* Right Section - Search and User Actions */}
         <div className="flex items-center space-x-4">
           {/* Search Bar */}
-          <div className="relative">
-            <div 
-              className="flex items-center cursor-pointer"
-              onClick={handleSearchClick}
-            >
+          <div className="relative" ref={searchRef}>
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
               <Input 
                 type="text" 
                 placeholder="Search dashboards, metrics..." 
                 value={searchQuery} 
-                onChange={e => setSearchQuery(e.target.value)}
-                onFocus={handleSearchClick}
-                className="pl-10 pr-16 py-2 w-80 bg-muted/50 border-border focus:bg-background focus:ring-2 focus:ring-ring focus:border-transparent cursor-pointer" 
-                readOnly
+                onChange={handleSearchChange}
+                onFocus={handleSearchFocus}
+                className="pl-10 pr-16 py-2 w-80 bg-muted/50 border-border focus:bg-background focus:ring-2 focus:ring-ring focus:border-transparent" 
               />
               <kbd className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-xs font-medium text-muted-foreground">
                 Ctrl K
               </kbd>
             </div>
+            
+            {/* Search Dropdown */}
+            <SearchDropdown
+              query={searchQuery}
+              isOpen={isSearchOpen}
+              onClose={() => setIsSearchOpen(false)}
+              onSuggestedQuery={handleSuggestedQuery}
+            />
           </div>
 
           {/* Notifications */}
@@ -140,11 +164,5 @@ export function TopNavigation() {
           </DropdownMenu>
         </div>
       </div>
-      
-      {/* Smart Search Modal */}
-      <SmartSearch
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-      />
     </nav>;
 }
