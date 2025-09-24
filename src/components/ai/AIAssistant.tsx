@@ -159,7 +159,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     if (lowerQuery.includes("trend") || lowerQuery.includes("time") || lowerQuery.includes("engagement")) {
       return {
         id: `viz-${Date.now()}`,
-        type: "line", 
+        type: "column", 
         title: "Learning Engagement Trends Over Past 6 Months",
         metrics: ["Learning Hours", "Course Completions"],
         attributes: ["Department", "Date - Month/Year"],
