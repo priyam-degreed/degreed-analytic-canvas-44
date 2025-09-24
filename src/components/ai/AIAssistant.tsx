@@ -115,81 +115,129 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const generateVisualization = (queryText: string): VisualizationData | null => {
     const lowerQuery = queryText.toLowerCase();
     
-    if (lowerQuery.includes("completion") && (lowerQuery.includes("rate") || lowerQuery.includes("pathway"))) {
+    // Top 5 skills trending for 6 months
+    if (lowerQuery.includes("top") && lowerQuery.includes("skill") && lowerQuery.includes("month")) {
       return {
         id: `viz-${Date.now()}`,
         type: "column",
-        title: "Learning Completion Rates by Pathway",
-        metrics: ["Completion Rate"],
-        attributes: ["Learning Pathway"],
-        filters: ["Active Pathways Only"],
+        title: "Top 5 Trending Skills - 6 Month Period",
+        metrics: ["Growth %", "New Learners"],
+        attributes: ["Skill Name", "Trend Period"],
+        filters: ["Past 6 months", "Trending Skills"],
         data: [
-          { name: "Data Science Professional", rate: 72, learners: 987 },
-          { name: "Software Engineering Track", rate: 67, learners: 1234 },
-          { name: "Leadership Development", rate: 59, learners: 876 },
-          { name: "Digital Marketing Specialist", rate: 81, learners: 654 },
-          { name: "Cloud Architecture Expert", rate: 63, learners: 543 }
+          { name: "Generative AI", growth: 158, learners: 3247, trend: "up" },
+          { name: "Cloud Security", growth: 134, learners: 2891, trend: "up" },
+          { name: "DevOps", growth: 112, learners: 2543, trend: "up" },
+          { name: "Data Analytics", growth: 98, learners: 2134, trend: "up" },
+          { name: "Product Management", growth: 87, learners: 1876, trend: "up" }
         ],
         canModify: true,
         saveOptions: true
       };
     }
     
+    // Content pathways completion rates
+    if (lowerQuery.includes("completion") && (lowerQuery.includes("rate") || lowerQuery.includes("pathway"))) {
+      return {
+        id: `viz-${Date.now()}`,
+        type: "bar",
+        title: "Content Pathways - Completion Rates",
+        metrics: ["Completion Rate %", "Total Enrollments"],
+        attributes: ["Learning Pathway"],
+        filters: ["Active Pathways", "Past 6 months"],
+        data: [
+          { name: "Digital Marketing Pro", rate: 84, learners: 756, completions: 635 },
+          { name: "AI/ML Specialist", rate: 78, learners: 943, completions: 736 },
+          { name: "Cloud Architecture", rate: 72, learners: 612, completions: 441 },
+          { name: "Data Science Track", rate: 69, learners: 1234, completions: 851 },
+          { name: "Software Engineering", rate: 67, learners: 1876, completions: 1257 },
+          { name: "Leadership Development", rate: 61, learners: 543, completions: 331 }
+        ],
+        canModify: true,
+        saveOptions: true
+      };
+    }
+    
+    // Skill gaps for engineering team
     if (lowerQuery.includes("skill") && (lowerQuery.includes("gap") || lowerQuery.includes("engineer"))) {
       return {
         id: `viz-${Date.now()}`,
         type: "bar",
-        title: "Skill Gaps in Engineering Team vs Market Demand",
-        metrics: ["Current Skills", "Market Demand", "Gap"],
-        attributes: ["Skill Category"],
-        filters: ["Engineering Department"],
+        title: "Engineering Team Skill Gaps vs Market Demand",
+        metrics: ["Current Level %", "Market Demand %", "Gap"],
+        attributes: ["Technical Skills"],
+        filters: ["Engineering Department", "Market Analysis 2024"],
         data: [
-          { name: "Kubernetes", current: 23, demand: 78, gap: 55 },
-          { name: "Machine Learning", current: 34, demand: 67, gap: 33 },
-          { name: "DevOps", current: 45, demand: 67, gap: 22 },
-          { name: "Cloud Architecture", current: 56, demand: 70, gap: 14 },
-          { name: "React/Frontend", current: 67, demand: 75, gap: 8 }
+          { name: "Kubernetes", current: 35, demand: 85, gap: 50 },
+          { name: "Machine Learning", current: 42, demand: 78, gap: 36 },
+          { name: "Microservices", current: 58, demand: 82, gap: 24 },
+          { name: "Cloud Native", current: 61, demand: 79, gap: 18 },
+          { name: "React/Vue", current: 74, demand: 81, gap: 7 }
         ],
         canModify: true,
         saveOptions: true
       };
     }
     
-    if (lowerQuery.includes("trend") || lowerQuery.includes("time") || lowerQuery.includes("engagement")) {
+    // Learners preparing for leadership roles
+    if (lowerQuery.includes("leadership") || lowerQuery.includes("preparing")) {
       return {
         id: `viz-${Date.now()}`,
-        type: "column", 
-        title: "Learning Engagement Trends Over Past 6 Months",
-        metrics: ["Learning Hours", "Course Completions"],
-        attributes: ["Department", "Date - Month/Year"],
-        filters: ["Past 6 months"],
+        type: "pie",
+        title: "Learners Preparing for Leadership Roles",
+        metrics: ["Learner Count", "Progress %"],
+        attributes: ["Leadership Track", "Department"],
+        filters: ["Active Leadership Programs"],
         data: [
-          { month: "Apr", hours: 2340, completions: 456, engagement: 78 },
-          { month: "May", hours: 2567, completions: 523, engagement: 82 },
-          { month: "Jun", hours: 2890, completions: 612, engagement: 85 },
-          { month: "Jul", hours: 3245, completions: 734, engagement: 88 },
-          { month: "Aug", hours: 3567, completions: 823, engagement: 91 },
-          { month: "Sep", hours: 3890, completions: 945, engagement: 94 }
+          { name: "Middle Management", value: 312, progress: 67 },
+          { name: "Team Lead Track", value: 189, progress: 78 },
+          { name: "Senior Leadership", value: 98, progress: 45 },
+          { name: "Executive Preparation", value: 47, progress: 34 },
+          { name: "Cross-Functional Lead", value: 134, progress: 72 }
         ],
         canModify: true,
         saveOptions: true
       };
     }
     
-    if (lowerQuery.includes("top") && lowerQuery.includes("skill")) {
+    // Learning engagement by department over time
+    if (lowerQuery.includes("engagement") && (lowerQuery.includes("department") || lowerQuery.includes("time"))) {
+      return {
+        id: `viz-${Date.now()}`,
+        type: "line",
+        title: "Learning Engagement by Department - 6 Month Trend",
+        metrics: ["Engagement Score", "Active Learners"],
+        attributes: ["Department", "Time Period"],
+        filters: ["All Departments", "Past 6 months"],
+        data: [
+          { month: "Apr", engineering: 78, marketing: 82, sales: 71, hr: 88, operations: 74 },
+          { month: "May", engineering: 81, marketing: 85, sales: 75, hr: 89, operations: 77 },
+          { month: "Jun", engineering: 85, marketing: 87, sales: 78, hr: 91, operations: 80 },
+          { month: "Jul", engineering: 88, marketing: 89, sales: 82, hr: 93, operations: 83 },
+          { month: "Aug", engineering: 91, marketing: 91, sales: 85, hr: 94, operations: 86 },
+          { month: "Sep", engineering: 94, marketing: 93, sales: 88, hr: 95, operations: 89 }
+        ],
+        canModify: true,
+        saveOptions: true
+      };
+    }
+    
+    // Content satisfaction scores
+    if (lowerQuery.includes("satisfaction") || lowerQuery.includes("content")) {
       return {
         id: `viz-${Date.now()}`,
         type: "column",
-        title: "Top 5 Trending Skills in Q3",
-        metrics: ["Learner Growth", "Market Demand Score"],
-        attributes: ["Skill Name"],
-        filters: ["Q3 2024", "Trending Skills"],
+        title: "Content with Highest Satisfaction Scores",
+        metrics: ["Satisfaction Score", "Review Count"],
+        attributes: ["Content Type", "Rating"],
+        filters: ["All Content", "Min 50 reviews"],
         data: [
-          { name: "Artificial Intelligence", growth: 145, demand: 95, learners: 2340 },
-          { name: "Cloud Computing", growth: 89, demand: 92, learners: 1987 },
-          { name: "Data Science", growth: 67, demand: 88, learners: 1765 },
-          { name: "Cybersecurity", growth: 123, demand: 85, learners: 1543 },
-          { name: "Agile Methodology", growth: 56, demand: 76, learners: 1432 }
+          { name: "AI Ethics Course", rate: 4.8, reviews: 234, completions: 543 },
+          { name: "Leadership Workshop", rate: 4.7, reviews: 189, completions: 412 },
+          { name: "Data Visualization", rate: 4.6, reviews: 156, completions: 378 },
+          { name: "Agile Masterclass", rate: 4.5, reviews: 298, completions: 672 },
+          { name: "Cloud Fundamentals", rate: 4.4, reviews: 445, completions: 891 },
+          { name: "UX Design Basics", rate: 4.3, reviews: 167, completions: 334 }
         ],
         canModify: true,
         saveOptions: true
@@ -202,24 +250,28 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const generateResponse = (queryText: string): string => {
     const lowerQuery = queryText.toLowerCase();
     
+    if (lowerQuery.includes("top") && lowerQuery.includes("skill") && lowerQuery.includes("month")) {
+      return "Analyzing trending skills over the past 6 months...\n\nHere's a column chart showing the Top 5 Trending Skills.\n\nKey insights:\n• Generative AI leads with 158% growth and 3,247 new learners\n• Cloud Security shows strong demand with 134% growth\n• DevOps continues upward trend with 112% growth\n• All top skills show consistent upward trajectory";
+    }
+    
     if (lowerQuery.includes("completion") && lowerQuery.includes("rate")) {
-      return "Creating new visualization...\n\nHere is a column chart showing the Learning Completion Rates by Pathway.\n\nKey insights:\n• Digital Marketing pathway leads with 81% completion\n• Leadership Development shows opportunity for improvement at 59%\n• Overall pathway engagement is strong across technical tracks";
+      return "Creating new visualization...\n\nHere's a bar chart showing Content Pathways with Highest Completion Rates.\n\nKey insights:\n• Digital Marketing Pro pathway leads with 84% completion rate\n• AI/ML Specialist shows strong engagement at 78%\n• Leadership Development has room for improvement at 61%\n• Over 5,000 total learners across all pathways";
     }
     
     if (lowerQuery.includes("skill") && lowerQuery.includes("gap")) {
-      return "Analyzing skill gaps for engineering team vs market demand...\n\nHere is a bar chart showing the Skill Gaps in Engineering Team.\n\nCritical findings:\n• Kubernetes shows the largest gap (55 point deficit)\n• Machine Learning skills need development (33 point gap)\n• React/Frontend skills are well-aligned with market needs";
+      return "Analyzing skill gaps for engineering team vs market demand...\n\nHere's a bar chart showing Engineering Team Skill Gaps.\n\nCritical findings:\n• Kubernetes shows the largest gap (50 point deficit)\n• Machine Learning skills need significant development (36 point gap)\n• React/Vue skills are well-aligned with market needs (7 point gap)\n• Recommend targeted training programs for top 3 gap areas";
     }
     
-    if (lowerQuery.includes("trend") || lowerQuery.includes("engagement")) {
-      return "Creating new visualization...\n\nHere is a line chart showing the Learning Engagement Trends Over the Past 6 Months.\n\nPositive trends identified:\n• 66% increase in learning hours since April\n• Course completions up 107% year-over-year\n• Engagement scores consistently improving";
+    if (lowerQuery.includes("leadership") || lowerQuery.includes("preparing")) {
+      return "Analyzing leadership preparation programs...\n\nHere's a pie chart showing Learners Preparing for Leadership Roles.\n\nCurrent status:\n• 780 total learners actively engaged in leadership tracks\n• Middle Management track has highest enrollment (312 learners)\n• Team Lead track shows best progress at 78% completion\n• Executive preparation programs need additional support";
     }
     
-    if (lowerQuery.includes("top") && lowerQuery.includes("skill")) {
-      return "Analyzing Q3 skill trends...\n\nHere is a column chart showing the Top 5 Trending Skills in Q3.\n\nKey findings:\n• AI/ML skills show explosive 145% growth\n• Cybersecurity interest surged by 123%\n• Cloud computing remains consistently in-demand";
+    if (lowerQuery.includes("engagement") && (lowerQuery.includes("department") || lowerQuery.includes("time"))) {
+      return "Creating new visualization...\n\nHere's a line chart showing Learning Engagement by Department Over Time.\n\nPositive trends identified:\n• All departments show consistent improvement\n• HR leads with 95% engagement score\n• Engineering shows strongest growth (78% to 94%)\n• 6-month average improvement: 16 percentage points";
     }
     
-    if (lowerQuery.includes("leadership")) {
-      return "Based on current data, 876 learners are actively engaged in leadership development pathways. The Leadership Development Journey shows a 59% completion rate with strong engagement in management fundamentals and team leadership modules.";
+    if (lowerQuery.includes("satisfaction") || (lowerQuery.includes("content") && lowerQuery.includes("score"))) {
+      return "Analyzing content satisfaction scores...\n\nHere's a column chart showing Content with Highest Satisfaction Scores.\n\nTop performing content:\n• AI Ethics Course leads with 4.8/5 rating (234 reviews)\n• Leadership Workshop maintains 4.7/5 score\n• All top content maintains 4.3+ satisfaction rating\n• Strong correlation between satisfaction and completion rates";
     }
     
     return "I can help you analyze learning data, create visualizations, and provide insights about skills, content performance, and learner engagement. What specific aspect would you like to explore?";
@@ -689,10 +741,19 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 variant="outline" 
                 size="sm" 
                 className="text-xs h-7"
-                onClick={() => handleChartTypeSwitch(message.id, "pie")}
+                onClick={() => handleChartTypeSwitch(message.id, viz.type === "pie" ? "column" : "pie")}
               >
-                <PieChart className="h-3 w-3 mr-1" />
-                Switch to pie chart
+                {viz.type === "pie" ? (
+                  <>
+                    <BarChart3 className="h-3 w-3 mr-1" />
+                    Switch to bar chart
+                  </>
+                ) : (
+                  <>
+                    <PieChart className="h-3 w-3 mr-1" />
+                    Switch to pie chart
+                  </>
+                )}
               </Button>
               <Button 
                 variant="outline" 
