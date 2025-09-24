@@ -11,6 +11,38 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 export default function EngagementOverviewDashboard() {
   const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', '#8884d8', '#82ca9d'];
   
+  // Manager-level team data (10-20 direct reports)
+  const teamEngagementData = {
+    activeTeamMembers: 17,
+    teamLearningHours: 68.4,
+    avgHoursPerMember: 4.0,
+    teamCompletions: 42,
+    teamCompletionChange: 24.5,
+    teamSatisfactionScore: 4.4,
+    
+    teamTrends: [
+      { month: "Jul", completions: 8, hours: 32, activeUsers: 14 },
+      { month: "Aug", completions: 12, hours: 48, activeUsers: 16 },
+      { month: "Sep", completions: 15, hours: 58, activeUsers: 17 }
+    ],
+    
+    teamContentUsage: [
+      { type: "Articles", usage: 28, completionRate: 82, avgRating: 4.3 },
+      { type: "Videos", usage: 24, completionRate: 88, avgRating: 4.6 },
+      { type: "Pathways", usage: 15, completionRate: 73, avgRating: 4.2 },
+      { type: "Assessments", usage: 12, completionRate: 95, avgRating: 4.1 },
+      { type: "Podcasts", usage: 8, completionRate: 68, avgRating: 4.0 }
+    ],
+    
+    teamSkillFocus: [
+      { topic: "Leadership Skills", learners: 8, growth: 60 },
+      { topic: "Project Management", learners: 6, growth: 33 },
+      { topic: "Communication", learners: 5, growth: 25 },
+      { topic: "Data Analysis", learners: 4, growth: 100 },
+      { topic: "Cloud Computing", learners: 3, growth: 50 }
+    ]
+  };
+  
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -27,27 +59,27 @@ export default function EngagementOverviewDashboard() {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
-          title="Total Active Learners"
-          value={learningEngagementData.activeUsersThisWeek.toLocaleString()}
-          change={{ value: 12.5, type: "positive" }}
+          title="Active Team Members"
+          value={teamEngagementData.activeTeamMembers.toString()}
+          change={{ value: 6.2, type: "positive" }}
           icon={<Users className="h-5 w-5" />}
         />
         <MetricCard
-          title="Avg Session Duration"
-          value={`${learningEngagementData.learningHours.avgPerLearner.toFixed(1)}h`}
+          title="Avg Hours per Member"
+          value={`${teamEngagementData.avgHoursPerMember.toFixed(1)}h`}
           change={{ value: 8.3, type: "positive" }}
           icon={<Clock className="h-5 w-5" />}
         />
         <MetricCard
-          title="Course Completions"
-          value={learningEngagementData.courseCompletions.thisQuarter.toLocaleString()}
-          change={{ value: learningEngagementData.courseCompletions.change, type: "positive" }}
+          title="Team Completions"
+          value={teamEngagementData.teamCompletions.toString()}
+          change={{ value: teamEngagementData.teamCompletionChange, type: "positive" }}
           icon={<Target className="h-5 w-5" />}
         />
         <MetricCard
-          title="Content Satisfaction"
-          value="4.3/5"
-          change={{ value: 5.2, type: "positive" }}
+          title="Team Satisfaction"
+          value={`${teamEngagementData.teamSatisfactionScore}/5`}
+          change={{ value: 4.8, type: "positive" }}
           icon={<Heart className="h-5 w-5" />}
         />
       </div>
@@ -59,10 +91,10 @@ export default function EngagementOverviewDashboard() {
           subtitle="User activity and interaction patterns over time"
         >
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={learningEngagementData.engagementTrends}>
+            <AreaChart data={teamEngagementData.teamTrends}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
-                dataKey="date" 
+                dataKey="month" 
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
               />
@@ -101,7 +133,7 @@ export default function EngagementOverviewDashboard() {
           subtitle="Learning preferences and content type engagement"
         >
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={learningEngagementData.contentModalities}>
+            <BarChart data={teamEngagementData.teamContentUsage}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
                 dataKey="type" 
@@ -130,12 +162,12 @@ export default function EngagementOverviewDashboard() {
 
       {/* Trending Topics Section */}
       <ChartCard
-        title="Trending Learning Topics"
-        subtitle="Most popular skills and growth trends"
+        title="Team Skill Focus Areas"
+        subtitle="Skills your team is actively developing"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            {learningEngagementData.trendingTopics.slice(0, 5).map((topic, index) => (
+            {teamEngagementData.teamSkillFocus.slice(0, 5).map((topic, index) => (
               <div key={topic.topic} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
@@ -157,7 +189,7 @@ export default function EngagementOverviewDashboard() {
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
-                data={learningEngagementData.contentModalities}
+                data={teamEngagementData.teamContentUsage}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
@@ -165,7 +197,7 @@ export default function EngagementOverviewDashboard() {
                 paddingAngle={5}
                 dataKey="usage"
               >
-                {learningEngagementData.contentModalities.map((entry, index) => (
+                {teamEngagementData.teamContentUsage.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -185,7 +217,7 @@ export default function EngagementOverviewDashboard() {
               </div>
               <div>
                 <div className="text-2xl font-bold">
-                  {Math.round(learningEngagementData.contentModalities.reduce((acc, curr) => acc + curr.completionRate, 0) / learningEngagementData.contentModalities.length)}%
+                  {Math.round(teamEngagementData.teamContentUsage.reduce((acc, curr) => acc + curr.completionRate, 0) / teamEngagementData.teamContentUsage.length)}%
                 </div>
                 <div className="text-sm text-muted-foreground">Avg Completion Rate</div>
               </div>
@@ -200,8 +232,8 @@ export default function EngagementOverviewDashboard() {
                 <Activity className="h-5 w-5 text-secondary" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{learningEngagementData.learningHours.total.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Total Learning Hours</div>
+                <div className="text-2xl font-bold">{teamEngagementData.teamLearningHours}</div>
+                <div className="text-sm text-muted-foreground">Team Learning Hours</div>
               </div>
             </div>
           </CardContent>
@@ -214,8 +246,8 @@ export default function EngagementOverviewDashboard() {
                 <Users className="h-5 w-5 text-accent" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{learningEngagementData.totalLearners.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Total Registered Learners</div>
+                <div className="text-2xl font-bold">{teamEngagementData.activeTeamMembers}</div>
+                <div className="text-sm text-muted-foreground">Total Team Members</div>
               </div>
             </div>
           </CardContent>
@@ -229,7 +261,7 @@ export default function EngagementOverviewDashboard() {
               </div>
               <div>
                 <div className="text-2xl font-bold">
-                  {(learningEngagementData.contentModalities.reduce((acc, curr) => acc + curr.avgRating, 0) / learningEngagementData.contentModalities.length).toFixed(1)}
+                  {(teamEngagementData.teamContentUsage.reduce((acc, curr) => acc + curr.avgRating, 0) / teamEngagementData.teamContentUsage.length).toFixed(1)}
                 </div>
                 <div className="text-sm text-muted-foreground">Average Content Rating</div>
               </div>
