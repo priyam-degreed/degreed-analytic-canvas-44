@@ -115,6 +115,27 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const generateVisualization = (queryText: string): VisualizationData | null => {
     const lowerQuery = queryText.toLowerCase();
     
+    // Search dashboards / learning engagement dashboards
+    if (lowerQuery.includes("dashboard") && lowerQuery.includes("engagement")) {
+      return {
+        id: `viz-${Date.now()}`,
+        type: "column",
+        title: "Learning Engagement Dashboard Overview",
+        metrics: ["Engagement Score", "Active Users", "Completion Rate"],
+        attributes: ["Dashboard Type", "Usage Metrics"],
+        filters: ["Active Dashboards", "Past 30 days"],
+        data: [
+          { name: "Skills Analytics", engagement: 89, users: 1247, completions: 78 },
+          { name: "Learning Paths", engagement: 85, users: 2341, completions: 82 },
+          { name: "Content Performance", engagement: 91, users: 987, completions: 76 },
+          { name: "Team Progress", engagement: 87, users: 1654, completions: 84 },
+          { name: "Competency Tracking", engagement: 83, users: 743, completions: 71 }
+        ],
+        canModify: true,
+        saveOptions: true
+      };
+    }
+    
     // Top 5 skills trending for 6 months
     if (lowerQuery.includes("top") && lowerQuery.includes("skill") && lowerQuery.includes("month")) {
       return {
@@ -250,6 +271,11 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const generateResponse = (queryText: string): string => {
     const lowerQuery = queryText.toLowerCase();
     
+    // Search dashboards / learning engagement dashboards
+    if (lowerQuery.includes("dashboard") && lowerQuery.includes("engagement")) {
+      return "Searching available learning engagement dashboards...\n\nHere's a column chart showing Learning Engagement Dashboard Overview.\n\nAvailable dashboards:\n• Content Performance leads with 91% engagement score\n• Skills Analytics shows strong usage (1,247 active users)\n• Team Progress dashboard has highest completion rate (84%)\n• 5 dashboards available with comprehensive learning metrics";
+    }
+    
     if (lowerQuery.includes("top") && lowerQuery.includes("skill") && lowerQuery.includes("month")) {
       return "Analyzing trending skills over the past 6 months...\n\nHere's a column chart showing the Top 5 Trending Skills.\n\nKey insights:\n• Generative AI leads with 158% growth and 3,247 new learners\n• Cloud Security shows strong demand with 134% growth\n• DevOps continues upward trend with 112% growth\n• All top skills show consistent upward trajectory";
     }
@@ -332,9 +358,37 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
 
   const handleQuickAction = (actionQuery: string) => {
     setQuery(actionQuery);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    
+    // Automatically send the query
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      type: "user", 
+      content: actionQuery,
+      timestamp: new Date()
+    };
+    
+    setChatMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+    setShowSuggestions(false);
+
+    // Simulate AI processing with realistic delay
+    setTimeout(() => {
+      const contextualResponse = generateContextualResponse(actionQuery);
+      const visualization = generateVisualization(actionQuery);
+      
+      const aiMessage: ChatMessage = {
+        id: `ai-${Date.now()}`,
+        type: "assistant",
+        content: contextualResponse.response,
+        timestamp: new Date(),
+        visualization,
+        suggestions: visualization ? getSuggestions(actionQuery) : contextualResponse.suggestions
+      };
+      
+      setChatMessages(prev => [...prev, aiMessage]);
+      setIsTyping(false);
+      setQuery(""); // Clear the input after sending
+    }, 1500);
   };
 
   const handleSuggestionClick = (suggestion: string) => {
