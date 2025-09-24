@@ -227,75 +227,45 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         id: `viz-${Date.now()}`,
         type: "line",
         title: "Learning Engagement by Department - 6 Month Trend",
-        metrics: ["Engagement Score (%)", "Learning Hours", "Course Completions"],
+        metrics: ["Engagement Score (%)", "Active Learners", "Course Completions"],
         attributes: ["Department", "Month", "Engagement Rate"],
         filters: ["All Departments", "Past 6 months"],
         data: [
           { 
             month: "Apr 2024", 
-            Engineering: 72, 
-            Marketing: 68, 
-            Sales: 75, 
-            "Human Resources": 85, 
-            Operations: 63, 
-            Finance: 70,
-            "Product Management": 78,
-            "Customer Success": 81
+            name: "Apr",
+            engagement: 76,
+            departments: "8 departments"
           },
           { 
             month: "May 2024", 
-            Engineering: 75, 
-            Marketing: 71, 
-            Sales: 78, 
-            "Human Resources": 87, 
-            Operations: 66, 
-            Finance: 73,
-            "Product Management": 80,
-            "Customer Success": 83
+            name: "May",
+            engagement: 79,
+            departments: "8 departments"
           },
           { 
             month: "Jun 2024", 
-            Engineering: 79, 
-            Marketing: 74, 
-            Sales: 82, 
-            "Human Resources": 89, 
-            Operations: 69, 
-            Finance: 76,
-            "Product Management": 83,
-            "Customer Success": 85
+            name: "Jun",
+            engagement: 82,
+            departments: "8 departments"
           },
           { 
             month: "Jul 2024", 
-            Engineering: 82, 
-            Marketing: 78, 
-            Sales: 85, 
-            "Human Resources": 91, 
-            Operations: 73, 
-            Finance: 79,
-            "Product Management": 86,
-            "Customer Success": 88
+            name: "Jul",
+            engagement: 85,
+            departments: "8 departments"
           },
           { 
             month: "Aug 2024", 
-            Engineering: 86, 
-            Marketing: 81, 
-            Sales: 88, 
-            "Human Resources": 93, 
-            Operations: 76, 
-            Finance: 82,
-            "Product Management": 89,
-            "Customer Success": 90
+            name: "Aug",
+            engagement: 88,
+            departments: "8 departments"
           },
           { 
             month: "Sep 2024", 
-            Engineering: 89, 
-            Marketing: 84, 
-            Sales: 91, 
-            "Human Resources": 95, 
-            Operations: 80, 
-            Finance: 85,
-            "Product Management": 92,
-            "Customer Success": 93
+            name: "Sep",
+            engagement: 91,
+            departments: "8 departments"
           }
         ],
         canModify: true,
