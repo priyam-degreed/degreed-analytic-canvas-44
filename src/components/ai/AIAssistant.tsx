@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Brain, 
   Search, 
@@ -41,6 +42,7 @@ interface ChatMessage {
   timestamp: Date;
   visualization?: VisualizationData;
   suggestions?: string[];
+  feedback?: "up" | "down" | null;
 }
 
 interface VisualizationData {
@@ -83,6 +85,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   // Handle close - clear conversation and reset state
   const handleClose = () => {
@@ -364,14 +367,201 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     }));
   };
 
-  const renderChart = (viz: VisualizationData) => {
-    const maxValue = Math.max(...viz.data.map(d => Math.max(d.rate || 0, d.gap || 0, d.growth || 0, d.engagement || 0, d.learners/10 || 0)));
+  const handleSaveVisualization = () => {
+    toast({
+      title: "Visualization Saved",
+      description: "Your visualization has been saved to your dashboard library.",
+    });
+  };
+
+  const handleOpenInAnalyze = () => {
+    toast({
+      title: "Opening in Analyze",
+      description: "Redirecting to Analyze workspace with this visualization.",
+    });
+  };
+
+  const handleFeedback = (messageId: string, feedbackType: "up" | "down") => {
+    setChatMessages(prev => prev.map(message => {
+      if (message.id === messageId) {
+        return {
+          ...message,
+          feedback: message.feedback === feedbackType ? null : feedbackType
+        };
+      }
+      return message;
+    }));
     
+    toast({
+      title: feedbackType === "up" ? "Positive Feedback" : "Negative Feedback",
+      description: `Thank you for your ${feedbackType === "up" ? "positive" : "negative"} feedback!`,
+    });
+  };
+
+  const renderChart = (viz: VisualizationData) => {
+    const maxValue = Math.max(...viz.data.map(d => Math.max(d.rate || 0, d.gap || 0, d.growth || 0, d.engagement || 0, d.learners/10 || 0, d.value || 0)));
+    
+    if (viz.type === "pie") {
+      const total = viz.data.reduce((sum, item) => sum + (item.value || item.rate || item.growth || item.engagement || 50), 0);
+      
+      return (
+        <div className="bg-white border rounded-lg p-4">
+          <div className="h-48 flex items-center justify-center">
+            <div className="relative w-40 h-40">
+              <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                {viz.data.map((item, idx) => {
+                  const value = item.value || item.rate || item.growth || item.engagement || 50;
+                  const percentage = (value / total) * 100;
+                  const angle = (percentage / 100) * 360;
+                  const prevAngles = viz.data.slice(0, idx).reduce((sum, prevItem) => {
+                    const prevValue = prevItem.value || prevItem.rate || prevItem.growth || prevItem.engagement || 50;
+                    return sum + ((prevValue / total) * 360);
+                  }, 0);
+                  
+                  const startAngle = prevAngles;
+                  const endAngle = prevAngles + angle;
+                  
+                  const x1 = 50 + 40 * Math.cos((startAngle * Math.PI) / 180);
+                  const y1 = 50 + 40 * Math.sin((startAngle * Math.PI) / 180);
+                  const x2 = 50 + 40 * Math.cos((endAngle * Math.PI) / 180);
+                  const y2 = 50 + 40 * Math.sin((endAngle * Math.PI) / 180);
+                  
+                  const largeArc = angle > 180 ? 1 : 0;
+                  
+                  const colors = ["#8b5cf6", "#3b82f6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"];
+                  
+                  return (
+                    <path
+                      key={idx}
+                      d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`}
+                      fill={colors[idx % colors.length]}
+                      className="hover:opacity-80 transition-opacity"
+                    />
+                  );
+                })}
+              </svg>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+            {viz.data.map((item, idx) => {
+              const colors = ["#8b5cf6", "#3b82f6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"];
+              return (
+                <div key={idx} className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-sm"
+                    style={{ backgroundColor: colors[idx % colors.length] }}
+                  />
+                  <span className="text-gray-600 truncate">
+                    {(item.name || item.month || `Item ${idx + 1}`).substring(0, 10)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+    
+    if (viz.type === "line") {
+      return (
+        <div className="bg-white border rounded-lg p-4">
+          <div className="h-48 relative">
+            <svg viewBox="0 0 400 160" className="w-full h-full">
+              <defs>
+                <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style={{stopColor: '#10b981', stopOpacity: 0.3}} />
+                  <stop offset="100%" style={{stopColor: '#10b981', stopOpacity: 0}} />
+                </linearGradient>
+              </defs>
+              
+              {/* Grid lines */}
+              {[0, 1, 2, 3, 4].map(i => (
+                <line 
+                  key={i}
+                  x1="40" 
+                  y1={20 + i * 30} 
+                  x2="380" 
+                  y2={20 + i * 30}
+                  stroke="#f3f4f6" 
+                  strokeWidth="1"
+                />
+              ))}
+              
+              {/* Line path */}
+              <path
+                d={viz.data.map((item, idx) => {
+                  const x = 60 + idx * (280 / (viz.data.length - 1));
+                  const value = item.value || item.trend || item.engagement || item.rate || 50;
+                  const y = 140 - ((value / maxValue) * 100);
+                  return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
+                }).join(' ')}
+                fill="none"
+                stroke="#10b981"
+                strokeWidth="3"
+                className="drop-shadow-sm"
+              />
+              
+              {/* Area fill */}
+              <path
+                d={[
+                  `M 60 140`,
+                  ...viz.data.map((item, idx) => {
+                    const x = 60 + idx * (280 / (viz.data.length - 1));
+                    const value = item.value || item.trend || item.engagement || item.rate || 50;
+                    const y = 140 - ((value / maxValue) * 100);
+                    return `L ${x} ${y}`;
+                  }),
+                  `L ${60 + (viz.data.length - 1) * (280 / (viz.data.length - 1))} 140 Z`
+                ].join(' ')}
+                fill="url(#lineGradient)"
+              />
+              
+              {/* Data points */}
+              {viz.data.map((item, idx) => {
+                const x = 60 + idx * (280 / (viz.data.length - 1));
+                const value = item.value || item.trend || item.engagement || item.rate || 50;
+                const y = 140 - ((value / maxValue) * 100);
+                return (
+                  <circle
+                    key={idx}
+                    cx={x}
+                    cy={y}
+                    r="4"
+                    fill="#10b981"
+                    stroke="white"
+                    strokeWidth="2"
+                    className="hover:r-6 transition-all"
+                  />
+                );
+              })}
+              
+              {/* Labels */}
+              {viz.data.map((item, idx) => {
+                const x = 60 + idx * (280 / (viz.data.length - 1));
+                return (
+                  <text
+                    key={idx}
+                    x={x}
+                    y="155"
+                    textAnchor="middle"
+                    className="text-xs fill-gray-600"
+                  >
+                    {(item.name || item.month || `${idx + 1}`).substring(0, 3)}
+                  </text>
+                );
+              })}
+            </svg>
+          </div>
+        </div>
+      );
+    }
+    
+    // Default column/bar chart
     return (
       <div className="bg-white border rounded-lg p-4">
         <div className="h-48 flex items-end justify-around gap-1">
           {viz.data.map((item, idx) => {
-            let value = item.rate || item.gap || item.growth || item.engagement || item.learners/10 || 50;
+            let value = item.rate || item.gap || item.growth || item.engagement || item.learners/10 || item.value || 50;
             const height = Math.max((value / maxValue) * 160, 12);
             
             return (
@@ -439,11 +629,21 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 </PopoverTrigger>
                 <PopoverContent className="w-56" align="end">
                   <div className="space-y-2">
-                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full justify-start text-sm"
+                      onClick={handleSaveVisualization}
+                    >
                       <BookmarkPlus className="h-4 w-4 mr-2" />
                       Save
                     </Button>
-                    <Button variant="ghost" size="sm" className="w-full justify-start text-sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full justify-start text-sm"
+                      onClick={handleOpenInAnalyze}
+                    >
                       <ExternalLink className="h-4 w-4 mr-2" />
                       Open in Analyse
                     </Button>
@@ -493,10 +693,26 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           {viz.saveOptions && (
             <div className="flex justify-start items-center pt-2 border-t border-blue-200">
               <div className="flex gap-2">
-                <Button variant="ghost" size="sm" className="text-xs h-7">
+                <Button 
+                  variant={message.feedback === "up" ? "default" : "ghost"} 
+                  size="sm" 
+                  className={cn(
+                    "text-xs h-7",
+                    message.feedback === "up" && "bg-green-500 hover:bg-green-600 text-white"
+                  )}
+                  onClick={() => handleFeedback(message.id, "up")}
+                >
                   <ThumbsUp className="h-3 w-3" />
                 </Button>
-                <Button variant="ghost" size="sm" className="text-xs h-7">
+                <Button 
+                  variant={message.feedback === "down" ? "default" : "ghost"} 
+                  size="sm" 
+                  className={cn(
+                    "text-xs h-7",
+                    message.feedback === "down" && "bg-red-500 hover:bg-red-600 text-white"
+                  )}
+                  onClick={() => handleFeedback(message.id, "down")}
+                >
                   <ThumbsDown className="h-3 w-3" />
                 </Button>
               </div>
