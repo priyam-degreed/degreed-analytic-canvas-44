@@ -5,7 +5,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
+import { ManagerLayout } from "./components/layout/ManagerLayout";
 import Dashboard from "./pages/Dashboard";
+import { ManagerView } from "./pages/manager/ManagerView";
+import { ManagerDashboard } from "./pages/manager/ManagerDashboard";
 import StrategicOverview from "./pages/overview/StrategicOverview";
 import ExecutiveOverview from "./pages/learning/ExecutiveOverview";
 import SkillsAdoption from "./pages/skills/SkillsAdoption";
@@ -66,6 +69,25 @@ const App = () => (
             <Route path="analyses" element={<Analyses />} />
             <Route path="search" element={<SearchPage />} />
           </Route>
+          
+          {/* Manager Routes with Separate Layout */}
+          <Route path="/manager" element={<ManagerLayout />}>
+            <Route index element={<ManagerView />} />
+            <Route path="dashboard" element={<ManagerDashboard />} />
+            <Route path="team-learning" element={<ManagerDashboard />} />
+            <Route path="skills-development" element={<ManagerDashboard />} />
+            <Route path="individual-progress" element={<ManagerDashboard />} />
+            <Route path="team-performance" element={<ManagerDashboard />} />
+            <Route path="my-learning" element={<ManagerDashboard />} />
+            <Route path="team-metrics" element={<ManagerDashboard />} />
+            <Route path="team-progress" element={<ManagerDashboard />} />
+            <Route path="individual-reports" element={<ManagerDashboard />} />
+            <Route path="skills-matrix" element={<ManagerDashboard />} />
+            <Route path="learning-paths" element={<ManagerDashboard />} />
+            <Route path="goal-setting" element={<ManagerDashboard />} />
+            <Route path="my-progress" element={<ManagerDashboard />} />
+          </Route>
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
