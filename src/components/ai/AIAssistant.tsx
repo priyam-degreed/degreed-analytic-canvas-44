@@ -82,6 +82,16 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Handle close - clear conversation and reset state
+  const handleClose = () => {
+    setChatMessages([]);
+    setQuery("");
+    setIsTyping(false);
+    setIsMinimized(false);
+    setShowSuggestions(false);
+    onClose();
+  };
+
   useEffect(() => {
     if (isOpen && chatMessages.length === 0) {
       // Initialize with welcome message
@@ -487,7 +497,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" 
-        onClick={onClose}
+        onClick={handleClose}
       />
       
       {/* Modal */}
@@ -519,7 +529,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 text-white hover:bg-white/20"
-              onClick={onClose}
+              onClick={handleClose}
             >
               <X className="h-4 w-4" />
             </Button>
