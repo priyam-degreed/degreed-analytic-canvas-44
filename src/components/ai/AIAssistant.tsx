@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { 
   Brain, 
   Search, 
@@ -27,7 +28,8 @@ import {
   Target,
   Award,
   BookOpen,
-  Lightbulb
+  Lightbulb,
+  MoreVertical
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { generateContextualResponse } from "@/data/aiConversations";
@@ -70,7 +72,7 @@ const sampleQueries = [
 const quickActions = [
   { icon: Search, label: "Search dashboards", query: "Show me learning engagement dashboards" },
   { icon: Plus, label: "Create visualization", query: "Create a chart showing course completion rates" },
-  { icon: TrendingUp, label: "Answer a business question", query: "What is the learning completion rate by department?" }
+  { icon: TrendingUp, label: "Answer a business question", query: "What is the learning completion rate by Pathway?" }
 ];
 
 export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
@@ -296,10 +298,10 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           visualization: {
             ...message.visualization,
             type: newType,
-            title: newType === "bar" ? 
-              message.visualization.title.replace("Column Chart", "Bar Chart").replace("Line Chart", "Bar Chart") :
+            title: newType === "pie" ? 
+              message.visualization.title.replace("Column Chart", "Pie Chart").replace("Line Chart", "Pie Chart").replace("Bar Chart", "Pie Chart") :
               newType === "line" ? 
-              message.visualization.title.replace("Bar Chart", "Line Chart").replace("Column Chart", "Line Chart") :
+              message.visualization.title.replace("Bar Chart", "Line Chart").replace("Column Chart", "Line Chart").replace("Pie Chart", "Line Chart") :
               message.visualization.title
           }
         };
@@ -411,56 +413,67 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         
         {/* Chart Details */}
         <div className="space-y-4">
-          <div>
-            <h4 className="font-semibold text-gray-800 mb-2">{viz.title}</h4>
-            <div className="text-sm text-gray-600 space-y-1">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-xs">Metrics: {viz.metrics.join(", ")}</Badge>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">Attributes: {viz.attributes.join(", ")}</Badge>  
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">Filters: {viz.filters.join(", ")}</Badge>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h4 className="font-semibold text-gray-800 mb-2">{viz.title}</h4>
+              <div className="text-sm text-gray-600 space-y-1">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs">Metrics: {viz.metrics.join(", ")}</Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">Attributes: {viz.attributes.join(", ")}</Badge>  
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">Filters: {viz.filters.join(", ")}</Badge>
+                </div>
               </div>
             </div>
+            
+            {/* 3-dot menu for chart controls */}
+            {viz.canModify && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56" align="end">
+                  <div className="space-y-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full justify-start text-sm"
+                      onClick={() => handleChartTypeSwitch(message.id, "pie")}
+                    >
+                      <PieChart className="h-4 w-4 mr-2" />
+                      Switch to pie chart
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full justify-start text-sm"
+                      onClick={() => handleShowTrend(message.id)}
+                    >
+                      <LineChart className="h-4 w-4 mr-2" />
+                      Show trend
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full justify-start text-sm"
+                      onClick={() => handleDepartmentBreakdown(message.id)}
+                    >
+                      <Users className="h-4 w-4 mr-2" />
+                      Break down by department
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
 
           {/* Chart Rendering */}
           {renderChart(viz)}
-
-          {/* Chart Controls */}
-          {viz.canModify && (
-            <div className="flex flex-wrap gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-xs h-7"
-                onClick={() => handleChartTypeSwitch(message.id, "bar")}
-              >
-                <BarChart3 className="h-3 w-3 mr-1" />
-                Switch to bar chart
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-xs h-7"
-                onClick={() => handleShowTrend(message.id)}
-              >
-                <LineChart className="h-3 w-3 mr-1" />
-                Show trend
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-xs h-7"
-                onClick={() => handleDepartmentBreakdown(message.id)}
-              >
-                <Users className="h-3 w-3 mr-1" />
-                Break down by department
-              </Button>
-            </div>
-          )}
 
           {/* Save Options */}
           {viz.saveOptions && (
