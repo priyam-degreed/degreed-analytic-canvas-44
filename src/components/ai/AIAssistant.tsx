@@ -88,7 +88,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       setChatMessages([{
        id: '1',
        type: 'assistant',
-        //content: 'Hi there,\n\nHow can I help you?',
+       content: 'Hi there,\n\nHow can I help you?',
        timestamp: new Date()
       }]);
     }
@@ -278,6 +278,80 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     }
   };
 
+  const handleChartTypeSwitch = (messageId: string, newType: "column" | "bar" | "line" | "pie") => {
+    setChatMessages(prev => prev.map(message => {
+      if (message.id === messageId && message.visualization) {
+        return {
+          ...message,
+          visualization: {
+            ...message.visualization,
+            type: newType,
+            title: newType === "bar" ? 
+              message.visualization.title.replace("Column Chart", "Bar Chart").replace("Line Chart", "Bar Chart") :
+              newType === "line" ? 
+              message.visualization.title.replace("Bar Chart", "Line Chart").replace("Column Chart", "Line Chart") :
+              message.visualization.title
+          }
+        };
+      }
+      return message;
+    }));
+  };
+
+  const handleShowTrend = (messageId: string) => {
+    setChatMessages(prev => prev.map(message => {
+      if (message.id === messageId && message.visualization) {
+        const trendData = [
+          { month: "Apr", value: 65, trend: "up" },
+          { month: "May", value: 72, trend: "up" },
+          { month: "Jun", value: 68, trend: "down" },
+          { month: "Jul", value: 78, trend: "up" },
+          { month: "Aug", value: 82, trend: "up" },
+          { month: "Sep", value: 85, trend: "up" }
+        ];
+        
+        return {
+          ...message,
+          visualization: {
+            ...message.visualization,
+            type: "line",
+            title: message.visualization.title + " - 6 Month Trend",
+            data: trendData,
+            metrics: ["Trend Value", "Growth Direction"]
+          }
+        };
+      }
+      return message;
+    }));
+  };
+
+  const handleDepartmentBreakdown = (messageId: string) => {
+    setChatMessages(prev => prev.map(message => {
+      if (message.id === messageId && message.visualization) {
+        const deptData = [
+          { name: "Engineering", value: 85, learners: 234 },
+          { name: "Marketing", value: 78, learners: 156 },
+          { name: "Sales", value: 72, learners: 189 },
+          { name: "HR", value: 68, learners: 98 },
+          { name: "Finance", value: 75, learners: 87 },
+          { name: "Operations", value: 71, learners: 143 }
+        ];
+        
+        return {
+          ...message,
+          visualization: {
+            ...message.visualization,
+            title: message.visualization.title + " by Department",
+            data: deptData,
+            attributes: ["Department", ...message.visualization.attributes.filter(attr => !attr.includes("Department"))],
+            filters: [...message.visualization.filters, "Department Breakdown"]
+          }
+        };
+      }
+      return message;
+    }));
+  };
+
   const renderChart = (viz: VisualizationData) => {
     const maxValue = Math.max(...viz.data.map(d => Math.max(d.rate || 0, d.gap || 0, d.growth || 0, d.engagement || 0, d.learners/10 || 0)));
     
@@ -348,15 +422,30 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           {/* Chart Controls */}
           {viz.canModify && (
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" className="text-xs h-7">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => handleChartTypeSwitch(message.id, "bar")}
+              >
                 <BarChart3 className="h-3 w-3 mr-1" />
                 Switch to bar chart
               </Button>
-              <Button variant="outline" size="sm" className="text-xs h-7">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => handleShowTrend(message.id)}
+              >
                 <LineChart className="h-3 w-3 mr-1" />
                 Show trend
               </Button>
-              <Button variant="outline" size="sm" className="text-xs h-7">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs h-7"
+                onClick={() => handleDepartmentBreakdown(message.id)}
+              >
                 <Users className="h-3 w-3 mr-1" />
                 Break down by department
               </Button>
