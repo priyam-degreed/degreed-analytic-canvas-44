@@ -891,8 +891,8 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               {chatMessages.length === 1 && chatMessages[0].type === 'assistant' && (
                 <div className="text-center space-y-4 py-6">
                   <div className="space-y-2">
-                    <h3 className="font-semibold text-xl text-gray-800">Welcome,</h3>
-                    <h3 className="font-semibold text-xl text-gray-800">I am your personal AI Assistant</h3>
+                    <h3 className="font-semibold text-xl text-gray-800">Hi there,</h3>
+                    <h3 className="font-semibold text-xl text-gray-800">How can I help you?</h3>
                   </div>
                   
                   <div className="grid gap-2">
