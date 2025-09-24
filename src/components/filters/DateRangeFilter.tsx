@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronDown, Calendar as CalendarIcon, Clock } from "lucide-react";
-import { format, subDays, subWeeks, subMonths, subYears, subHours, subMinutes, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfDay, endOfDay, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
+import { format, subDays, subWeeks, subMonths, subYears, subHours, subMinutes, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfDay, endOfDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 
@@ -29,9 +29,9 @@ const relativePeriods: RelativePeriod[] = [
   { label: "Last year", category: "YEAR", getValue: () => ({ from: startOfYear(subYears(new Date(), 1)), to: endOfYear(subYears(new Date(), 1)) }) },
   
   // QUARTER
-  { label: "This quarter", category: "QUARTER", getValue: () => ({ from: startOfQuarter(new Date()), to: endOfQuarter(new Date()) }) },
-  { label: "Last quarter", category: "QUARTER", getValue: () => ({ from: startOfQuarter(subQuarters(new Date(), 1)), to: endOfQuarter(subQuarters(new Date(), 1)) }) },
-  { label: "Last 4 quarters", category: "QUARTER", getValue: () => ({ from: startOfQuarter(subQuarters(new Date(), 3)), to: endOfQuarter(new Date()) }) },
+  { label: "This quarter", category: "QUARTER", getValue: () => ({ from: startOfMonth(new Date()), to: endOfMonth(new Date()) }) },
+  { label: "Last quarter", category: "QUARTER", getValue: () => ({ from: startOfMonth(subMonths(new Date(), 3)), to: endOfMonth(subMonths(new Date(), 1)) }) },
+  { label: "Last 4 quarters", category: "QUARTER", getValue: () => ({ from: subMonths(new Date(), 12), to: new Date() }) },
   
   // MONTH
   { label: "This month", category: "MONTH", getValue: () => ({ from: startOfMonth(new Date()), to: endOfMonth(new Date()) }) },

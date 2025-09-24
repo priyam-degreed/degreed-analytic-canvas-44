@@ -776,19 +776,10 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 variant="outline" 
                 size="sm" 
                 className="text-xs h-7"
-                onClick={() => handleChartTypeSwitch(message.id, viz.type === "pie" ? "bar" : "pie")}
+                onClick={() => handleChartTypeSwitch(message.id, "pie")}
               >
-                {viz.type === "pie" ? (
-                  <>
-                    <BarChart3 className="h-3 w-3 mr-1" />
-                    Switch to bar chart
-                  </>
-                ) : (
-                  <>
-                    <PieChart className="h-3 w-3 mr-1" />
-                    Switch to pie chart
-                  </>
-                )}
+                <PieChart className="h-3 w-3 mr-1" />
+                Switch to pie chart
               </Button>
               <Button 
                 variant="outline" 
