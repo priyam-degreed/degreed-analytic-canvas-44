@@ -167,95 +167,22 @@ export const searchData: SearchResult[] = [
   }
 ];
 
-// AI-powered similarity matching function
+// Simple exact matching function
 export function calculateSimilarity(query: string, result: SearchResult): number {
   const queryLower = query.toLowerCase().trim();
-  const words = queryLower.split(/\s+/).filter(word => word.length > 1);
   
-  if (words.length === 0) return 0;
+  if (!queryLower) return 0;
   
-  let score = 0;
-  const maxScore = 95;
-  
-  // Exact title match gets highest score
-  if (result.title.toLowerCase() === queryLower) {
-    return maxScore;
+  // Check for exact matches in title, description, tags, or synonyms
+  if (result.title.toLowerCase().includes(queryLower) ||
+      result.description.toLowerCase().includes(queryLower) ||
+      result.tags.some(tag => tag.toLowerCase().includes(queryLower)) ||
+      result.synonyms.some(synonym => synonym.toLowerCase().includes(queryLower)) ||
+      result.category.toLowerCase().includes(queryLower)) {
+    return 100; // Return high score for any match
   }
   
-  // Title contains exact query
-  if (result.title.toLowerCase().includes(queryLower)) {
-    score += 30;
-  }
-  
-  // Individual word matching in title (higher weight)
-  words.forEach(word => {
-    if (result.title.toLowerCase().includes(word)) {
-      score += 20;
-    }
-  });
-  
-  // Description matching  
-  if (result.description.toLowerCase().includes(queryLower)) {
-    score += 15;
-  }
-  
-  words.forEach(word => {
-    if (result.description.toLowerCase().includes(word)) {
-      score += 8;
-    }
-  });
-  
-  // Tag matching with higher weight
-  result.tags.forEach(tag => {
-    if (tag.toLowerCase() === queryLower) {
-      score += 25;
-    }
-    if (tag.toLowerCase().includes(queryLower)) {
-      score += 15;
-    }
-    words.forEach(word => {
-      if (tag.toLowerCase().includes(word)) {
-        score += 12;
-      }
-    });
-  });
-  
-  // Synonym matching (handles typos and alternative terms)
-  result.synonyms.forEach(synonym => {
-    if (synonym.toLowerCase() === queryLower) {
-      score += 25;
-    }
-    if (synonym.toLowerCase().includes(queryLower)) {
-      score += 18;
-    }
-    words.forEach(word => {
-      if (synonym.toLowerCase().includes(word)) {
-        score += 15;
-      }
-    });
-  });
-  
-  // Category matching
-  if (result.category.toLowerCase().includes(queryLower)) {
-    score += 12;
-  }
-  
-  words.forEach(word => {
-    if (result.category.toLowerCase().includes(word)) {
-      score += 8;
-    }
-  });
-  
-  // Boost based on type relevance (prioritize dashboards)
-  const typeBoosts = {
-    dashboard: 10,
-    metric: 5, 
-    visualization: 4,
-    insight: 4
-  };
-  score += typeBoosts[result.type] || 0;
-  
-  return Math.min(score, maxScore);
+  return 0; // No match
 }
 
 export function searchWithAI(query: string, limit: number = 10): SearchResult[] {
@@ -266,10 +193,10 @@ export function searchWithAI(query: string, limit: number = 10): SearchResult[] 
     relevance: calculateSimilarity(query, item)
   }));
   
-  // Filter results with relevance > 10 for better matching
+  // Only return exact matches
   return results
-    .filter(item => item.relevance > 10)
-    .sort((a, b) => b.relevance - a.relevance)
+    .filter(item => item.relevance > 0)
+    .sort((a, b) => a.title.localeCompare(b.title)) // Sort alphabetically
     .slice(0, limit);
 }
 
