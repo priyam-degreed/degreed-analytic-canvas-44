@@ -227,16 +227,76 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         id: `viz-${Date.now()}`,
         type: "line",
         title: "Learning Engagement by Department - 6 Month Trend",
-        metrics: ["Engagement Score", "Active Learners"],
-        attributes: ["Department", "Time Period"],
+        metrics: ["Engagement Score (%)", "Learning Hours", "Course Completions"],
+        attributes: ["Department", "Month", "Engagement Rate"],
         filters: ["All Departments", "Past 6 months"],
         data: [
-          { month: "Apr", engineering: 78, marketing: 82, sales: 71, hr: 88, operations: 74 },
-          { month: "May", engineering: 81, marketing: 85, sales: 75, hr: 89, operations: 77 },
-          { month: "Jun", engineering: 85, marketing: 87, sales: 78, hr: 91, operations: 80 },
-          { month: "Jul", engineering: 88, marketing: 89, sales: 82, hr: 93, operations: 83 },
-          { month: "Aug", engineering: 91, marketing: 91, sales: 85, hr: 94, operations: 86 },
-          { month: "Sep", engineering: 94, marketing: 93, sales: 88, hr: 95, operations: 89 }
+          { 
+            month: "Apr 2024", 
+            Engineering: 72, 
+            Marketing: 68, 
+            Sales: 75, 
+            "Human Resources": 85, 
+            Operations: 63, 
+            Finance: 70,
+            "Product Management": 78,
+            "Customer Success": 81
+          },
+          { 
+            month: "May 2024", 
+            Engineering: 75, 
+            Marketing: 71, 
+            Sales: 78, 
+            "Human Resources": 87, 
+            Operations: 66, 
+            Finance: 73,
+            "Product Management": 80,
+            "Customer Success": 83
+          },
+          { 
+            month: "Jun 2024", 
+            Engineering: 79, 
+            Marketing: 74, 
+            Sales: 82, 
+            "Human Resources": 89, 
+            Operations: 69, 
+            Finance: 76,
+            "Product Management": 83,
+            "Customer Success": 85
+          },
+          { 
+            month: "Jul 2024", 
+            Engineering: 82, 
+            Marketing: 78, 
+            Sales: 85, 
+            "Human Resources": 91, 
+            Operations: 73, 
+            Finance: 79,
+            "Product Management": 86,
+            "Customer Success": 88
+          },
+          { 
+            month: "Aug 2024", 
+            Engineering: 86, 
+            Marketing: 81, 
+            Sales: 88, 
+            "Human Resources": 93, 
+            Operations: 76, 
+            Finance: 82,
+            "Product Management": 89,
+            "Customer Success": 90
+          },
+          { 
+            month: "Sep 2024", 
+            Engineering: 89, 
+            Marketing: 84, 
+            Sales: 91, 
+            "Human Resources": 95, 
+            Operations: 80, 
+            Finance: 85,
+            "Product Management": 92,
+            "Customer Success": 93
+          }
         ],
         canModify: true,
         saveOptions: true
