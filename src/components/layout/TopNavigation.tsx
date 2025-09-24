@@ -2,16 +2,20 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, Search, Bell, User, Settings, HelpCircle, LogOut, BarChart3, Database, TrendingUp, Activity } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { ChevronDown, Search, Bell, User, Settings, HelpCircle, LogOut, BarChart3, Database, TrendingUp, Activity, Shield, Users } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { SearchDropdown } from "@/components/ai/SearchDropdown";
+import { useViewMode } from "@/contexts/ViewModeContext";
 export function TopNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const { viewMode, setViewMode, isManagerView } = useViewMode();
   
   // Handle Ctrl+K keyboard shortcut
   useEffect(() => {
@@ -96,8 +100,29 @@ export function TopNavigation() {
           
         </div>
 
-        {/* Right Section - Search and User Actions */}
+        {/* Right Section - View Mode Switch, Search and User Actions */}
         <div className="flex items-center space-x-4">
+          {/* View Mode Switch */}
+          <div className="flex items-center space-x-3 border-r border-border pr-4">
+            <div className="flex items-center space-x-2">
+              <Shield className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">Admin</span>
+            </div>
+            <Switch
+              checked={isManagerView}
+              onCheckedChange={(checked) => setViewMode(checked ? 'manager' : 'admin')}
+              className="data-[state=checked]:bg-accent"
+            />
+            <div className="flex items-center space-x-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">Manager</span>
+            </div>
+            {isManagerView && (
+              <Badge variant="secondary" className="text-xs">
+                Scope: Direct Reports
+              </Badge>
+            )}
+          </div>
           {/* Search Bar */}
           <div className="relative" ref={searchRef}>
             <div className="relative">
