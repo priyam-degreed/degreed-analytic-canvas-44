@@ -29,7 +29,8 @@ import {
   Award,
   BookOpen,
   Lightbulb,
-  MoreVertical
+  MoreVertical,
+  RotateCcw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { generateContextualResponse } from "@/data/aiConversations";
@@ -94,6 +95,23 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     setIsMinimized(false);
     setShowSuggestions(false);
     onClose();
+  };
+
+  // Handle reset - clear conversation and start new chat
+  const handleReset = () => {
+    setChatMessages([]);
+    setQuery("");
+    setIsTyping(false);
+    setShowSuggestions(false);
+    // Re-initialize with welcome message
+    setTimeout(() => {
+      setChatMessages([{
+        id: '1',
+        type: 'assistant',
+        content: 'Hi there,\n\nHow can I help you?',
+        timestamp: new Date()
+      }]);
+    }, 100);
   };
 
   useEffect(() => {
@@ -899,10 +917,18 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
             </div>
             <div>
               <span className="font-semibold">AI Analytics Assistant</span>
-              <div className="text-xs text-blue-100">Powered by Degreed Intelligence</div>
             </div>
           </div>
           <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-white hover:bg-white/20"
+              onClick={handleReset}
+              title="Reset conversation"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
             <Button
               variant="ghost"
               size="sm"
