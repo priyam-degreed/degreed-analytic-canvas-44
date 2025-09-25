@@ -231,21 +231,56 @@ function generateRatingDistribution(avgRating: number) {
 
 export const skillDistributionData: SkillDistribution[] = generateSkillDistributionData();
 
-// Mock skill progression entries
-export const skillProgressionEntries: SkillProgressionEntry[] = skillDistributionData.map((item, index) => ({
-  id: `sp-${index}`,
-  role: item.role,
-  skillName: item.skill,
-  timePeriod: item.timePeriod,
-  ratingLevel: Math.round(item.avgRating),
-  ratingType: ['Self', 'Peer', 'Manager'][index % 3] as 'Self' | 'Peer' | 'Manager',
-  employeeCount: Math.floor(Math.random() * 50) + 20,
-  avgRating: item.avgRating,
-  progressionPercent: Math.random() * 30 + 5, // 5-35% progression
-  skillGapToTarget: Math.max(0, 6 - item.avgRating), // Target rating of 6
-  skillImportance: Math.random() * 10 + 1, // 1-10 importance scale
-  targetRating: 6
-}));
+// Generate diversified mock skill progression entries with realistic rating type patterns
+function generateSkillProgressionEntries(): SkillProgressionEntry[] {
+  const entries: SkillProgressionEntry[] = [];
+  
+  skillDistributionData.forEach((item, index) => {
+    // Create entries for each rating type with realistic variations
+    ['Self', 'Peer', 'Manager'].forEach((ratingType, typeIndex) => {
+      let adjustedRating = item.avgRating;
+      
+      // Apply realistic rating type patterns
+      if (ratingType === 'Self') {
+        // Self-ratings tend to be slightly higher
+        adjustedRating = Math.min(8, item.avgRating + (Math.random() * 0.5 + 0.2));
+      } else if (ratingType === 'Peer') { 
+        // Peer ratings tend to be more moderate/accurate
+        adjustedRating = item.avgRating + (Math.random() - 0.5) * 0.3;
+      } else if (ratingType === 'Manager') {
+        // Manager ratings can be more conservative or more generous depending on skill
+        const isStrategicSkill = ['Leadership', 'Communication', 'Strategic Planning', 'People Management'].includes(item.skill);
+        if (isStrategicSkill) {
+          adjustedRating = Math.max(1, item.avgRating - (Math.random() * 0.4 + 0.1)); // More conservative
+        } else {
+          adjustedRating = item.avgRating + (Math.random() - 0.5) * 0.4; // More varied
+        }
+      }
+      
+      // Ensure rating stays within bounds
+      adjustedRating = Math.max(1, Math.min(8, adjustedRating));
+      
+      entries.push({
+        id: `sp-${index}-${typeIndex}`,
+        role: item.role,
+        skillName: item.skill,
+        timePeriod: item.timePeriod,
+        ratingLevel: Math.round(adjustedRating),
+        ratingType: ratingType as 'Self' | 'Peer' | 'Manager',
+        employeeCount: Math.floor(Math.random() * 30) + 15, // Smaller groups for each rating type
+        avgRating: Math.round(adjustedRating * 10) / 10,
+        progressionPercent: Math.random() * 25 + 5, // 5-30% progression
+        skillGapToTarget: Math.max(0, 6 - adjustedRating), // Target rating of 6
+        skillImportance: Math.random() * 10 + 1, // 1-10 importance scale
+        targetRating: 6
+      });
+    });
+  });
+  
+  return entries;
+}
+
+export const skillProgressionEntries: SkillProgressionEntry[] = generateSkillProgressionEntries();
 
 // Mock bubble chart data for priority view
 export const priorityViewData = skillOptions.map(skill => ({

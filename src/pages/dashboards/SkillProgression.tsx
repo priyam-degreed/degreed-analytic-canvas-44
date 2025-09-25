@@ -183,6 +183,32 @@ export default function SkillProgression() {
     };
   });
 
+  // Prepare skills vs rating type data
+  const skillsByRatingTypeData = paginatedSkills.map(skill => {
+    const skillEntries = skillProgressionEntries.filter(entry => 
+      entry.skillName === skill && 
+      (filters.roles.length === 0 || filters.roles.includes(entry.role)) &&
+      (filters.timePeriod.length === 0 || filters.timePeriod.some(period => 
+        entry.timePeriod === period || 
+        (period.includes('-Q') && entry.timePeriod.startsWith(period)) ||
+        (period.startsWith('FY') && !period.includes('-') && entry.timePeriod.startsWith(period))
+      )) &&
+      (filters.ratingTypes.length === 0 || filters.ratingTypes.includes(entry.ratingType))
+    );
+    
+    // Calculate average ratings for each type
+    const selfRatings = skillEntries.filter(e => e.ratingType === 'Self');
+    const peerRatings = skillEntries.filter(e => e.ratingType === 'Peer'); 
+    const managerRatings = skillEntries.filter(e => e.ratingType === 'Manager');
+    
+    return {
+      skill,
+      Self: selfRatings.length > 0 ? Number((selfRatings.reduce((sum, e) => sum + e.avgRating, 0) / selfRatings.length).toFixed(1)) : 0,
+      Peer: peerRatings.length > 0 ? Number((peerRatings.reduce((sum, e) => sum + e.avgRating, 0) / peerRatings.length).toFixed(1)) : 0,
+      Manager: managerRatings.length > 0 ? Number((managerRatings.reduce((sum, e) => sum + e.avgRating, 0) / managerRatings.length).toFixed(1)) : 0
+    };
+  });
+
           // Prepare skill gaps data for horizontal progress bars - use paginated skills
   const skillGapsData = paginatedSkills.map(skill => {
     const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
@@ -351,6 +377,38 @@ export default function SkillProgression() {
                 />
               ))}
             </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Skills vs Rating Type Chart */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Skills vs Rating Type</CardTitle>
+          <CardDescription>Comparison of ratings across Self, Peer, and Manager assessments</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart 
+              data={skillsByRatingTypeData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="skill" 
+                angle={-45}
+                textAnchor="end"
+                height={80}
+                interval={0}
+                fontSize={12}
+              />
+              <YAxis domain={[0, 8]} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="Self" fill="#10b981" name="Self Rating" />
+              <Bar dataKey="Peer" fill="#3b82f6" name="Peer Rating" />
+              <Bar dataKey="Manager" fill="#f59e0b" name="Manager Rating" />
+            </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
