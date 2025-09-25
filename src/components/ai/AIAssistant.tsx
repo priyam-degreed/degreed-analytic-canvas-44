@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import { 
   Search, 
   Send, 
@@ -91,6 +92,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Handle close - clear conversation and reset state
   const handleClose = () => {
@@ -522,11 +524,27 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     setVisualizationName("");
   };
 
-  const handleOpenInAnalyze = () => {
-    toast({
-      title: "Opening in Analyze",
-      description: "Redirecting to Analyze workspace with this visualization.",
-    });
+  const handleOpenInAnalyze = (visualization?: VisualizationData) => {
+    if (visualization) {
+      // Navigate to dashboard builder with the visualization data
+      navigate('/dashboard-builder', {
+        state: {
+          importedVisualization: {
+            id: Date.now(),
+            componentType: "visualization",
+            name: visualization.title,
+            type: visualization.type,
+            description: `${visualization.metrics.join(", ")} analysis`,
+            config: visualization
+          }
+        }
+      });
+      
+      toast({
+        title: "Opening in Dashboard Builder",
+        description: "Redirecting to Dashboard Builder with this visualization.",
+      });
+    }
   };
 
   const handleFeedback = (messageId: string, feedbackType: "up" | "down") => {
@@ -816,7 +834,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                       variant="ghost" 
                       size="sm" 
                       className="w-full justify-start text-sm"
-                      onClick={handleOpenInAnalyze}
+                      onClick={() => handleOpenInAnalyze(viz)}
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
                       Open in Analyse

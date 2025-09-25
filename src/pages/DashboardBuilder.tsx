@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Canvas } from "@/components/dashboard-builder/Canvas";
 import { DateRangeFilter } from "@/components/filters/DateRangeFilter";
 import { MultiSelectFilter } from "@/components/filters/MultiSelectFilter";
 import { VisualizationBuilder } from "@/components/ai/VisualizationBuilder";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 
 interface DashboardBuilderProps {
@@ -20,6 +20,7 @@ interface DashboardBuilderProps {
 
 export default function DashboardBuilder({ mode = "create", dashboardId }: DashboardBuilderProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [dashboardName, setDashboardName] = useState(mode === "edit" ? "01 Learning Dashboard" : "");
   const [isPublic, setIsPublic] = useState(false);
   const [isVisualizationBuilderOpen, setIsVisualizationBuilderOpen] = useState(false);
@@ -71,6 +72,18 @@ export default function DashboardBuilder({ mode = "create", dashboardId }: Dashb
       }
     ] : []
   );
+
+  // Check for imported visualization from AI Assistant
+  useEffect(() => {
+    const state = location.state as { importedVisualization?: any };
+    if (state?.importedVisualization) {
+      setCanvasComponents(prev => [...prev, state.importedVisualization]);
+      toast.success(`Visualization "${state.importedVisualization.name}" has been added to your dashboard!`);
+      
+      // Clear the state to prevent re-adding on re-render
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleSave = () => {
     if (!dashboardName.trim()) {
