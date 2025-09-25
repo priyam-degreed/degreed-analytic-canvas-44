@@ -350,6 +350,26 @@ export default function SkillProgression() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
+            {/* Y-axis label */}
+            <div className="flex items-center gap-2">
+              <div className="w-24"></div>
+              <div className="flex gap-1 flex-1">
+                <div className="text-xs font-medium text-muted-foreground text-center mb-2">
+                  Time Periods (X-axis)
+                </div>
+              </div>
+            </div>
+            {/* Period headers */}
+            <div className="flex items-center gap-2">
+              <div className="w-24 text-xs font-medium text-muted-foreground">Skills (Y-axis)</div>
+              <div className="flex gap-1 flex-1">
+                {availablePeriods.map((period) => (
+                  <div key={period} className="flex-1 text-xs font-medium text-center text-muted-foreground">
+                    {period}
+                  </div>
+                ))}
+              </div>
+            </div>
             {heatmapData.map((skillRow) => (
               <div key={skillRow.skill} className="flex items-center gap-2">
                 <div className="w-24 text-sm font-medium truncate">{skillRow.skill}</div>
@@ -358,14 +378,14 @@ export default function SkillProgression() {
                      const value = skillRow[period] || 0;
                      let backgroundColor, textColor;
                      
-                     if (value >= 1 && value <= 2) {
-                       // Red gradient for 1-2
-                       const intensity = (value - 1) * 100; // 0-100%
+                     if (value >= 1 && value < 3) {
+                       // Red gradient for 1-3
+                       const intensity = (value - 1) / 2 * 100; // 0-100%
                        backgroundColor = `hsl(0, 75%, ${Math.max(85 - intensity, 45)}%)`;
                        textColor = intensity > 50 ? 'white' : 'black';
-                     } else if (value >= 3 && value <= 4) {
-                       // Amber gradient for 3-4  
-                       const intensity = (value - 3) * 100; // 0-100%
+                     } else if (value >= 3 && value < 5) {
+                       // Amber gradient for 3-5  
+                       const intensity = (value - 3) / 2 * 100; // 0-100%
                        backgroundColor = `hsl(45, 85%, ${Math.max(85 - intensity, 35)}%)`;
                        textColor = intensity > 50 ? 'black' : 'black';
                      } else if (value >= 5 && value <= 8) {
