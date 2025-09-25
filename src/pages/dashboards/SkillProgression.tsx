@@ -32,8 +32,10 @@ import {
 import { 
   skillProgressionMetrics,
   skillDistributionData,
-  priorityViewData,
-  heatmapData
+  generateHeatmapData,
+  generateBubbleData,
+  roleSkillMapping,
+  periodLabels
 } from "@/data/skillProgressionData";
 
 // Custom colors for different rating levels
@@ -54,18 +56,53 @@ const priorityColors = {
   neutral: "#64748b"
 };
 
+interface FilterState {
+  dateRange: any;
+  roles: string[];
+  skills: string[];
+  timePeriod: string[];
+  ratingLevels: string[];
+  ratingTypes: string[];
+}
+
 export default function SkillProgression() {
-  const [selectedRole, setSelectedRole] = useState("Data Scientist");
-  const [selectedSkills, setSelectedSkills] = useState(["SQL", "Python", "Machine Learning"]);
+  const [filters, setFilters] = useState<FilterState>({
+    dateRange: null,
+    roles: [],
+    skills: [],
+    timePeriod: [],
+    ratingLevels: [],
+    ratingTypes: []
+  });
 
-  // Filter data for selected role and skills
-  const filteredDistributionData = skillDistributionData.filter(
-    item => item.role === selectedRole && selectedSkills.includes(item.skill)
-  );
+  // Apply filters to data
+  const filteredData = skillDistributionData.filter(item => {
+    const roleMatch = filters.roles.length === 0 || filters.roles.includes(item.role);
+    const skillMatch = filters.skills.length === 0 || filters.skills.includes(item.skill);
+    const periodMatch = filters.timePeriod.length === 0 || filters.timePeriod.some(period => 
+      item.timePeriod === period || 
+      (period.includes('-Q') && item.timePeriod.startsWith(period)) ||
+      (period.startsWith('FY') && !period.includes('-') && item.timePeriod.startsWith(period))
+    );
+    
+    return roleMatch && skillMatch && periodMatch;
+  });
 
-  // Prepare stacked column chart data for selected role
-  const stackedData = skillDistributionData
-    .filter(item => item.role === selectedRole && item.skill === "SQL")
+  // Get unique values for dropdowns based on filtered data
+  const availableRoles = filters.roles.length > 0 ? filters.roles : 
+    Array.from(new Set(filteredData.map(d => d.role)));
+  const availableSkills = filters.skills.length > 0 ? filters.skills :
+    Array.from(new Set(filteredData.map(d => d.skill)));
+  const availablePeriods = filters.timePeriod.length > 0 ? filters.timePeriod :
+    Array.from(new Set(filteredData.map(d => d.timePeriod)));
+
+  // Use first available role/skill for focused views
+  const selectedRole = availableRoles[0] || "Data Scientist";
+  const selectedSkill = availableSkills[0] || "SQL";
+
+  // Prepare stacked column chart data for selected role and skill
+  const stackedData = filteredData
+    .filter(item => item.role === selectedRole && item.skill === selectedSkill)
     .map(item => ({
       period: item.timePeriod,
       Beginner: item.beginner,
@@ -79,24 +116,41 @@ export default function SkillProgression() {
     }));
 
   // Prepare line chart data for skill progression
-  const lineData = ["Q1 2024", "Q2 2024", "Q3 2024", "Q4 2024"].map(period => {
+  const lineData = availablePeriods.map(period => {
     const periodData: any = { period };
-    selectedSkills.forEach(skill => {
-      const skillData = skillDistributionData.find(
-        item => item.timePeriod === period && item.skill === skill && item.role === selectedRole
+    availableSkills.slice(0, 5).forEach(skill => { // Limit to 5 skills for readability
+      const skillData = filteredData.find(
+        item => item.timePeriod === period && item.skill === skill && availableRoles.includes(item.role)
       );
       periodData[skill] = skillData?.avgRating || 0;
     });
     return periodData;
   });
 
-  // Prepare bubble chart data with color based on change
-  const bubbleData = priorityViewData.map(item => ({
+  // Generate dynamic data based on filters
+  const heatmapData = generateHeatmapData(filteredData);
+  const bubbleData = generateBubbleData(filteredData).map(item => ({
     ...item,
     color: item.changeVsLastQuarter > 0.2 ? priorityColors.positive :
            item.changeVsLastQuarter < -0.2 ? priorityColors.negative :
            priorityColors.neutral
   }));
+
+  // Calculate filtered metrics
+  const filteredMetrics = {
+    totalEmployees: filteredData.length > 0 ? Math.floor(Math.random() * 200) + 100 : 0,
+    avgSkillRating: filteredData.length > 0 ? 
+      filteredData.reduce((sum, item) => sum + item.avgRating, 0) / filteredData.length : 0,
+    employeesAboveThreshold: filteredData.length > 0 ? 
+      Math.floor((filteredData.filter(item => item.avgRating >= 6).length / filteredData.length) * 100) : 0,
+    progressionPercent: Math.random() * 20 + 10,
+    skillGapToTarget: filteredData.length > 0 ?
+      Math.max(0, 6 - (filteredData.reduce((sum, item) => sum + item.avgRating, 0) / filteredData.length)) : 0
+  };
+
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
 
   // Custom tooltip for bubble chart
   const CustomBubbleTooltip = ({ active, payload }: any) => {
@@ -154,34 +208,34 @@ export default function SkillProgression() {
       </div>
 
       {/* Filters */}
-      <SkillProgressionFilterBar />
+      <SkillProgressionFilterBar onFilterChange={handleFilterChange} />
 
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Total Employees"
-          value={skillProgressionMetrics.totalEmployees.toString()}
+          value={filteredMetrics.totalEmployees.toString()}
           icon={<Users className="h-5 w-5" />}
           change={{ value: "+8.2%", type: "positive" }}
           subtitle="Tracked across all roles"
         />
         <MetricCard
           title="Avg Skill Rating"
-          value={skillProgressionMetrics.avgSkillRating.toFixed(1)}
+          value={filteredMetrics.avgSkillRating.toFixed(1)}
           icon={<Award className="h-5 w-5" />}
           change={{ value: "+12.5%", type: "positive" }}
           subtitle="Out of 8.0 scale"
         />
         <MetricCard
           title="Advanced+ Employees"
-          value={`${skillProgressionMetrics.employeesAboveThreshold}%`}
+          value={`${filteredMetrics.employeesAboveThreshold}%`}
           icon={<Target className="h-5 w-5" />}
           change={{ value: "+15.3%", type: "positive" }}
           subtitle="Rating 6+ (Advanced)"
         />
         <MetricCard
           title="Progression Rate"
-          value={`+${skillProgressionMetrics.progressionPercent}%`}
+          value={`+${filteredMetrics.progressionPercent.toFixed(1)}%`}
           icon={<TrendingUp className="h-5 w-5" />}
           change={{ value: "+22.1%", type: "positive" }}
           subtitle="Vs previous period"
@@ -226,12 +280,12 @@ export default function SkillProgression() {
               <YAxis domain={[0, 8]} />
               <Tooltip />
               <Legend />
-              {selectedSkills.map((skill, index) => (
+              {availableSkills.slice(0, 5).map((skill, index) => (
                 <Line 
                   key={skill}
                   type="monotone" 
                   dataKey={skill} 
-                  stroke={`hsl(${index * 120}, 70%, 50%)`}
+                  stroke={`hsl(${index * 60}, 70%, 50%)`}
                   strokeWidth={2}
                   dot={{ r: 4 }}
                 />
@@ -255,7 +309,7 @@ export default function SkillProgression() {
                 <div key={skillRow.skill} className="flex items-center gap-2">
                   <div className="w-24 text-sm font-medium truncate">{skillRow.skill}</div>
                   <div className="flex gap-1 flex-1">
-                    {["Q1 2024", "Q2 2024", "Q3 2024", "Q4 2024"].map((period) => {
+                    {availablePeriods.map((period) => {
                       const value = skillRow[period];
                       const intensity = Math.round((value - 2) / 4 * 100); // Scale 2-6 to 0-100%
                       return (
@@ -318,7 +372,7 @@ export default function SkillProgression() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {priorityViewData.slice(0, 6).map((skill) => (
+            {bubbleData.slice(0, 10).map((skill) => (
               <div key={skill.skill} className="flex items-center justify-between p-3 border border-border rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="font-medium">{skill.skill}</div>

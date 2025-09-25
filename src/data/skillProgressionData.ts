@@ -52,31 +52,69 @@ export const roleOptions = [
   "Engineering Manager"
 ];
 
-// Skill options
-export const skillOptions = [
-  "SQL",
-  "Python",
-  "Machine Learning",
-  "AI Tools",
-  "React",
-  "Node.js",
-  "AWS",
-  "Docker",
-  "Kubernetes",
-  "Data Analytics",
-  "Product Strategy",
-  "System Design",
-  "Leadership",
-  "Communication"
+// Role-specific skill mapping
+export const roleSkillMapping: Record<string, string[]> = {
+  "Data Scientist": ["SQL", "Python", "Machine Learning", "AI Tools", "Data Analytics", "Statistics", "R", "Tableau"],
+  "Backend Engineer": ["SQL", "Python", "Node.js", "Java", "AWS", "Docker", "Kubernetes", "System Design"],
+  "Frontend Engineer": ["React", "JavaScript", "TypeScript", "CSS", "HTML", "Vue.js", "Angular", "Web Performance"],
+  "Product Manager": ["Product Strategy", "Analytics", "Communication", "Leadership", "Market Research", "User Research", "Roadmapping", "Stakeholder Management"],
+  "DevOps Engineer": ["AWS", "Docker", "Kubernetes", "CI/CD", "Infrastructure", "Monitoring", "Security", "Automation"],
+  "ML Engineer": ["Python", "Machine Learning", "AI Tools", "MLOps", "Deep Learning", "TensorFlow", "PyTorch", "Data Pipeline"],
+  "Software Architect": ["System Design", "Architecture", "Leadership", "Technical Strategy", "Microservices", "Scalability", "Security", "Code Review"],
+  "UX Designer": ["Design Systems", "User Research", "Prototyping", "Figma", "Adobe Creative", "Information Architecture", "Usability Testing", "Visual Design"],
+  "Technical Lead": ["Leadership", "Code Review", "Mentoring", "System Design", "Project Management", "Technical Strategy", "Team Building", "Architecture"],
+  "Engineering Manager": ["Leadership", "People Management", "Strategic Planning", "Budget Management", "Process Improvement", "Team Development", "Communication", "Performance Management"]
+};
+
+// All unique skills across roles
+export const skillOptions = Array.from(new Set(Object.values(roleSkillMapping).flat())).sort();
+
+// Time period options with fiscal structure
+export interface FiscalPeriod {
+  fiscalYear: string;
+  quarter: string;
+  month?: string;
+  value: string;
+  label: string;
+}
+
+export const timePeriodOptions: FiscalPeriod[] = [
+  // FY24
+  { fiscalYear: "FY24", quarter: "Q1", month: "Jan", value: "FY24-Q1-Jan", label: "FY24 Q1 Jan" },
+  { fiscalYear: "FY24", quarter: "Q1", month: "Feb", value: "FY24-Q1-Feb", label: "FY24 Q1 Feb" },
+  { fiscalYear: "FY24", quarter: "Q1", month: "Mar", value: "FY24-Q1-Mar", label: "FY24 Q1 Mar" },
+  { fiscalYear: "FY24", quarter: "Q2", month: "Apr", value: "FY24-Q2-Apr", label: "FY24 Q2 Apr" },
+  { fiscalYear: "FY24", quarter: "Q2", month: "May", value: "FY24-Q2-May", label: "FY24 Q2 May" },
+  { fiscalYear: "FY24", quarter: "Q2", month: "Jun", value: "FY24-Q2-Jun", label: "FY24 Q2 Jun" },
+  { fiscalYear: "FY24", quarter: "Q3", month: "Jul", value: "FY24-Q3-Jul", label: "FY24 Q3 Jul" },
+  { fiscalYear: "FY24", quarter: "Q3", month: "Aug", value: "FY24-Q3-Aug", label: "FY24 Q3 Aug" },
+  { fiscalYear: "FY24", quarter: "Q3", month: "Sep", value: "FY24-Q3-Sep", label: "FY24 Q3 Sep" },
+  { fiscalYear: "FY24", quarter: "Q4", month: "Oct", value: "FY24-Q4-Oct", label: "FY24 Q4 Oct" },
+  { fiscalYear: "FY24", quarter: "Q4", month: "Nov", value: "FY24-Q4-Nov", label: "FY24 Q4 Nov" },
+  { fiscalYear: "FY24", quarter: "Q4", month: "Dec", value: "FY24-Q4-Dec", label: "FY24 Q4 Dec" },
+  // FY25
+  { fiscalYear: "FY25", quarter: "Q1", month: "Jan", value: "FY25-Q1-Jan", label: "FY25 Q1 Jan" },
+  { fiscalYear: "FY25", quarter: "Q1", month: "Feb", value: "FY25-Q1-Feb", label: "FY25 Q1 Feb" },
+  { fiscalYear: "FY25", quarter: "Q1", month: "Mar", value: "FY25-Q1-Mar", label: "FY25 Q1 Mar" },
+  { fiscalYear: "FY25", quarter: "Q2", month: "Apr", value: "FY25-Q2-Apr", label: "FY25 Q2 Apr" },
+  { fiscalYear: "FY25", quarter: "Q2", month: "May", value: "FY25-Q2-May", label: "FY25 Q2 May" },
+  { fiscalYear: "FY25", quarter: "Q2", month: "Jun", value: "FY25-Q2-Jun", label: "FY25 Q2 Jun" },
+  
+  // Quarterly rollups
+  { fiscalYear: "FY24", quarter: "Q1", value: "FY24-Q1", label: "FY24 Q1" },
+  { fiscalYear: "FY24", quarter: "Q2", value: "FY24-Q2", label: "FY24 Q2" },
+  { fiscalYear: "FY24", quarter: "Q3", value: "FY24-Q3", label: "FY24 Q3" },
+  { fiscalYear: "FY24", quarter: "Q4", value: "FY24-Q4", label: "FY24 Q4" },
+  { fiscalYear: "FY25", quarter: "Q1", value: "FY25-Q1", label: "FY25 Q1" },
+  { fiscalYear: "FY25", quarter: "Q2", value: "FY25-Q2", label: "FY25 Q2" },
+  
+  // Yearly rollups
+  { fiscalYear: "FY24", quarter: "", value: "FY24", label: "FY24" },
+  { fiscalYear: "FY25", quarter: "", value: "FY25", label: "FY25" }
 ];
 
-// Time period options
-export const timePeriodOptions = [
-  "Q1 2024", "Q2 2024", "Q3 2024", "Q4 2024",
-  "Jan 2024", "Feb 2024", "Mar 2024", "Apr 2024", 
-  "May 2024", "Jun 2024", "Jul 2024", "Aug 2024",
-  "Sep 2024", "Oct 2024", "Nov 2024", "Dec 2024"
-];
+// Simple period labels for backward compatibility
+export const periodLabels = ["FY24-Q1", "FY24-Q2", "FY24-Q3", "FY24-Q4", "FY25-Q1", "FY25-Q2"];
 
 // Rating level options (1-8 scale)
 export const ratingLevels = [
@@ -93,50 +131,79 @@ export const ratingLevels = [
 // Rating type options
 export const ratingTypeOptions = ["Self", "Peer", "Manager"];
 
-// Mock skill distribution data
-export const skillDistributionData: SkillDistribution[] = [
-  // Data Scientist - SQL progression
-  { timePeriod: "Q1 2024", role: "Data Scientist", skill: "SQL", beginner: 40, capable: 25, intermediate: 20, effective: 10, experienced: 3, advanced: 2, distinguished: 0, master: 0, avgRating: 2.1 },
-  { timePeriod: "Q2 2024", role: "Data Scientist", skill: "SQL", beginner: 30, capable: 30, intermediate: 25, effective: 10, experienced: 3, advanced: 2, distinguished: 0, master: 0, avgRating: 2.8 },
-  { timePeriod: "Q3 2024", role: "Data Scientist", skill: "SQL", beginner: 20, capable: 25, intermediate: 30, effective: 15, experienced: 5, advanced: 4, distinguished: 1, master: 0, avgRating: 3.4 },
-  { timePeriod: "Q4 2024", role: "Data Scientist", skill: "SQL", beginner: 15, capable: 20, intermediate: 25, effective: 20, experienced: 10, advanced: 7, distinguished: 2, master: 1, avgRating: 4.1 },
+// Generate comprehensive mock data for all roles and skills
+function generateSkillDistributionData(): SkillDistribution[] {
+  const data: SkillDistribution[] = [];
+  const periods = ["FY24-Q1", "FY24-Q2", "FY24-Q3", "FY24-Q4", "FY25-Q1", "FY25-Q2"];
   
-  // Data Scientist - Python progression
-  { timePeriod: "Q1 2024", role: "Data Scientist", skill: "Python", beginner: 25, capable: 30, intermediate: 25, effective: 15, experienced: 3, advanced: 2, distinguished: 0, master: 0, avgRating: 2.7 },
-  { timePeriod: "Q2 2024", role: "Data Scientist", skill: "Python", beginner: 20, capable: 25, intermediate: 30, effective: 15, experienced: 7, advanced: 3, distinguished: 0, master: 0, avgRating: 3.2 },
-  { timePeriod: "Q3 2024", role: "Data Scientist", skill: "Python", beginner: 15, capable: 20, intermediate: 25, effective: 20, experienced: 12, advanced: 6, distinguished: 2, master: 0, avgRating: 3.8 },
-  { timePeriod: "Q4 2024", role: "Data Scientist", skill: "Python", beginner: 10, capable: 15, intermediate: 25, effective: 25, experienced: 15, advanced: 8, distinguished: 2, master: 0, avgRating: 4.3 },
+  Object.entries(roleSkillMapping).forEach(([role, skills]) => {
+    skills.forEach(skill => {
+      periods.forEach((period, periodIndex) => {
+        // Generate progressive improvement over time
+        const baseSkillLevel = Math.random() * 2 + 1; // Base level 1-3
+        const progression = periodIndex * 0.4; // Gradual improvement
+        const avgRating = Math.min(8, baseSkillLevel + progression + (Math.random() * 0.5));
+        
+        // Generate distribution based on average rating
+        const distribution = generateRatingDistribution(avgRating);
+        
+        data.push({
+          timePeriod: period,
+          role,
+          skill,
+          ...distribution,
+          avgRating: Math.round(avgRating * 10) / 10
+        });
+      });
+    });
+  });
   
-  // Data Scientist - Machine Learning progression
-  { timePeriod: "Q1 2024", role: "Data Scientist", skill: "Machine Learning", beginner: 50, capable: 30, intermediate: 15, effective: 4, experienced: 1, advanced: 0, distinguished: 0, master: 0, avgRating: 1.8 },
-  { timePeriod: "Q2 2024", role: "Data Scientist", skill: "Machine Learning", beginner: 40, capable: 35, intermediate: 18, effective: 5, experienced: 2, advanced: 0, distinguished: 0, master: 0, avgRating: 2.1 },
-  { timePeriod: "Q3 2024", role: "Data Scientist", skill: "Machine Learning", beginner: 30, capable: 30, intermediate: 25, effective: 10, experienced: 4, advanced: 1, distinguished: 0, master: 0, avgRating: 2.6 },
-  { timePeriod: "Q4 2024", role: "Data Scientist", skill: "Machine Learning", beginner: 25, capable: 25, intermediate: 25, effective: 15, experienced: 7, advanced: 3, distinguished: 0, master: 0, avgRating: 3.1 },
+  return data;
+}
 
-  // Backend Engineer - SQL progression
-  { timePeriod: "Q1 2024", role: "Backend Engineer", skill: "SQL", beginner: 20, capable: 30, intermediate: 30, effective: 15, experienced: 4, advanced: 1, distinguished: 0, master: 0, avgRating: 2.9 },
-  { timePeriod: "Q2 2024", role: "Backend Engineer", skill: "SQL", beginner: 15, capable: 25, intermediate: 35, effective: 18, experienced: 5, advanced: 2, distinguished: 0, master: 0, avgRating: 3.3 },
-  { timePeriod: "Q3 2024", role: "Backend Engineer", skill: "SQL", beginner: 10, capable: 20, intermediate: 30, effective: 25, experienced: 10, advanced: 4, distinguished: 1, master: 0, avgRating: 3.9 },
-  { timePeriod: "Q4 2024", role: "Backend Engineer", skill: "SQL", beginner: 8, capable: 15, intermediate: 27, effective: 28, experienced: 15, advanced: 6, distinguished: 1, master: 0, avgRating: 4.2 },
+function generateRatingDistribution(avgRating: number) {
+  // Create realistic distribution around the average
+  const total = 100;
+  const center = Math.round(avgRating);
+  
+  const distribution = {
+    beginner: 0,
+    capable: 0,
+    intermediate: 0,
+    effective: 0,
+    experienced: 0,
+    advanced: 0,
+    distinguished: 0,
+    master: 0
+  };
+  
+  // Generate normal-ish distribution around center
+  const ratings = ['beginner', 'capable', 'intermediate', 'effective', 'experienced', 'advanced', 'distinguished', 'master'];
+  
+  for (let i = 0; i < total; i++) {
+    // Bias towards center rating with some spread
+    const random = Math.random();
+    let selectedRating;
+    
+    if (random < 0.4) {
+      selectedRating = center - 1;
+    } else if (random < 0.8) {
+      selectedRating = center;
+    } else {
+      selectedRating = center + 1;
+    }
+    
+    // Add some additional spread
+    selectedRating += Math.floor((Math.random() - 0.5) * 2);
+    selectedRating = Math.max(0, Math.min(7, selectedRating));
+    
+    distribution[ratings[selectedRating] as keyof typeof distribution]++;
+  }
+  
+  return distribution;
+}
 
-  // Backend Engineer - Node.js progression
-  { timePeriod: "Q1 2024", role: "Backend Engineer", skill: "Node.js", beginner: 15, capable: 25, intermediate: 35, effective: 20, experienced: 4, advanced: 1, distinguished: 0, master: 0, avgRating: 3.1 },
-  { timePeriod: "Q2 2024", role: "Backend Engineer", skill: "Node.js", beginner: 10, capable: 20, intermediate: 30, effective: 25, experienced: 10, advanced: 4, distinguished: 1, master: 0, avgRating: 3.7 },
-  { timePeriod: "Q3 2024", role: "Backend Engineer", skill: "Node.js", beginner: 8, capable: 15, intermediate: 25, effective: 30, experienced: 15, advanced: 6, distinguished: 1, master: 0, avgRating: 4.1 },
-  { timePeriod: "Q4 2024", role: "Backend Engineer", skill: "Node.js", beginner: 5, capable: 12, intermediate: 23, effective: 30, experienced: 20, advanced: 8, distinguished: 2, master: 0, avgRating: 4.5 },
-
-  // Frontend Engineer - React progression
-  { timePeriod: "Q1 2024", role: "Frontend Engineer", skill: "React", beginner: 10, capable: 20, intermediate: 40, effective: 25, experienced: 4, advanced: 1, distinguished: 0, master: 0, avgRating: 3.3 },
-  { timePeriod: "Q2 2024", role: "Frontend Engineer", skill: "React", beginner: 8, capable: 15, intermediate: 35, effective: 30, experienced: 8, advanced: 3, distinguished: 1, master: 0, avgRating: 3.8 },
-  { timePeriod: "Q3 2024", role: "Frontend Engineer", skill: "React", beginner: 5, capable: 12, intermediate: 25, effective: 35, experienced: 15, advanced: 6, distinguished: 2, master: 0, avgRating: 4.3 },
-  { timePeriod: "Q4 2024", role: "Frontend Engineer", skill: "React", beginner: 3, capable: 10, intermediate: 22, effective: 35, experienced: 20, advanced: 8, distinguished: 2, master: 0, avgRating: 4.7 },
-
-  // Product Manager - Product Strategy progression
-  { timePeriod: "Q1 2024", role: "Product Manager", skill: "Product Strategy", beginner: 30, capable: 35, intermediate: 25, effective: 8, experienced: 2, advanced: 0, distinguished: 0, master: 0, avgRating: 2.3 },
-  { timePeriod: "Q2 2024", role: "Product Manager", skill: "Product Strategy", beginner: 25, capable: 30, intermediate: 30, effective: 12, experienced: 3, advanced: 0, distinguished: 0, master: 0, avgRating: 2.7 },
-  { timePeriod: "Q3 2024", role: "Product Manager", skill: "Product Strategy", beginner: 20, capable: 25, intermediate: 30, effective: 18, experienced: 5, advanced: 2, distinguished: 0, master: 0, avgRating: 3.2 },
-  { timePeriod: "Q4 2024", role: "Product Manager", skill: "Product Strategy", beginner: 15, capable: 20, intermediate: 30, effective: 25, experienced: 8, advanced: 2, distinguished: 0, master: 0, avgRating: 3.6 },
-];
+export const skillDistributionData: SkillDistribution[] = generateSkillDistributionData();
 
 // Mock skill progression entries
 export const skillProgressionEntries: SkillProgressionEntry[] = skillDistributionData.map((item, index) => ({
@@ -172,11 +239,47 @@ export const skillProgressionMetrics: SkillProgressionMetrics = {
   skillGapToTarget: 2.6
 };
 
-// Heatmap data (skill vs time)
-export const heatmapData = skillOptions.slice(0, 8).map(skill => {
-  const skillData: any = { skill };
-  timePeriodOptions.slice(0, 4).forEach(period => {
-    skillData[period] = Math.random() * 4 + 2; // 2-6 rating
+// Generate heatmap data based on actual skill distribution data
+export function generateHeatmapData(filteredData: SkillDistribution[]) {
+  const skills = Array.from(new Set(filteredData.map(d => d.skill)));
+  const periods = Array.from(new Set(filteredData.map(d => d.timePeriod)));
+  
+  return skills.map(skill => {
+    const skillData: any = { skill };
+    periods.forEach(period => {
+      const data = filteredData.find(d => d.skill === skill && d.timePeriod === period);
+      skillData[period] = data?.avgRating || 0;
+    });
+    return skillData;
   });
-  return skillData;
-});
+}
+
+// Generate bubble chart data based on filtered data
+export function generateBubbleData(filteredData: SkillDistribution[]) {
+  const skillStats = new Map();
+  
+  filteredData.forEach(entry => {
+    if (!skillStats.has(entry.skill)) {
+      skillStats.set(entry.skill, {
+        skill: entry.skill,
+        totalRating: 0,
+        count: 0,
+        employeeCount: 0,
+        importance: Math.random() * 10 + 1
+      });
+    }
+    
+    const stats = skillStats.get(entry.skill);
+    stats.totalRating += entry.avgRating;
+    stats.count++;
+    stats.employeeCount += Math.floor(Math.random() * 50) + 20;
+  });
+  
+  return Array.from(skillStats.values()).map(stats => ({
+    skill: stats.skill,
+    importance: stats.importance,
+    avgRating: stats.totalRating / stats.count,
+    employeeCount: Math.floor(stats.employeeCount / stats.count),
+    changeVsLastQuarter: (Math.random() - 0.5) * 2
+  }));
+}
