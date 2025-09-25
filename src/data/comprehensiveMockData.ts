@@ -226,21 +226,91 @@ export function generateSkillRatingData(): SkillRatingItem[] {
   const data: SkillRatingItem[] = [];
   let idCounter = 1;
 
-  // Generate ratings for each skill across different contexts
-  FILTER_OPTIONS.skills.forEach(skill => {
-    FILTER_OPTIONS.roles.forEach(role => {
-      FILTER_OPTIONS.groups.forEach(group => {
-        // Generate multiple rating entries for this combination
-        const entriesCount = getRandomInRange(2, 4);
+  // Define role-skill priorities to ensure relevant skill gaps
+  const roleSkillPriorities = {
+    "Software Engineer": ["Python Programming", "Java", "Cloud Computing", "Data Analytics"],
+    "Senior Software Engineer": ["Python Programming", "Java", "Cloud Computing", "Leadership"],
+    "Tech Lead": ["Leadership", "Project Management", "Python Programming", "Innovation"],
+    "Engineering Manager": ["Leadership", "Project Management", "Innovation", "Business Analysis"],
+    "Product Manager": ["Leadership", "Project Management", "Business Analysis", "Innovation"],
+    "Senior Product Manager": ["Leadership", "Project Management", "Business Analysis", "Business Intelligence"],
+    "Data Scientist": ["Python Programming", "Machine Learning", "Data Analytics", "Big Data Analysis"],
+    "Senior Data Scientist": ["Python Programming", "Machine Learning", "Data Analytics", "Business Intelligence"],
+    "Data Analyst": ["Data Analytics", "Business Intelligence", "Data Visualization", "Python Programming"],
+    "UX Designer": ["Innovation", "Data Visualization", "Leadership", "Business Analysis"],
+    "Senior UX Designer": ["Innovation", "Data Visualization", "Leadership", "Project Management"],
+    "Marketing Manager": ["Leadership", "Data Analytics", "Business Intelligence", "Innovation"],
+    "Sales Manager": ["Leadership", "Business Analysis", "Project Management", "Innovation"],
+    "DevOps Engineer": ["Cloud Computing", "Python Programming", "Leadership", "Project Management"],
+    "QA Engineer": ["Java", "Python Programming", "Project Management", "Cloud Computing"],
+    "Business Analyst": ["Business Analysis", "Data Analytics", "Business Intelligence", "Data Visualization"],
+    "Project Manager": ["Project Management", "Leadership", "Business Analysis", "Innovation"],
+    "Scrum Master": ["Project Management", "Leadership", "Business Analysis", "Innovation"],
+    "Director": ["Leadership", "Project Management", "Business Analysis", "Innovation"],
+    "VP Engineering": ["Leadership", "Project Management", "Innovation", "Business Analysis"],
+    "CTO": ["Leadership", "Innovation", "Project Management", "Cloud Computing"]
+  };
+
+  // Generate entries for priority skills per role first
+  Object.entries(roleSkillPriorities).forEach(([role, prioritySkills]) => {
+    FILTER_OPTIONS.groups.forEach(group => {
+      prioritySkills.forEach(skill => {
+        // Generate 3-4 entries per role-skill-group combination for priority skills
+        const entriesCount = getRandomInRange(3, 4);
         
         for (let i = 0; i < entriesCount; i++) {
-          const contentTypes = getRandomElements(FILTER_OPTIONS.contentTypes, 1, 2);
-          const providers = getRandomElements(FILTER_OPTIONS.providers, 1, 2);
+          const contentTypes = getRandomElements(FILTER_OPTIONS.contentTypes, 1, 1);
+          const providers = getRandomElements(FILTER_OPTIONS.providers, 1, 1);
           const customAttributes = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
           
-          // Generate realistic ratings based on role and skill
-          const currentRating = getRoleSkillBaseline(role, skill) + getRandomFloat(-0.5, 0.5);
-          const targetRating = Math.min(5, currentRating + getRandomFloat(0.3, 1.2));
+          // Generate realistic ratings with bigger gaps for priority skills
+          const currentRating = getRoleSkillBaseline(role, skill) + getRandomFloat(-0.8, 0.4);
+          const targetRating = Math.min(5, currentRating + getRandomFloat(0.6, 1.8));
+          
+          // Random recent date
+          const randomQuarter = Math.floor(Math.random() * 4) + 1;
+          const quarterData = DATE_HIERARCHY.FY25[`Q${randomQuarter}` as keyof typeof DATE_HIERARCHY.FY25];
+          const randomDate = quarterData.dates[Math.floor(Math.random() * quarterData.dates.length)];
+
+          data.push({
+            id: `rating-${idCounter++}`,
+            skill,
+            currentRating: Math.max(1, Math.min(5, +currentRating.toFixed(1))),
+            targetRating: Math.max(1, Math.min(5, +targetRating.toFixed(1))),
+            date: randomDate,
+            contentType: contentTypes[0],
+            provider: providers[0],
+            skills: [skill],
+            groups: [group],
+            roles: [role],
+            customAttribute: customAttributes
+          });
+        }
+      });
+    });
+  });
+
+  // Then add some additional data for all skill-role combinations (reduced volume)
+  FILTER_OPTIONS.skills.forEach(skill => {
+    FILTER_OPTIONS.roles.forEach(role => {
+      // Skip if this is already a priority skill for this role
+      const rolePriorities = roleSkillPriorities[role as keyof typeof roleSkillPriorities];
+      if (rolePriorities && rolePriorities.includes(skill)) {
+        return; // Already generated above
+      }
+      
+      // Generate fewer entries for non-priority skills
+      FILTER_OPTIONS.groups.slice(0, 3).forEach(group => { // Only first 3 groups to reduce volume
+        const entriesCount = getRandomInRange(1, 2);
+        
+        for (let i = 0; i < entriesCount; i++) {
+          const contentTypes = getRandomElements(FILTER_OPTIONS.contentTypes, 1, 1);
+          const providers = getRandomElements(FILTER_OPTIONS.providers, 1, 1);
+          const customAttributes = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
+          
+          // Generate realistic ratings with smaller gaps for non-priority skills
+          const currentRating = getRoleSkillBaseline(role, skill) + getRandomFloat(-0.3, 0.3);
+          const targetRating = Math.min(5, currentRating + getRandomFloat(0.2, 0.8));
           
           // Random recent date
           const randomQuarter = Math.floor(Math.random() * 4) + 1;

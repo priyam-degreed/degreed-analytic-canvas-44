@@ -60,30 +60,51 @@ export default function SkillInsights() {
   const filteredSkillGaps = useMemo(() => {
     console.log('Generating skill gaps from:', filteredSkillRatings.length, 'ratings');
     
-    const skillGaps = filteredSkillRatings.reduce((acc: any, rating) => {
+    // Group ratings by role and find the biggest gaps for each role
+    const roleSkillGaps = filteredSkillRatings.reduce((acc: any, rating) => {
+      const role = rating.roles[0] || "General";
       const skill = rating.skill;
       const gap = Math.max(0, rating.targetRating - rating.currentRating);
       
-      if (gap > 0.5) { // Only significant gaps
-        const role = rating.roles[0] || "General";
-        const key = `${skill}-${role}`;
-        
-        if (!acc[key]) {
-          acc[key] = {
-            jobRole: role,
-            skill: skill,
-            current: Math.round(rating.currentRating * 20), // Convert to percentage
-            required: Math.round(rating.targetRating * 20),
-            gap: Math.round(gap * 20)
-          };
+      if (gap > 0.3) { // Lower threshold for more variety
+        if (!acc[role]) {
+          acc[role] = [];
         }
+        
+        acc[role].push({
+          jobRole: role,
+          skill: skill,
+          current: Math.round(rating.currentRating * 20), // Convert to percentage
+          required: Math.round(rating.targetRating * 20),
+          gap: Math.round(gap * 20),
+          gapValue: gap // Keep original gap for sorting
+        });
       }
       
       return acc;
     }, {});
     
-    const result = Object.values(skillGaps).slice(0, 8); // Top 8 gaps
-    console.log('Generated skill gaps:', result);
+    // Get the top skill gap for each role, ensuring diversity
+    const topGapsPerRole: any[] = [];
+    Object.entries(roleSkillGaps).forEach(([role, gaps]: [string, any]) => {
+      // Sort by gap size and pick the biggest one for this role
+      const sortedGaps = (gaps as any[]).sort((a, b) => b.gapValue - a.gapValue);
+      if (sortedGaps.length > 0) {
+        topGapsPerRole.push(sortedGaps[0]);
+      }
+    });
+    
+    // Sort all role gaps by gap size and take top 8
+    const result = topGapsPerRole
+      .sort((a, b) => b.gapValue - a.gapValue)
+      .slice(0, 8)
+      .map(item => {
+        // Remove the helper gapValue property
+        const { gapValue, ...cleanItem } = item;
+        return cleanItem;
+      });
+    
+    console.log('Generated diverse skill gaps by role:', result);
     return result;
   }, [filteredSkillRatings]);
 
@@ -254,9 +275,31 @@ export default function SkillInsights() {
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={filteredSkillGaps.length > 0 ? filteredSkillGaps : skillGrowthData.skillGaps}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="skill" angle={-45} textAnchor="end" height={60} />
-            <YAxis />
-            <Tooltip />
+            <XAxis 
+              dataKey="jobRole" 
+              angle={-45} 
+              textAnchor="end" 
+              height={80}
+              fontSize={12}
+            />
+            <YAxis label={{ value: 'Skill Level (%)', angle: -90, position: 'insideLeft' }} />
+            <Tooltip 
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  const data = payload[0].payload;
+                  return (
+                    <div className="bg-background border rounded-lg p-3 shadow-lg">
+                      <p className="font-semibold">{data.jobRole}</p>
+                      <p className="text-sm text-muted-foreground mb-2">{data.skill}</p>
+                      <p className="text-sm">Current: {data.current}%</p>
+                      <p className="text-sm">Required: {data.required}%</p>
+                      <p className="text-sm font-medium text-red-500">Gap: {data.gap}%</p>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
             <Bar dataKey="current" fill="hsl(var(--secondary))" name="Current Level" />
             <Bar dataKey="required" fill="hsl(var(--primary))" name="Required Level" />
           </BarChart>
