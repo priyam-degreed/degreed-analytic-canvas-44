@@ -195,75 +195,149 @@ export default function LearningEngagement() {
         />
       </div>
 
-      {/* Current vs Previous Period Learning Completion */}
+      {/* Learning Completions (In Period) vs. Previous Period */}
       <ChartCard
-        title="How much learning was completed in this period? Current vs Prev"
-        subtitle="Comparison of learning metrics between current and previous periods"
+        title="Learning Completions (In Period) vs. Previous Period"
+        subtitle="Aug 2025"
       >
         <div className="space-y-6">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart 
-              data={currentVsPrevComparison.comparison}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="metric" />
-              <YAxis />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--popover))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '6px'
-                }}
-              />
-              <Bar dataKey="current" fill="hsl(var(--primary))" name="Current Period" />
-              <Bar dataKey="previous" fill="hsl(var(--secondary))" name="Previous Period" />
-            </BarChart>
-          </ResponsiveContainer>
-          
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 border rounded-lg">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">
-                  {currentVsPrevComparison.current.completions.toLocaleString()}
-                </div>
-                <div className="text-sm text-muted-foreground">Current Completions</div>
-                <div className="text-xs text-green-600 mt-1">
-                  {currentVsPrevComparison.previous.completions > 0 
-                    ? `${((currentVsPrevComparison.current.completions - currentVsPrevComparison.previous.completions) / currentVsPrevComparison.previous.completions * 100).toFixed(1)}%`
-                    : 'N/A'
-                  } vs prev
+          {/* Summary Row */}
+          <div className="grid grid-cols-3 gap-8 p-6 bg-muted/30 rounded-lg">
+            <div className="text-center">
+              <div className="text-sm text-muted-foreground mb-1">Aug 31 2025</div>
+              <div className="text-4xl font-bold">{currentVsPrevComparison.current.completions}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-muted-foreground mb-1">Jul 31 2025</div>
+              <div className="text-4xl font-bold">{currentVsPrevComparison.previous.completions}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-muted-foreground mb-1">Change</div>
+              <div className="text-4xl font-bold text-green-600">
+                +{currentVsPrevComparison.current.completions - currentVsPrevComparison.previous.completions}
+              </div>
+            </div>
+          </div>
+
+          {/* Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Learning Completions by H1 */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Learning Completions (In Period) vs. Previous Period by H1</h4>
+              <div className="space-y-4">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart 
+                    data={[
+                      { category: 'Aug 31 2025', current: currentVsPrevComparison.current.completions, previous: 0 },
+                      { category: 'Jul 31 2025', current: 0, previous: currentVsPrevComparison.previous.completions }
+                    ]}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="category" />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value, name, props) => {
+                        const isCurrentPeriod = props.payload.category === 'Aug 31 2025';
+                        return [
+                          value, 
+                          isCurrentPeriod ? 'Learning Completions (in Period)' : 'Previous Period'
+                        ];
+                      }}
+                      labelFormatter={(label) => label}
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--popover))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '6px'
+                      }}
+                    />
+                    <Bar dataKey="current" fill="#60A5FA" name="Aug 31 2025" />
+                    <Bar dataKey="previous" fill="#A78BFA" name="Previous Period" />
+                  </BarChart>
+                </ResponsiveContainer>
+                
+                <div className="flex justify-center gap-8">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#60A5FA]"></div>
+                    <span className="text-sm">Aug 31 2025</span>
+                    <span className="font-semibold">{currentVsPrevComparison.current.completions}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#A78BFA]"></div>
+                    <span className="text-sm">Jul 31 2025</span>
+                    <span className="font-semibold">{currentVsPrevComparison.previous.completions}</span>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <div className="p-4 border rounded-lg">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">
-                  {currentVsPrevComparison.current.hours.toLocaleString()}h
-                </div>
-                <div className="text-sm text-muted-foreground">Current Hours</div>
-                <div className="text-xs text-green-600 mt-1">
-                  {currentVsPrevComparison.previous.hours > 0 
-                    ? `${((currentVsPrevComparison.current.hours - currentVsPrevComparison.previous.hours) / currentVsPrevComparison.previous.hours * 100).toFixed(1)}%`
-                    : 'N/A'
-                  } vs prev
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-4 border rounded-lg">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">
-                  {currentVsPrevComparison.current.activeUsers.toLocaleString()}
-                </div>
-                <div className="text-sm text-muted-foreground">Current Active Users</div>
-                <div className="text-xs text-green-600 mt-1">
-                  {currentVsPrevComparison.previous.activeUsers > 0 
-                    ? `${((currentVsPrevComparison.current.activeUsers - currentVsPrevComparison.previous.activeUsers) / currentVsPrevComparison.previous.activeUsers * 100).toFixed(1)}%`
-                    : 'N/A'
-                  } vs prev
+
+            {/* Learning Completions by Job Role */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Learning Completions (In Period) vs. Previous Period by Job Role</h4>
+              <div className="space-y-4">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart 
+                    data={roleData.map(role => ({
+                      role: role.dept,
+                      current: Math.floor(role.learners * 0.3), // Mock current completions
+                      previous: Math.floor(role.learners * 0.2), // Mock previous completions
+                      change: Math.floor(role.learners * 0.1)
+                    }))}
+                    layout="horizontal"
+                    margin={{ top: 5, right: 80, left: 80, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="role" width={120} />
+                    <Tooltip 
+                      formatter={(value, name, props) => {
+                        const data = props.payload;
+                        return [
+                          <div key="tooltip" className="space-y-1">
+                            <div>{data.role}</div>
+                            <div>Learning Completions (in Period)</div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full bg-[#60A5FA]"></div>
+                              <span>Aug 31 2025</span>
+                              <span className="font-semibold ml-auto">{data.current}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full bg-[#A78BFA]"></div>
+                              <span>Previous Period</span>
+                              <span className="font-semibold ml-auto">{data.previous}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full bg-[#8B5CF6]"></div>
+                              <span>Difference</span>
+                              <span className="font-semibold ml-auto">+{data.change}</span>
+                            </div>
+                          </div>
+                        ];
+                      }}
+                      labelFormatter={() => ''}
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--popover))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '6px',
+                        minWidth: '200px'
+                      }}
+                    />
+                    <Bar dataKey="current" fill="#60A5FA" name="Current" />
+                    <Bar dataKey="previous" fill="#A78BFA" name="Previous" />
+                  </BarChart>
+                </ResponsiveContainer>
+                
+                <div className="flex justify-center gap-8">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#60A5FA]"></div>
+                    <span className="text-sm">Aug 31 2025</span>
+                    <span className="font-semibold">{currentVsPrevComparison.current.completions}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#A78BFA]"></div>
+                    <span className="text-sm">Jul 31 2025</span>
+                    <span className="font-semibold">{currentVsPrevComparison.previous.completions}</span>
+                  </div>
                 </div>
               </div>
             </div>
