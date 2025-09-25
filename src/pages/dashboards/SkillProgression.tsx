@@ -57,7 +57,6 @@ const priorityColors = {
 };
 
 interface FilterState {
-  dateRange: any;
   roles: string[];
   skills: string[];
   timePeriod: string[];
@@ -67,7 +66,6 @@ interface FilterState {
 
 export default function SkillProgression() {
   const [filters, setFilters] = useState<FilterState>({
-    dateRange: null,
     roles: [],
     skills: [],
     timePeriod: [],

@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { DateRangeFilter } from "./DateRangeFilter";
 import { MultiSelectFilter } from "./MultiSelectFilter";
-import { subDays } from "date-fns";
-import { DateRange } from "react-day-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { RotateCcw } from "lucide-react";
 import { 
   roleOptions, 
   skillOptions, 
@@ -15,7 +14,6 @@ import {
 } from "@/data/skillProgressionData";
 
 interface FilterState {
-  dateRange: DateRange;
   roles: string[];
   skills: string[];
   timePeriod: string[];
@@ -130,10 +128,6 @@ function PeriodFilter({
 
 export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFilterBarProps) {
   const [filters, setFilters] = useState<FilterState>({
-    dateRange: {
-      from: subDays(new Date(), 89),
-      to: new Date()
-    },
     roles: [],
     skills: [],
     timePeriod: [],
@@ -147,17 +141,31 @@ export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFi
     onFilterChange?.(newFilters);
   };
 
+  const handleReset = () => {
+    const resetFilters: FilterState = {
+      roles: [],
+      skills: [],
+      timePeriod: [],
+      ratingLevels: [],
+      ratingTypes: []
+    };
+    setFilters(resetFilters);
+    onFilterChange?.(resetFilters);
+  };
+
   const ratingLevelOptions = ratingLevels.map(level => `${level.value} - ${level.label}`);
 
   return (
     <div className="flex items-center gap-2 p-3 bg-muted/30 border border-border rounded-lg mb-6 flex-wrap">
-      <div className="flex items-center gap-1.5">
-        <span className="text-xs text-muted-foreground whitespace-nowrap">Date:</span>
-        <DateRangeFilter
-          value={filters.dateRange}
-          onChange={(value) => handleFilterChange('dateRange', value)}
-        />
-      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleReset}
+        className="h-8 px-2 text-xs"
+      >
+        <RotateCcw className="h-3 w-3 mr-1" />
+        Reset
+      </Button>
 
       <div className="flex items-center gap-1.5">
         <span className="text-xs text-muted-foreground whitespace-nowrap">Role:</span>
