@@ -341,22 +341,25 @@ export default function LearningEngagement() {
                         const data = props.payload;
                         return [
                           <div key="tooltip" className="space-y-1">
-                            <div>{data.role}</div>
-                            <div>Learning Completions (in Period)</div>
+                            <div className="font-medium">{data.role}</div>
+                            <div className="text-sm text-muted-foreground mb-2">Learning Completions</div>
                             <div className="flex items-center gap-2">
                               <div className="w-3 h-3 rounded-full bg-[#60A5FA]"></div>
-                              <span>Aug 31 2025</span>
+                              <span>Aug 31 2025 (Current)</span>
                               <span className="font-semibold ml-auto">{data.current}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="w-3 h-3 rounded-full bg-[#A78BFA]"></div>
-                              <span>Previous Period</span>
+                              <span>Jul 31 2025 (Previous)</span>
                               <span className="font-semibold ml-auto">{data.previous}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-full bg-[#8B5CF6]"></div>
-                              <span>Difference</span>
-                              <span className="font-semibold ml-auto">+{data.change}</span>
+                            <div className="border-t pt-1 mt-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm">Net Change:</span>
+                                <span className={`font-semibold ml-auto ${data.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  {data.change >= 0 ? '+' : ''}{data.change}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         ];
