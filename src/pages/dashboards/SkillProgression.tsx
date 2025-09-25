@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { subDays } from "date-fns";
-import { DateRange } from "react-day-picker";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Button } from "@/components/ui/button";
@@ -59,21 +57,18 @@ const priorityColors = {
 };
 
 interface FilterState {
-  dateRange: { from?: Date; to?: Date };
   roles: string[];
   skills: string[];
+  timePeriod: string[];
   ratingLevels: string[];
   ratingTypes: string[];
 }
 
 export default function SkillProgression() {
   const [filters, setFilters] = useState<FilterState>({
-    dateRange: {
-      from: subDays(new Date(), 29),
-      to: new Date()
-    },
     roles: [],
     skills: [],
+    timePeriod: [],
     ratingLevels: [],
     ratingTypes: []
   });
@@ -86,9 +81,12 @@ export default function SkillProgression() {
     // Skill filter - independent
     const skillMatch = filters.skills.length === 0 || filters.skills.includes(item.skill);
     
-    // Date range filter - independent, check if item date falls within selected range
-    const dateMatch = !filters.dateRange.from || !filters.dateRange.to || !item.date ||
-      (item.date >= filters.dateRange.from && item.date <= filters.dateRange.to);
+    // Time period filter - independent, handles quarters and fiscal years
+    const periodMatch = filters.timePeriod.length === 0 || filters.timePeriod.some(period => 
+      item.timePeriod === period || 
+      (period.includes('-Q') && item.timePeriod.startsWith(period)) ||
+      (period.startsWith('FY') && !period.includes('-') && item.timePeriod.startsWith(period))
+    );
     
     // Rating level filter - independent, based on avgRating ranges
     const ratingLevelMatch = filters.ratingLevels.length === 0 || filters.ratingLevels.some(level => {
@@ -113,22 +111,18 @@ export default function SkillProgression() {
     });
     
     // All filters must match (AND logic)
-    return roleMatch && skillMatch && dateMatch && ratingLevelMatch && ratingTypeMatch;
+    return roleMatch && skillMatch && periodMatch && ratingLevelMatch && ratingTypeMatch;
   });
 
   // Get unique values based on full dataset (not filtered) for dropdown options
   const allRoles = Array.from(new Set(skillDistributionData.map(d => d.role)));
   const allSkills = Array.from(new Set(skillDistributionData.map(d => d.skill)));
-  const allDates = Array.from(new Set(
-    skillDistributionData
-      .filter(d => d.date) // Filter out undefined dates
-      .map(d => d.date.toISOString().split('T')[0])
-  ));
+  const allPeriods = Array.from(new Set(skillDistributionData.map(d => d.timePeriod)));
 
-  // Get available values for current context (for chart display)  
+  // Get available values for current context (for chart display)
   const availableRoles = filters.roles.length > 0 ? filters.roles : allRoles;
   const availableSkills = filters.skills.length > 0 ? filters.skills : allSkills;
-  const availablePeriods = Array.from(new Set(filteredData.map(d => d.timePeriod)));
+  const availablePeriods = filters.timePeriod.length > 0 ? filters.timePeriod : allPeriods;
 
   // Pagination state - reset to 0 when filters change
   const [currentPage, setCurrentPage] = useState(0);
