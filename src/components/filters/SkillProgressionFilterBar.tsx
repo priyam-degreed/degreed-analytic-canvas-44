@@ -50,6 +50,15 @@ function PeriodFilter({
     }
   };
 
+  const handleSelectAll = () => {
+    const allPeriods = timePeriodOptions.map(p => p.value);
+    onChange(allPeriods);
+  };
+
+  const handleClearAll = () => {
+    onChange([]);
+  };
+
   const getDisplayText = () => {
     if (selected.length === 0) return "All Periods";
     if (selected.length === 1) return selected[0];
@@ -70,6 +79,20 @@ function PeriodFilter({
       
       {isOpen && (
         <div className="absolute z-50 mt-1 max-h-60 w-80 overflow-auto rounded-md border bg-popover p-2 shadow-lg">
+          <div className="flex items-center justify-between mb-3 pb-2 border-b">
+            <button 
+              className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+              onClick={handleSelectAll}
+            >
+              Select All
+            </button>
+            <button 
+              className="text-xs text-muted-foreground hover:text-foreground"
+              onClick={handleClearAll}
+            >
+              Clear All
+            </button>
+          </div>
           {Object.entries(groupedPeriods).map(([fiscalYear, periods]) => {
             const quarters = Array.from(new Set(periods.filter(p => p.quarter).map(p => p.quarter)));
             
@@ -156,16 +179,8 @@ export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFi
   const ratingLevelOptions = ratingLevels.map(level => `${level.value} - ${level.label}`);
 
   return (
-    <div className="flex items-center gap-2 p-3 bg-muted/30 border border-border rounded-lg mb-6 flex-wrap">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleReset}
-        className="h-8 px-2 text-xs"
-      >
-        <RotateCcw className="h-3 w-3 mr-1" />
-        Reset
-      </Button>
+    <div className="flex items-center justify-between gap-2 p-3 bg-muted/30 border border-border rounded-lg mb-6 flex-wrap">
+      <div className="flex items-center gap-2 flex-wrap">
 
       <div className="flex items-center gap-1.5">
         <span className="text-xs text-muted-foreground whitespace-nowrap">Role:</span>
@@ -218,6 +233,17 @@ export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFi
           placeholder="All"
         />
       </div>
+      </div>
+
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleReset}
+        className="h-8 px-2 text-xs"
+      >
+        <RotateCcw className="h-3 w-3 mr-1" />
+        Reset
+      </Button>
     </div>
   );
 }
