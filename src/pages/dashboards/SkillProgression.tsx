@@ -427,13 +427,13 @@ export default function SkillProgression() {
               <div className="w-24"></div>
               <div className="flex gap-1 flex-1">
                 <div className="text-xs font-medium text-muted-foreground text-center mb-2">
-                  Time Periods (X-axis)
+                  Time Period
                 </div>
               </div>
             </div>
             {/* Period headers */}
             <div className="flex items-center gap-2">
-              <div className="w-24 text-xs font-medium text-muted-foreground">Skills (Y-axis)</div>
+              <div className="w-24 text-xs font-medium text-muted-foreground">Skills</div>
               <div className="flex gap-1 flex-1">
                 {availablePeriods.map((period) => (
                   <div key={period} className="flex-1 text-xs font-medium text-center text-muted-foreground">
@@ -451,32 +451,32 @@ export default function SkillProgression() {
                      let backgroundColor, textColor;
                      
                      if (value >= 1 && value < 3) {
-                       // Red gradient for 1-3
-                       const intensity = (value - 1) / 2 * 100; // 0-100%
-                       backgroundColor = `hsl(0, 75%, ${Math.max(85 - intensity, 45)}%)`;
-                       textColor = intensity > 50 ? 'white' : 'black';
+                       // Soft red gradient for 1-3
+                       const intensity = (value - 1) / 2; // 0-1 range
+                       backgroundColor = `linear-gradient(135deg, hsl(0, 60%, ${95 - intensity * 25}%), hsl(0, 50%, ${90 - intensity * 20}%))`;
+                       textColor = intensity > 0.6 ? 'hsl(0, 70%, 30%)' : 'hsl(0, 60%, 40%)';
                      } else if (value >= 3 && value < 5) {
-                       // Amber gradient for 3-5  
-                       const intensity = (value - 3) / 2 * 100; // 0-100%
-                       backgroundColor = `hsl(45, 85%, ${Math.max(85 - intensity, 35)}%)`;
-                       textColor = intensity > 50 ? 'black' : 'black';
+                       // Soft amber gradient for 3-5  
+                       const intensity = (value - 3) / 2; // 0-1 range
+                       backgroundColor = `linear-gradient(135deg, hsl(45, 70%, ${95 - intensity * 30}%), hsl(50, 60%, ${90 - intensity * 25}%))`;
+                       textColor = intensity > 0.5 ? 'hsl(45, 70%, 25%)' : 'hsl(45, 60%, 35%)';
                      } else if (value >= 5 && value <= 8) {
-                       // Green gradient for 5-8
-                       const intensity = (value - 5) / 3 * 100; // 0-100%
-                       backgroundColor = `hsl(142, 76%, ${Math.max(85 - intensity, 25)}%)`;
-                       textColor = intensity > 50 ? 'white' : 'black';
+                       // Soft green gradient for 5-8
+                       const intensity = (value - 5) / 3; // 0-1 range
+                       backgroundColor = `linear-gradient(135deg, hsl(142, 60%, ${95 - intensity * 35}%), hsl(142, 50%, ${90 - intensity * 30}%))`;
+                       textColor = intensity > 0.6 ? 'hsl(142, 70%, 25%)' : 'hsl(142, 60%, 30%)';
                      } else {
                        // Default for 0 or invalid values
-                       backgroundColor = 'hsl(var(--muted))';
+                       backgroundColor = 'linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted)))';
                        textColor = 'hsl(var(--muted-foreground))';
                      }
                      
                      return (
                         <div
                          key={period}
-                         className="flex-1 h-8 rounded border border-border flex items-center justify-center text-xs font-medium"
+                         className="flex-1 h-8 rounded-md border border-border/30 flex items-center justify-center text-xs font-medium shadow-sm transition-all duration-200 hover:shadow-md"
                          style={{
-                           backgroundColor,
+                           background: backgroundColor,
                            color: textColor
                          }}
                          title={`${period}: ${value.toFixed(1)}`}
