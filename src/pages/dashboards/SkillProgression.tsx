@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Button } from "@/components/ui/button";
@@ -73,39 +73,74 @@ export default function SkillProgression() {
     ratingTypes: []
   });
 
-  // Apply filters to data
+  // Apply filters to data - each filter works independently and in combination
   const filteredData = skillDistributionData.filter(item => {
+    // Role filter - independent
     const roleMatch = filters.roles.length === 0 || filters.roles.includes(item.role);
+    
+    // Skill filter - independent
     const skillMatch = filters.skills.length === 0 || filters.skills.includes(item.skill);
+    
+    // Time period filter - independent, handles quarters and fiscal years
     const periodMatch = filters.timePeriod.length === 0 || filters.timePeriod.some(period => 
       item.timePeriod === period || 
       (period.includes('-Q') && item.timePeriod.startsWith(period)) ||
       (period.startsWith('FY') && !period.includes('-') && item.timePeriod.startsWith(period))
     );
     
-    return roleMatch && skillMatch && periodMatch;
+    // Rating level filter - independent, based on avgRating ranges
+    const ratingLevelMatch = filters.ratingLevels.length === 0 || filters.ratingLevels.some(level => {
+      const rating = item.avgRating;
+      switch(level) {
+        case 'Beginner (1-2)': return rating >= 1 && rating < 3;
+        case 'Capable (3-4)': return rating >= 3 && rating < 5;
+        case 'Intermediate (5-6)': return rating >= 5 && rating < 7;
+        case 'Advanced (7-8)': return rating >= 7 && rating <= 8;
+        default: return true;
+      }
+    });
+    
+    // Rating type filter - independent, based on data characteristics
+    const ratingTypeMatch = filters.ratingTypes.length === 0 || filters.ratingTypes.some(type => {
+      switch(type) {
+        case 'Self Assessment': return true; // Assuming all current data is self-assessment
+        case 'Manager Assessment': return false; // Not available in current dataset
+        case '360 Feedback': return false; // Not available in current dataset
+        default: return true;
+      }
+    });
+    
+    // All filters must match (AND logic)
+    return roleMatch && skillMatch && periodMatch && ratingLevelMatch && ratingTypeMatch;
   });
 
-  // Get unique values for dropdowns based on filtered data
-  const availableRoles = filters.roles.length > 0 ? filters.roles : 
-    Array.from(new Set(filteredData.map(d => d.role)));
-  const availableSkills = filters.skills.length > 0 ? filters.skills :
-    Array.from(new Set(filteredData.map(d => d.skill)));
-  const availablePeriods = filters.timePeriod.length > 0 ? filters.timePeriod :
-    Array.from(new Set(filteredData.map(d => d.timePeriod)));
+  // Get unique values based on full dataset (not filtered) for dropdown options
+  const allRoles = Array.from(new Set(skillDistributionData.map(d => d.role)));
+  const allSkills = Array.from(new Set(skillDistributionData.map(d => d.skill)));
+  const allPeriods = Array.from(new Set(skillDistributionData.map(d => d.timePeriod)));
 
-  // Use first available role/skill for focused views
-  const selectedRole = availableRoles[0] || "Data Scientist";
-  const selectedSkill = availableSkills[0] || "SQL";
+  // Get available values for current context (for chart display)
+  const availableRoles = filters.roles.length > 0 ? filters.roles : allRoles;
+  const availableSkills = filters.skills.length > 0 ? filters.skills : allSkills;
+  const availablePeriods = filters.timePeriod.length > 0 ? filters.timePeriod : allPeriods;
 
-  // Pagination state
+  // Pagination state - reset to 0 when filters change
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
 
-  // Prepare line chart data for Progress Over Time
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [filters]);
+
+  // Apply pagination to all data - limit to 10 entries by default
+  const paginatedData = filteredData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+
+  // Prepare line chart data for Progress Over Time - use paginated skills
+  const paginatedSkills = availableSkills.slice(0, Math.min(10, availableSkills.length));
   const progressData = availablePeriods.map(period => {
     const periodData: any = { period };
-    availableSkills.slice(0, 6).forEach(skill => { // Show top 6 skills
+    paginatedSkills.forEach(skill => {
       const skillData = filteredData.find(
         item => item.timePeriod === period && item.skill === skill && availableRoles.includes(item.role)
       );
@@ -114,12 +149,12 @@ export default function SkillProgression() {
     return periodData;
   });
 
-  // Prepare grouped bar chart data for Current vs Target Ratings
-  const currentVsTargetData = availableSkills.slice(0, 6).map(skill => {
+  // Prepare grouped bar chart data for Current vs Target Ratings - use paginated skills
+  const currentVsTargetData = paginatedSkills.map(skill => {
     const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
     const avgCurrent = skillData.length > 0 ? 
       skillData.reduce((sum, item) => sum + item.avgRating, 0) / skillData.length : 0;
-    const target = Math.min(avgCurrent + Math.random() * 2 + 0.5, 10); // Simulate target slightly higher
+    const target = Math.min(avgCurrent + Math.random() * 2 + 0.5, 8); // Target max 8, not 10
     
     return {
       skill,
@@ -128,12 +163,12 @@ export default function SkillProgression() {
     };
   });
 
-  // Prepare skill gaps data for horizontal progress bars
-  const skillGapsData = availableSkills.slice(0, 6).map(skill => {
+  // Prepare skill gaps data for horizontal progress bars - use paginated skills
+  const skillGapsData = paginatedSkills.map(skill => {
     const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
     const avgCurrent = skillData.length > 0 ? 
       skillData.reduce((sum, item) => sum + item.avgRating, 0) / skillData.length : 0;
-    const target = Math.min(avgCurrent + Math.random() * 2 + 0.5, 10);
+    const target = Math.min(avgCurrent + Math.random() * 2 + 0.5, 8);
     const gap = target - avgCurrent;
     const priority = gap > 1.5 ? 'HIGH' : gap > 0.8 ? 'MEDIUM' : 'LOW';
     
@@ -147,7 +182,7 @@ export default function SkillProgression() {
     };
   });
 
-  // Generate dynamic data based on filters  
+  // Generate dynamic data based on filters and pagination
   const allHeatmapData = generateHeatmapData(filteredData);
   const allBubbleData = generateBubbleData(filteredData).map(item => ({
     ...item,
@@ -156,13 +191,14 @@ export default function SkillProgression() {
            priorityColors.neutral
   }));
 
-  // Paginated data
+  // Apply pagination to heatmap and bubble data
   const heatmapData = allHeatmapData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
   const bubbleData = allBubbleData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
   
   // Pagination info
   const totalHeatmapPages = Math.ceil(allHeatmapData.length / itemsPerPage);
   const totalBubblePages = Math.ceil(allBubbleData.length / itemsPerPage);
+  const totalFilteredPages = Math.ceil(filteredData.length / itemsPerPage);
 
   // Calculate filtered metrics
   const filteredMetrics = {
@@ -284,7 +320,7 @@ export default function SkillProgression() {
               <YAxis domain={[0, 8]} />
               <Tooltip />
               <Legend />
-              {availableSkills.slice(0, 6).map((skill, index) => (
+              {paginatedSkills.map((skill, index) => (
                 <Line 
                   key={skill}
                   type="monotone" 
@@ -327,8 +363,11 @@ export default function SkillProgression() {
             <CardTitle>Skill vs Time Heatmap</CardTitle>
             <CardDescription>Average ratings across skills and time periods</CardDescription>
           </div>
-          {totalHeatmapPages > 1 && (
+          {totalFilteredPages > 1 && (
             <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                Showing {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+              </span>
               <Button
                 variant="outline"
                 size="sm"
@@ -338,13 +377,13 @@ export default function SkillProgression() {
                 Previous
               </Button>
               <span className="text-sm text-muted-foreground">
-                {currentPage + 1} of {totalHeatmapPages}
+                {currentPage + 1} of {totalFilteredPages}
               </span>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(Math.min(totalHeatmapPages - 1, currentPage + 1))}
-                disabled={currentPage === totalHeatmapPages - 1}
+                onClick={() => setCurrentPage(Math.min(totalFilteredPages - 1, currentPage + 1))}
+                disabled={currentPage === totalFilteredPages - 1}
               >
                 Next
               </Button>
