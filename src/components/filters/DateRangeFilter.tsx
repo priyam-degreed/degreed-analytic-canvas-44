@@ -71,11 +71,18 @@ export function DateRangeFilter({ value, onChange }: DateRangeFilterProps) {
     return `${format(value.from, "MMM d")} - ${format(value.to, "MMM d, yyyy")}`;
   };
 
+  const handleAllTimeClick = () => {
+    onChange({ from: undefined, to: undefined });
+    setIsOpen(false);
+  };
+
   const handlePeriodClick = (period: RelativePeriod) => {
     const range = period.getValue();
     setTempRange(range);
     setStartDate(range.from);
     setEndDate(range.to);
+    onChange(range);
+    setIsOpen(false);
   };
 
   const handleStaticDateChange = () => {
@@ -144,116 +151,39 @@ export function DateRangeFilter({ value, onChange }: DateRangeFilterProps) {
       </Button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-popover border border-border rounded-md shadow-lg z-50 w-96">
+        <div className="absolute top-full left-0 mt-1 bg-popover border border-border rounded-md shadow-lg z-50 w-80">
           <div className="p-4">
             {/* Period Type Selection */}
-            <div className="space-y-3 mb-4">
-              <div className="flex flex-col space-y-2">
-                <Button
-                  variant={periodType === "all-time" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setPeriodType("all-time")}
-                  className="w-full justify-start"
-                >
-                  All time
-                </Button>
-                <Button
-                  variant={periodType === "static" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setPeriodType("static")}
-                  className="w-full justify-start"
-                >
-                  Static period
-                </Button>
-                <Button
-                  variant={periodType === "relative" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setPeriodType("relative")}
-                  className="w-full justify-start text-blue-600"
-                >
-                  Relative period
-                </Button>
+            <div className="space-y-2 mb-4">
+              <div 
+                className={cn(
+                  "p-3 rounded-lg cursor-pointer text-sm font-medium",
+                  periodType === "all-time" ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-accent"
+                )}
+                onClick={handleAllTimeClick}
+              >
+                All time
+              </div>
+              <div 
+                className={cn(
+                  "p-3 rounded-lg cursor-pointer text-sm font-medium",
+                  periodType === "static" ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-accent"
+                )}
+                onClick={() => setPeriodType("static")}
+              >
+                Static period
+              </div>
+              <div 
+                className={cn(
+                  "p-3 rounded-lg cursor-pointer text-sm font-medium",
+                  periodType === "relative" ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-accent"
+                )}
+                onClick={() => setPeriodType("relative")}
+              >
+                Relative period
               </div>
             </div>
 
-            {/* Static Period Content */}
-            {periodType === "static" && (
-              <div className="space-y-4 mb-4">
-                 <Tabs defaultValue="months" className="w-full">
-                   <TabsList className="grid w-full grid-cols-3 text-xs">
-                     <TabsTrigger value="years">Years</TabsTrigger>
-                     <TabsTrigger value="quarters">Quarters</TabsTrigger>
-                     <TabsTrigger value="months">Months</TabsTrigger>
-                   </TabsList>
-                 </Tabs>
-
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-sm">Period start</Label>
-                      <Input placeholder="Type or select" className="mt-1" />
-                    </div>
-                    <div>
-                      <Label className="text-sm">Period end</Label>
-                      <Input placeholder="Type or select" className="mt-1" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-sm">Start date</Label>
-                        <div className="relative mt-1">
-                          <Input
-                            type="date"
-                            value={startDate ? format(startDate, "yyyy-MM-dd") : ""}
-                            onChange={(e) => setStartDate(e.target.value ? new Date(e.target.value) : undefined)}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <Label className="text-sm">Start time</Label>
-                        <div className="relative mt-1">
-                          <Input
-                            type="time"
-                            value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-sm">End date</Label>
-                        <div className="relative mt-1">
-                          <Input
-                            type="date"
-                            value={endDate ? format(endDate, "yyyy-MM-dd") : ""}
-                            onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : undefined)}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <Label className="text-sm">End time</Label>
-                        <div className="relative mt-1">
-                          <Input
-                            type="time"
-                            value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="text-xs text-muted-foreground space-y-1">
-                      <div>Use date format M/d/y</div>
-                      <div>Use time format HH:MM, max value is 23:59</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Relative Period Content */}
             {periodType === "relative" && (
@@ -264,18 +194,16 @@ export function DateRangeFilter({ value, onChange }: DateRangeFilterProps) {
                   
                   return (
                     <div key={category}>
-                      <h5 className="text-xs font-medium text-muted-foreground mb-2">{category}</h5>
-                      <div className="space-y-1">
+                      <h5 className="text-xs font-medium text-muted-foreground uppercase mb-2">{category}</h5>
+                      <div className="space-y-1 ml-4">
                         {categoryPeriods.map((period) => (
-                          <Button
+                          <div
                             key={period.label}
-                            variant="ghost"
-                            size="sm"
                             onClick={() => handlePeriodClick(period)}
-                            className="w-full justify-start text-sm h-8"
+                            className="cursor-pointer text-sm py-2 px-2 hover:bg-accent rounded text-foreground"
                           >
                             {period.label}
-                          </Button>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -284,17 +212,6 @@ export function DateRangeFilter({ value, onChange }: DateRangeFilterProps) {
               </div>
             )}
 
-            {/* Exclude Open Period */}
-            <div className="flex items-center space-x-2 mb-4">
-              <Checkbox
-                id="exclude-open"
-                checked={excludeOpenPeriod}
-                onCheckedChange={(checked) => setExcludeOpenPeriod(checked as boolean)}
-              />
-              <Label htmlFor="exclude-open" className="text-sm">
-                Exclude open period
-              </Label>
-            </div>
 
             {/* Actions */}
             <div className="flex justify-end space-x-2 pt-3 border-t">
