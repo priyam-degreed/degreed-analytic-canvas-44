@@ -410,16 +410,16 @@ export default function SkillProgression() {
             >
               <defs>
                 <linearGradient id="selfGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#a7f3d0" stopOpacity={0.9}/>
-                  <stop offset="100%" stopColor="#6ee7b7" stopOpacity={0.7}/>
+                  <stop offset="0%" stopColor="#34d399" stopOpacity={0.95}/>
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.8}/>
                 </linearGradient>
                 <linearGradient id="peerGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#bfdbfe" stopOpacity={0.9}/>
-                  <stop offset="100%" stopColor="#93c5fd" stopOpacity={0.7}/>
+                  <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.95}/>
+                  <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.8}/>
                 </linearGradient>
                 <linearGradient id="managerGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#fde68a" stopOpacity={0.9}/>
-                  <stop offset="100%" stopColor="#fcd34d" stopOpacity={0.7}/>
+                  <stop offset="0%" stopColor="#fbbf24" stopOpacity={0.95}/>
+                  <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.8}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.3} />
