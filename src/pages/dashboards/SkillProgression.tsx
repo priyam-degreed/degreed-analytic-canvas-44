@@ -87,7 +87,7 @@ export default function SkillProgression() {
     const skillMatch = filters.skills.length === 0 || filters.skills.includes(item.skill);
     
     // Date range filter - independent, check if item date falls within selected range
-    const dateMatch = !filters.dateRange.from || !filters.dateRange.to || 
+    const dateMatch = !filters.dateRange.from || !filters.dateRange.to || !item.date ||
       (item.date >= filters.dateRange.from && item.date <= filters.dateRange.to);
     
     // Rating level filter - independent, based on avgRating ranges
@@ -119,9 +119,13 @@ export default function SkillProgression() {
   // Get unique values based on full dataset (not filtered) for dropdown options
   const allRoles = Array.from(new Set(skillDistributionData.map(d => d.role)));
   const allSkills = Array.from(new Set(skillDistributionData.map(d => d.skill)));
-  const allDates = Array.from(new Set(skillDistributionData.map(d => d.date.toISOString().split('T')[0])));
+  const allDates = Array.from(new Set(
+    skillDistributionData
+      .filter(d => d.date) // Filter out undefined dates
+      .map(d => d.date.toISOString().split('T')[0])
+  ));
 
-  // Get available values for current context (for chart display)
+  // Get available values for current context (for chart display)  
   const availableRoles = filters.roles.length > 0 ? filters.roles : allRoles;
   const availableSkills = filters.skills.length > 0 ? filters.skills : allSkills;
   const availablePeriods = Array.from(new Set(filteredData.map(d => d.timePeriod)));
