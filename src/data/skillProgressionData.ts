@@ -54,7 +54,7 @@ export const roleOptions = [
 
 // Role-specific skill mapping
 export const roleSkillMapping: Record<string, string[]> = {
-  "Data Scientist": ["SQL", "Python", "Machine Learning", "AI Tools", "Data Analytics", "Statistics", "R", "Tableau"],
+  "Data Scientist": ["SQL", "Python", "Machine Learning", "AI Tools", "Data Analytics", "Statistics", "Tableau"],
   "Backend Engineer": ["SQL", "Python", "Node.js", "Java", "AWS", "Docker", "Kubernetes", "System Design"],
   "Frontend Engineer": ["React", "JavaScript", "TypeScript", "CSS", "HTML", "Vue.js", "Angular", "Web Performance"],
   "Product Manager": ["Product Strategy", "Analytics", "Communication", "Leadership", "Market Research", "User Research", "Roadmapping", "Stakeholder Management"],
