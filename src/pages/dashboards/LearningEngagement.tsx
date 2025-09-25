@@ -675,29 +675,58 @@ export default function LearningEngagement() {
         title="Learning Velocity by Job Role"
         subtitle={`Average learning hours per employee - ${roleComparisonData.length} roles shown`}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {roleComparisonData.map((role, index) => {
-            const avgHours = role.currentPeriod.count > 0 
-              ? (role.currentPeriod.hours / role.currentPeriod.count).toFixed(1)
-              : '0.0';
-            const changePercent = role.previousPeriod.hours > 0
-              ? (((role.currentPeriod.hours - role.previousPeriod.hours) / role.previousPeriod.hours) * 100).toFixed(1)
-              : '0.0';
-            
-            return (
-              <div key={index} className="p-4 border rounded-lg space-y-2">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-medium">{role.role}</h4>
-                  <span className={`text-sm ${parseFloat(changePercent) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {parseFloat(changePercent) > 0 ? '+' : ''}{changePercent}%
-                  </span>
-                </div>
-                <div className="text-2xl font-bold text-primary">{avgHours}h</div>
-                <div className="text-sm text-muted-foreground">{role.currentPeriod.learners} learners</div>
-              </div>
-            );
-          })}
-        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <AreaChart
+            data={roleComparisonData.map(role => {
+              const avgCurrentHours = role.currentPeriod.count > 0 
+                ? (role.currentPeriod.hours / role.currentPeriod.count)
+                : 0;
+              const avgPreviousHours = role.previousPeriod.count > 0 
+                ? (role.previousPeriod.hours / role.previousPeriod.count)
+                : 0;
+              
+              return {
+                role: role.role,
+                currentHours: Number(avgCurrentHours.toFixed(1)),
+                previousHours: Number(avgPreviousHours.toFixed(1)),
+                learners: role.currentPeriod.learners
+              };
+            })}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="role" />
+            <YAxis label={{ value: 'Hours', angle: -90, position: 'insideLeft' }} />
+            <Tooltip 
+              formatter={(value, name) => [
+                `${value}h`, 
+                name === 'currentHours' ? 'Current Period' : 'Previous Period'
+              ]}
+              labelFormatter={(label) => `Role: ${label}`}
+              contentStyle={{
+                backgroundColor: 'hsl(var(--popover))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '6px'
+              }}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="previousHours" 
+              stackId="1"
+              stroke="hsl(var(--muted-foreground))" 
+              fill="hsl(var(--muted))" 
+              name="Previous Period"
+            />
+            <Area 
+              type="monotone" 
+              dataKey="currentHours" 
+              stackId="2"
+              stroke="hsl(var(--primary))" 
+              fill="hsl(var(--primary))" 
+              name="Current Period"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </ChartCard>
     </div>
   );
