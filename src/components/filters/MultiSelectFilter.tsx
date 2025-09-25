@@ -77,6 +77,11 @@ export function MultiSelectFilter({
     }
   }, [isOpen]);
 
+  // Sync tempSelected with selected prop when it changes
+  useEffect(() => {
+    setTempSelected(selected);
+  }, [selected]);
+
   return (
     <div className="relative" ref={dropdownRef}>
       <Button
