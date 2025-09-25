@@ -10,7 +10,8 @@ import {
   timePeriodOptions,
   FiscalPeriod,
   ratingLevels, 
-  ratingTypeOptions 
+  ratingTypeOptions,
+  roleSkillMapping
 } from "@/data/skillProgressionData";
 
 interface FilterState {
@@ -160,6 +161,17 @@ export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFi
 
   const handleFilterChange = (filterType: keyof FilterState, value: any) => {
     const newFilters = { ...filters, [filterType]: value };
+    
+    // If roles changed, filter skills to only show applicable ones
+    if (filterType === 'roles') {
+      const applicableSkills = value.length > 0 
+        ? Array.from(new Set(value.flatMap((role: string) => roleSkillMapping[role] || [])))
+        : skillOptions;
+      
+      // Keep only skills that are still applicable
+      newFilters.skills = newFilters.skills.filter((skill: string) => applicableSkills.includes(skill));
+    }
+    
     setFilters(newFilters);
     onFilterChange?.(newFilters);
   };
@@ -197,7 +209,10 @@ export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFi
         <span className="text-xs text-muted-foreground whitespace-nowrap">Skills:</span>
         <MultiSelectFilter
           label="Skills"
-          options={skillOptions}
+          options={filters.roles.length > 0 
+            ? Array.from(new Set(filters.roles.flatMap(role => roleSkillMapping[role] || [])))
+            : skillOptions
+          }
           selected={filters.skills}
           onChange={(value) => handleFilterChange('skills', value)}
           placeholder="All"
@@ -206,10 +221,13 @@ export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFi
 
       <div className="flex items-center gap-1.5">
         <span className="text-xs text-muted-foreground whitespace-nowrap">Period:</span>
-        <PeriodFilter
-          selected={filters.timePeriod}
-          onChange={(value) => handleFilterChange('timePeriod', value)}
-        />
+          <MultiSelectFilter
+            label="Time Period"
+            options={timePeriodOptions.map(p => p.value)}
+            selected={filters.timePeriod}
+            onChange={(value) => handleFilterChange('timePeriod', value)}
+            placeholder="All Periods"
+          />
       </div>
 
       <div className="flex items-center gap-1.5">

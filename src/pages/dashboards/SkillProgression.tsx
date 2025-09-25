@@ -98,6 +98,10 @@ export default function SkillProgression() {
   const selectedRole = availableRoles[0] || "Data Scientist";
   const selectedSkill = availableSkills[0] || "SQL";
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 10;
+
   // Prepare stacked column chart data for selected role and skill
   const stackedData = filteredData
     .filter(item => item.role === selectedRole && item.skill === selectedSkill)
@@ -125,14 +129,22 @@ export default function SkillProgression() {
     return periodData;
   });
 
-  // Generate dynamic data based on filters
-  const heatmapData = generateHeatmapData(filteredData);
-  const bubbleData = generateBubbleData(filteredData).map(item => ({
+  // Generate dynamic data based on filters  
+  const allHeatmapData = generateHeatmapData(filteredData);
+  const allBubbleData = generateBubbleData(filteredData).map(item => ({
     ...item,
     color: item.changeVsLastQuarter > 0.2 ? priorityColors.positive :
            item.changeVsLastQuarter < -0.2 ? priorityColors.negative :
            priorityColors.neutral
   }));
+
+  // Paginated data
+  const heatmapData = allHeatmapData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+  const bubbleData = allBubbleData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+  
+  // Pagination info
+  const totalHeatmapPages = Math.ceil(allHeatmapData.length / itemsPerPage);
+  const totalBubblePages = Math.ceil(allBubbleData.length / itemsPerPage);
 
   // Calculate filtered metrics
   const filteredMetrics = {
@@ -245,7 +257,7 @@ export default function SkillProgression() {
         {/* Stacked Column Chart */}
         <ChartCard 
           title="Skill Distribution Over Time"
-          subtitle={`Rating distribution for ${selectedRole} - SQL`}
+          subtitle={`Rating distribution for ${selectedRole} - ${selectedSkill}`}
         >
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={stackedData}>
@@ -297,9 +309,34 @@ export default function SkillProgression() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Heatmap */}
         <Card>
-          <CardHeader>
-            <CardTitle>Skill vs Time Heatmap</CardTitle>
-            <CardDescription>Average ratings across skills and time periods</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Skill vs Time Heatmap</CardTitle>
+              <CardDescription>Average ratings across skills and time periods</CardDescription>
+            </div>
+            {totalHeatmapPages > 1 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                  disabled={currentPage === 0}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  {currentPage + 1} of {totalHeatmapPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.min(totalHeatmapPages - 1, currentPage + 1))}
+                  disabled={currentPage === totalHeatmapPages - 1}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -307,20 +344,42 @@ export default function SkillProgression() {
                 <div key={skillRow.skill} className="flex items-center gap-2">
                   <div className="w-24 text-sm font-medium truncate">{skillRow.skill}</div>
                   <div className="flex gap-1 flex-1">
-                    {availablePeriods.map((period) => {
-                      const value = skillRow[period];
-                      const intensity = Math.round((value - 2) / 4 * 100); // Scale 2-6 to 0-100%
-                      return (
-                         <div
+                     {availablePeriods.map((period) => {
+                       const value = skillRow[period] || 0;
+                       let backgroundColor, textColor;
+                       
+                       if (value >= 1 && value <= 2) {
+                         // Red gradient for 1-2
+                         const intensity = (value - 1) * 100; // 0-100%
+                         backgroundColor = `hsl(0, 75%, ${Math.max(85 - intensity, 45)}%)`;
+                         textColor = intensity > 50 ? 'white' : 'black';
+                       } else if (value >= 3 && value <= 4) {
+                         // Amber gradient for 3-4  
+                         const intensity = (value - 3) * 100; // 0-100%
+                         backgroundColor = `hsl(45, 85%, ${Math.max(85 - intensity, 35)}%)`;
+                         textColor = intensity > 50 ? 'black' : 'black';
+                       } else if (value >= 5 && value <= 8) {
+                         // Green gradient for 5-8
+                         const intensity = (value - 5) / 3 * 100; // 0-100%
+                         backgroundColor = `hsl(142, 76%, ${Math.max(85 - intensity, 25)}%)`;
+                         textColor = intensity > 50 ? 'white' : 'black';
+                       } else {
+                         // Default for 0 or invalid values
+                         backgroundColor = 'hsl(var(--muted))';
+                         textColor = 'hsl(var(--muted-foreground))';
+                       }
+                       
+                       return (
+                          <div
                            key={period}
                            className="flex-1 h-8 rounded border border-border flex items-center justify-center text-xs font-medium"
                            style={{
-                             backgroundColor: `hsl(142, 76%, ${Math.max(85 - intensity, 20)}%)`,
-                             color: intensity > 50 ? 'white' : 'black'
+                             backgroundColor,
+                             color: textColor
                            }}
-                           title={`${period}: ${(value || 0).toFixed(1)}`}
+                           title={`${period}: ${value.toFixed(1)}`}
                          >
-                           {(value || 0).toFixed(1)}
+                           {value.toFixed(1)}
                          </div>
                       );
                     })}
@@ -332,10 +391,11 @@ export default function SkillProgression() {
         </Card>
 
         {/* Priority View - Bubble Chart */}
-        <ChartCard 
-          title="Skill Investment Priorities" 
-          subtitle="Bubble size = employee count, color = change vs last quarter"
-        >
+        <div className="space-y-4">
+          <ChartCard 
+            title="Skill Investment Priorities" 
+            subtitle="Bubble size = employee count, color = change vs last quarter"
+          >
           <ResponsiveContainer width="100%" height={300}>
             <ScatterChart data={bubbleData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -360,6 +420,31 @@ export default function SkillProgression() {
             </ScatterChart>
           </ResponsiveContainer>
         </ChartCard>
+        
+        {totalBubblePages > 1 && (
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+              disabled={currentPage === 0}
+            >
+              Previous
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              {currentPage + 1} of {totalBubblePages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(Math.min(totalBubblePages - 1, currentPage + 1))}
+              disabled={currentPage === totalBubblePages - 1}
+            >
+              Next
+            </Button>
+          </div>
+        )}
+        </div>
       </div>
 
       {/* Skills Summary Table */}
@@ -370,7 +455,7 @@ export default function SkillProgression() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {bubbleData.slice(0, 10).map((skill) => (
+            {allBubbleData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).map((skill) => (
               <div key={skill.skill} className="flex items-center justify-between p-3 border border-border rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="font-medium">{skill.skill}</div>
@@ -401,6 +486,30 @@ export default function SkillProgression() {
               </div>
             ))}
           </div>
+          
+          {Math.ceil(allBubbleData.length / itemsPerPage) > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-4 border-t">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                disabled={currentPage === 0}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {currentPage + 1} of {Math.ceil(allBubbleData.length / itemsPerPage)}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.min(Math.ceil(allBubbleData.length / itemsPerPage) - 1, currentPage + 1))}
+                disabled={currentPage === Math.ceil(allBubbleData.length / itemsPerPage) - 1}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
