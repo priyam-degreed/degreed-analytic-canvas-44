@@ -60,47 +60,11 @@ const managerDashboards: Dashboard[] = [
   { id: "M5", name: "Content Performance (Team)", path: "/dashboards/content-performance" }
 ];
 
-// Admin navigation items (full access)
-const adminNavigationItems = [
-  {
-    title: "Overview",
-    items: [
-      { name: "Strategic Overview", path: "/overview/strategic", icon: TrendingUp },
-      { name: "Operational Review", path: "/overview/operational", icon: Activity },
-    ]
-  },
-  {
-    title: "Learning Overview Dashboard",
-    items: [
-      { name: "Executive Overview", path: "/learning/executive", icon: BarChart3 },
-      { name: "Engagement Overview", path: "/learning/engagement", icon: Users },
-      { name: "Impact Overview", path: "/learning/impact", icon: Target },
-    ]
-  },
-  {
-    title: "Learning Guided Insights",
-    items: [
-      { name: "Assignment Deep Dive", path: "/learning/assignments", icon: BookOpen },
-      { name: "Operations Deep Dive", path: "/learning/operations", icon: FileText },
-    ]
-  },
-  {
-    title: "Guided Analysis",
-    items: [
-      { name: "Skills Adoption", path: "/skills/adoption", icon: Target },
-      { name: "Skills Planning", path: "/skills/planning", icon: Calendar },
-    ]
-  },
-  {
-    title: "Analysis Template",
-    items: [
-      { name: "Skill Tracker", path: "/analysis/skill-tracker", icon: PieChart },
-    ]
-  }
-];
+// Admin navigation items (full access) - Removed all sections
+const adminNavigationItems: any[] = [];
 
 // Manager navigation items (limited scope) - No additional navigation sections
-const managerNavigationItems: typeof adminNavigationItems = [];
+const managerNavigationItems: any[] = [];
 
 export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   const location = useLocation();
