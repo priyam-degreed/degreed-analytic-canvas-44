@@ -270,15 +270,59 @@ export default function SkillProgression() {
         />
       </div>
 
-      {/* Skill Progression Heatmap - Full Width */}
-      <Card>
+      {/* Main Charts Grid */}
+      <div className="grid gap-6 lg:grid-cols-2 mb-6">
+        {/* Progress Over Time Line Chart */}
+        <ChartCard 
+          title="Progress Over Time"
+          subtitle="Skill rating progression across time periods"
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={progressData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="period" />
+              <YAxis domain={[0, 10]} />
+              <Tooltip />
+              <Legend />
+              {availableSkills.slice(0, 6).map((skill, index) => (
+                <Line 
+                  key={skill}
+                  type="monotone" 
+                  dataKey={skill} 
+                  stroke={`hsl(${index * 60}, 70%, 50%)`}
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        {/* Current vs Target Ratings */}
+        <ChartCard 
+          title="Current vs Target Ratings"
+          subtitle="Comparison between current and target skill levels"
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={currentVsTargetData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="skill" />
+              <YAxis domain={[0, 10]} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="current" fill="#22d3ee" name="Current Rating" />
+              <Bar dataKey="target" fill="#f472b6" name="Target Rating" />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      {/* Skill vs Time Heatmap */}
+      <Card className="mb-6">
         <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🔥</span>
-            <div>
-              <CardTitle>Skill Progression Heatmap</CardTitle>
-              <CardDescription>Average ratings across skills and time periods</CardDescription>
-            </div>
+          <div>
+            <CardTitle>Skill vs Time Heatmap</CardTitle>
+            <CardDescription>Average ratings across skills and time periods</CardDescription>
           </div>
           {totalHeatmapPages > 1 && (
             <div className="flex items-center gap-2">
@@ -353,88 +397,14 @@ export default function SkillProgression() {
               </div>
             ))}
           </div>
-          
-          {/* Heatmap Legend */}
-          <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t">
-            <span className="text-sm text-muted-foreground">Low</span>
-            <div className="flex gap-1">
-              <div className="w-4 h-4 rounded bg-blue-600"></div>
-              <div className="w-4 h-4 rounded bg-blue-500"></div>
-              <div className="w-4 h-4 rounded bg-blue-400"></div>
-              <div className="w-4 h-4 rounded bg-blue-300"></div>
-              <div className="w-4 h-4 rounded bg-blue-200"></div>
-            </div>
-            <span className="text-sm text-muted-foreground">High</span>
-            <div className="flex items-center gap-1 ml-4 text-sm text-muted-foreground">
-              <span>0</span>
-              <span className="mx-2">5</span>
-              <span>10</span>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
-      {/* Main Charts Grid */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Progress Over Time Line Chart */}
-        <div className="flex items-start gap-2">
-          <span className="text-lg mt-1">📊</span>
-          <ChartCard 
-            title="Progress Over Time"
-            subtitle="Skill rating progression across time periods"
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={progressData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="period" />
-                <YAxis domain={[0, 10]} />
-                <Tooltip />
-                <Legend />
-                {availableSkills.slice(0, 6).map((skill, index) => (
-                  <Line 
-                    key={skill}
-                    type="monotone" 
-                    dataKey={skill} 
-                    stroke={`hsl(${index * 60}, 70%, 50%)`}
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </div>
-
-        {/* Current vs Target Ratings */}
-        <div className="flex items-start gap-2">
-          <span className="text-lg mt-1">🎯</span>
-          <ChartCard 
-            title="Current vs Target Ratings"
-            subtitle="Comparison between current and target skill levels"
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={currentVsTargetData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="skill" />
-                <YAxis domain={[0, 10]} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="current" fill="#22d3ee" name="Current Rating" />
-                <Bar dataKey="target" fill="#f472b6" name="Target Rating" />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </div>
-      </div>
-
       {/* Skill Gaps & Priority Areas */}
       <Card>
-        <CardHeader className="flex flex-row items-center gap-2">
-          <span className="text-lg">⚡</span>
-          <div>
-            <CardTitle>Skill Gaps & Priority Areas</CardTitle>
-            <CardDescription>Priority areas requiring skill development focus</CardDescription>
-          </div>
+        <CardHeader>
+          <CardTitle>Skill Gaps & Priority Areas</CardTitle>
+          <CardDescription>Priority areas requiring skill development focus</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
