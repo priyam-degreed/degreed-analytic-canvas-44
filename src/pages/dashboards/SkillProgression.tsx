@@ -93,6 +93,9 @@ export default function SkillProgression() {
   // Drill-down state
   const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
   const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
+  
+  // Highlight state for Progress Over Time chart
+  const [highlightedDataPoint, setHighlightedDataPoint] = useState<{skill: string, period: string} | null>(null);
 
   // Apply filters to data - each filter works independently and in combination
   const filteredData = skillDistributionData.filter(item => {
@@ -339,6 +342,30 @@ export default function SkillProgression() {
     return null;
   };
 
+  // Handle line chart data point clicks
+  const handleLineChartClick = (data: any, skill: string) => {
+    if (data && data.activePayload && data.activePayload.length > 0) {
+      const period = data.activeLabel;
+      const skillValue = data.activePayload.find((payload: any) => payload.dataKey === skill)?.value;
+      
+      // Set highlight state
+      setHighlightedDataPoint({ skill, period });
+      
+      // Set drill-down data
+      setDrillDownData({
+        skill,
+        period,
+        value: skillValue,
+        additionalData: {
+          'Avg Rating': skillValue,
+          'Period': period,
+          'Skill': skill
+        }
+      });
+      setIsDrillDownOpen(true);
+    }
+  };
+
   const CustomBarTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -459,28 +486,72 @@ export default function SkillProgression() {
 
       {/* Progress Over Time Chart */}
       <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Progress Over Time</CardTitle>
-          <CardDescription>Skill rating progression across time periods</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Progress Over Time</CardTitle>
+            <CardDescription>Skill rating progression across time periods</CardDescription>
+          </div>
+          {highlightedDataPoint && (
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-xs">
+                Highlighted: {highlightedDataPoint.skill} - {highlightedDataPoint.period}
+              </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setHighlightedDataPoint(null)}
+                className="text-xs"
+              >
+                Clear
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={progressData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="period" />
-              <YAxis domain={[0, 8]} />
+            <LineChart 
+              data={progressData}
+              onClick={(data) => {
+                // Handle chart click for any highlighted line
+                if (highlightedDataPoint && data && data.activeLabel) {
+                  const skill = highlightedDataPoint.skill;
+                  handleLineChartClick(data, skill);
+                }
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.3} />
+              <XAxis dataKey="period" stroke="hsl(var(--muted-foreground))" />
+              <YAxis domain={[0, 8]} stroke="hsl(var(--muted-foreground))" />
               <Tooltip content={<CustomLineTooltip />} />
               <Legend />
-              {paginatedSkills.map((skill, index) => (
-                <Line 
-                  key={skill}
-                  type="monotone" 
-                  dataKey={skill} 
-                  stroke={`hsl(${index * 60}, 70%, 50%)`}
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                />
-              ))}
+              {paginatedSkills.map((skill, index) => {
+                const isHighlighted = highlightedDataPoint?.skill === skill;
+                const isDimmed = highlightedDataPoint && !isHighlighted;
+                
+                return (
+                  <Line 
+                    key={skill}
+                    type="monotone" 
+                    dataKey={skill} 
+                    stroke={`hsl(${index * 60}, 70%, 50%)`}
+                    strokeWidth={isHighlighted ? 3 : 2}
+                    strokeOpacity={isDimmed ? 0.3 : 1}
+                    dot={{ 
+                      r: isHighlighted ? 6 : 4,
+                      fill: isHighlighted ? `hsl(${index * 60}, 70%, 50%)` : undefined,
+                      fillOpacity: isDimmed ? 0.3 : 1,
+                      strokeOpacity: isDimmed ? 0.3 : 1
+                    }}
+                    activeDot={{ 
+                      r: 8, 
+                      fill: `hsl(${index * 60}, 70%, 50%)`,
+                      stroke: 'hsl(var(--background))',
+                      strokeWidth: 2,
+                      onClick: (data: any) => handleLineChartClick(data, skill)
+                    }}
+                  />
+                );
+              })}
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
