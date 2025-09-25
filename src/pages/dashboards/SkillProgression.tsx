@@ -511,19 +511,24 @@ export default function SkillProgression() {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart 
               data={progressData}
-              onClick={(data) => {
-                // Handle chart click for any highlighted line
-                if (highlightedDataPoint && data && data.activeLabel) {
-                  const skill = highlightedDataPoint.skill;
-                  handleLineChartClick(data, skill);
-                }
-              }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.3} />
-              <XAxis dataKey="period" stroke="hsl(var(--muted-foreground))" />
-              <YAxis domain={[0, 8]} stroke="hsl(var(--muted-foreground))" />
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="hsl(var(--muted-foreground))" 
+                strokeOpacity={highlightedDataPoint ? 0.1 : 0.3} 
+              />
+              <XAxis 
+                dataKey="period" 
+                stroke="hsl(var(--muted-foreground))"
+                opacity={highlightedDataPoint ? 0.3 : 1}
+              />
+              <YAxis 
+                domain={[0, 8]} 
+                stroke="hsl(var(--muted-foreground))"
+                opacity={highlightedDataPoint ? 0.3 : 1}
+              />
               <Tooltip content={<CustomLineTooltip />} />
-              <Legend />
+              <Legend opacity={highlightedDataPoint ? 0.3 : 1} />
               {paginatedSkills.map((skill, index) => {
                 const isChartDimmed = highlightedDataPoint !== null;
                 
@@ -534,7 +539,7 @@ export default function SkillProgression() {
                     dataKey={skill} 
                     stroke={`hsl(${index * 60}, 70%, 50%)`}
                     strokeWidth={2}
-                    strokeOpacity={isChartDimmed ? 0.2 : 1}
+                    strokeOpacity={isChartDimmed ? 0.15 : 1}
                     dot={(props: any) => {
                       const currentPeriod = props.payload?.period;
                       const isThisDataPointHighlighted = highlightedDataPoint && 
@@ -548,11 +553,12 @@ export default function SkillProgression() {
                           cy={props.cy}
                           r={isThisDataPointHighlighted ? 8 : 4}
                           fill={`hsl(${index * 60}, 70%, 50%)`}
-                          fillOpacity={isThisDataPointHighlighted ? 1 : (isChartDimmed ? 0.2 : 1)}
+                          fillOpacity={isThisDataPointHighlighted ? 1 : (isChartDimmed ? 0.15 : 1)}
                           stroke={isThisDataPointHighlighted ? 'hsl(var(--background))' : undefined}
                           strokeWidth={isThisDataPointHighlighted ? 3 : 0}
                           style={{ cursor: 'pointer' }}
                           onClick={() => {
+                            console.log('Dot clicked:', { skill, period: currentPeriod });
                             const clickData = {
                               activeLabel: currentPeriod,
                               activePayload: [{ dataKey: skill, value: props.payload[skill] }]
@@ -567,7 +573,10 @@ export default function SkillProgression() {
                       fill: `hsl(${index * 60}, 70%, 50%)`,
                       stroke: 'hsl(var(--background))',
                       strokeWidth: 2,
-                      onClick: (data: any) => handleLineChartClick(data, skill)
+                      onClick: (data: any) => {
+                        console.log('Active dot clicked:', data);
+                        handleLineChartClick(data, skill);
+                      }
                     }}
                   />
                 );
