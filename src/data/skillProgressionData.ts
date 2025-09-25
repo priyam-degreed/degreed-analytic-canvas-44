@@ -136,12 +136,12 @@ export const ratingTypeOptions = ["Self", "Peer", "Manager"];
 function generateSkillDistributionData(): SkillDistribution[] {
   const data: SkillDistribution[] = [];
   const periods = [
-    { period: "FY24-Q1", date: new Date(2023, 9, 1) },   // Oct 2023
-    { period: "FY24-Q2", date: new Date(2024, 0, 1) },   // Jan 2024  
-    { period: "FY24-Q3", date: new Date(2024, 3, 1) },   // Apr 2024
-    { period: "FY24-Q4", date: new Date(2024, 6, 1) },   // Jul 2024
-    { period: "FY25-Q1", date: new Date(2024, 9, 1) },   // Oct 2024
-    { period: "FY25-Q2", date: new Date(2025, 0, 1) },   // Jan 2025
+    { period: "FY24-Q1", date: new Date(2023, 9, 15) },   // Oct 15, 2023
+    { period: "FY24-Q2", date: new Date(2024, 0, 15) },   // Jan 15, 2024  
+    { period: "FY24-Q3", date: new Date(2024, 3, 15) },   // Apr 15, 2024
+    { period: "FY24-Q4", date: new Date(2024, 6, 15) },   // Jul 15, 2024
+    { period: "FY25-Q1", date: new Date(2024, 9, 15) },   // Oct 15, 2024
+    { period: "FY25-Q2", date: new Date(2025, 0, 15) },   // Jan 15, 2025
   ];
   
   Object.entries(roleSkillMapping).forEach(([role, skills]) => {
