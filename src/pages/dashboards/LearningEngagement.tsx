@@ -1,12 +1,6 @@
-import { MetricCard } from "@/components/dashboard/MetricCard";
-import { ChartCard } from "@/components/dashboard/ChartCard";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Users, Clock, BookOpen, Play, Award, Target, Share, Edit, Download } from "lucide-react";
-import { learningEngagementData } from "@/data/mockData";
-import { FilterBar } from "@/components/filters/FilterBar";
-import { useFilters } from "@/contexts/FilterContext";
-import { useFilteredData, useFilteredMetrics } from "@/hooks/useFilteredData";
+import { TrendingUp, Users, Clock, BookOpen, Award, Target, Play, Calendar, BarChart3, Star } from "lucide-react";
 import { 
   AreaChart, 
   Area, 
@@ -21,68 +15,101 @@ import {
   Pie,
   Cell
 } from "recharts";
+import { LearningFilterBar } from "@/components/filters/LearningFilterBar";
+import { MetricCard } from "@/components/dashboard/MetricCard";
+import { 
+  learningData, 
+  filterLearningData, 
+  generateEngagementTrends,
+  generateContentPerformance,
+  generatePopularSkills,
+  learningMetrics
+} from "@/data/learningData";
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', '#8884d8'];
 
+interface LearningFilters {
+  roles: string[];
+  contentTypes: string[];
+  providers: string[];
+  ratings: number[];
+  periods: string[];
+  skills: string[];
+}
+
 export default function LearningEngagement() {
-  const { filters } = useFilters();
-  
+  const [filters, setFilters] = useState<LearningFilters>({
+    roles: [],
+    contentTypes: [],
+    providers: [],
+    ratings: [],
+    periods: [],
+    skills: []
+  });
+
   // Filter the data based on current filters
-  const filteredEngagementTrends = useFilteredData(learningEngagementData.engagementTrends, filters);
-  const filteredContentModalities = useFilteredData(learningEngagementData.contentModalities, filters);
-  const filteredTrendingTopics = useFilteredData(learningEngagementData.trendingTopics, filters);
+  const filteredData = filterLearningData(learningData, filters);
   
+  // Generate dashboard data from filtered results
+  const engagementTrends = generateEngagementTrends(filteredData);
+  const contentPerformance = generateContentPerformance(filteredData);
+  const popularSkills = generatePopularSkills(filteredData);
+
   // Calculate filtered metrics
-  const metrics = useFilteredMetrics(
-    [...filteredEngagementTrends, ...filteredContentModalities, ...filteredTrendingTopics], 
-    filters,
-    (data) => {
-      const totalCompletions = filteredEngagementTrends.reduce((sum, item) => sum + item.completions, 0);
-      const totalHours = filteredEngagementTrends.reduce((sum, item) => sum + item.hours, 0);
-      const totalActiveUsers = filteredEngagementTrends.reduce((sum, item) => sum + item.activeUsers, 0);
-      const avgActiveUsers = filteredEngagementTrends.length > 0 ? Math.floor(totalActiveUsers / filteredEngagementTrends.length) : 0;
-      
-      const totalModalityUsage = filteredContentModalities.reduce((sum, item) => sum + item.usage, 0);
-      const avgCompletionRate = filteredContentModalities.length > 0 
-        ? filteredContentModalities.reduce((sum, item) => sum + item.completionRate, 0) / filteredContentModalities.length 
-        : 0;
-      
-      return {
-        totalLearners: filteredTrendingTopics.reduce((sum, topic) => sum + topic.learners, 0) || learningEngagementData.totalLearners,
-        activeUsersThisWeek: avgActiveUsers || learningEngagementData.activeUsersThisWeek,
-        courseCompletions: totalCompletions || learningEngagementData.courseCompletions.thisQuarter,
-        learningHours: totalHours || learningEngagementData.learningHours.total,
-        avgCompletionRate: Math.round(avgCompletionRate) || 75
+  const metrics = {
+    totalLearners: filteredData.length > 0 
+      ? Math.floor(filteredData.reduce((sum, activity) => sum + activity.activeUsers, 0) / filteredData.length * 10)
+      : Math.floor(learningMetrics.totalLearners),
+    activeUsersThisWeek: filteredData.length > 0
+      ? Math.floor(filteredData.reduce((sum, activity) => sum + activity.activeUsers, 0) / filteredData.length * 8)
+      : Math.floor(learningMetrics.totalLearners * 0.6),
+    courseCompletions: filteredData.reduce((sum, activity) => sum + activity.completions, 0) || 0,
+    learningHours: Math.floor(filteredData.reduce((sum, activity) => sum + activity.learningHours, 0)) || 0,
+    avgCompletionRate: filteredData.length > 0 
+      ? Number((filteredData.reduce((sum, activity) => sum + activity.completionRate, 0) / filteredData.length).toFixed(1))
+      : Number(learningMetrics.avgCompletionRate.toFixed(1)),
+    avgRating: filteredData.length > 0
+      ? Number((filteredData.reduce((sum, activity) => sum + activity.avgRating, 0) / filteredData.length).toFixed(1))
+      : Number(learningMetrics.avgRating.toFixed(1))
+  };
+
+  // Top performing providers from filtered data
+  const topProviders = filteredData.reduce((acc, activity) => {
+    if (!acc[activity.provider]) {
+      acc[activity.provider] = {
+        provider: activity.provider,
+        completions: 0,
+        avgRating: 0,
+        totalRating: 0,
+        count: 0
       };
     }
-  );
+    acc[activity.provider].completions += activity.completions;
+    acc[activity.provider].totalRating += activity.avgRating;
+    acc[activity.provider].count += 1;
+    acc[activity.provider].avgRating = acc[activity.provider].totalRating / acc[activity.provider].count;
+    return acc;
+  }, {} as Record<string, any>);
 
-  // Job role data filtered by current filters
-  const roleData = [
-    { dept: "Engineering", hours: 8.5, learners: 1240, trend: 15 },
-    { dept: "Product", hours: 6.8, learners: 340, trend: 8 },
-    { dept: "Data Science", hours: 9.2, learners: 180, trend: 22 },
-    { dept: "Marketing", hours: 4.3, learners: 290, trend: -3 }
-  ].filter(role => {
-    if (filters.roles.length === 0) return true;
-    return filters.roles.some(selectedRole => 
-      role.dept.toLowerCase().includes(selectedRole.toLowerCase()) ||
-      selectedRole.toLowerCase().includes(role.dept.toLowerCase())
-    );
-  });
+  const sortedProviders = Object.values(topProviders)
+    .sort((a: any, b: any) => b.completions - a.completions)
+    .slice(0, 5);
 
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Learning Engagement</h1>
+        <h1 className="text-3xl font-bold">Learning Engagement Dashboard</h1>
         <p className="text-muted-foreground mt-1">
-          Track learning activity, participation, and engagement across your organization
+          Interactive dashboard tracking learning activities, participation, and engagement across your organization
         </p>
       </div>
 
-      {/* Filter Bar */}
-      <FilterBar showRoles={true} />
+      {/* Enhanced Filter Bar */}
+      <LearningFilterBar 
+        filters={filters} 
+        onFiltersChange={setFilters} 
+      />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -91,199 +118,226 @@ export default function LearningEngagement() {
           value={metrics.totalLearners.toLocaleString()}
           change={{ value: 15.3, type: "positive" }}
           icon={<Users className="h-5 w-5" />}
-        />
-        <MetricCard
-          title="Active This Week"
-          value={metrics.activeUsersThisWeek.toLocaleString()}
-          change={{ value: 8.9, type: "positive" }}
-          icon={<TrendingUp className="h-5 w-5" />}
+          subtitle={`${filteredData.length} activities tracked`}
         />
         <MetricCard
           title="Course Completions"
           value={metrics.courseCompletions.toLocaleString()}
-          change={{ value: learningEngagementData.courseCompletions.change, type: "positive" }}
+          change={{ value: 12.8, type: "positive" }}
           icon={<Award className="h-5 w-5" />}
+          subtitle={`${metrics.avgCompletionRate}% avg completion rate`}
         />
         <MetricCard
           title="Learning Hours"
           value={`${metrics.learningHours.toLocaleString()}h`}
-          change={{ value: 12.4, type: "positive" }}
+          change={{ value: 18.2, type: "positive" }}
           icon={<Clock className="h-5 w-5" />}
+          subtitle="Total hours consumed"
+        />
+        <MetricCard
+          title="Average Rating"
+          value={`${metrics.avgRating}/5.0`}
+          change={{ value: 5.4, type: "positive" }}
+          icon={<Star className="h-5 w-5" />}
+          subtitle="Content satisfaction"
         />
       </div>
 
       {/* Engagement Trends */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard
-          title="Learning Engagement Trends"
-          subtitle={`Showing data for ${filteredEngagementTrends.length} periods`}
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={filteredEngagementTrends}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Area type="monotone" dataKey="completions" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" />
-              <Area type="monotone" dataKey="activeUsers" stackId="2" stroke="hsl(var(--secondary))" fill="hsl(var(--secondary))" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <ChartCard
-          title="Content Modality Performance"
-          subtitle={`${filteredContentModalities.length} content types filtered`}
-        >
-          <div className="space-y-4">
-            {filteredContentModalities.map((modality, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                    <span className="font-medium">{modality.type}</span>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>{modality.usage.toLocaleString()} users</span>
-                    <span>{modality.completionRate}% completion</span>
-                    <span>⭐ {modality.avgRating}</span>
-                  </div>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full"
-                    style={{
-                      width: `${modality.completionRate}%`,
-                      backgroundColor: COLORS[index % COLORS.length]
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </ChartCard>
-      </div>
-
-      {/* Trending Topics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <ChartCard
-            title="Trending Learning Topics"
-            subtitle={`${filteredTrendingTopics.length} topics filtered`}
-          >
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Learning Engagement Trends
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Showing data for {engagementTrends.length} periods
+            </p>
+          </CardHeader>
+          <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={filteredTrendingTopics}>
+              <AreaChart data={engagementTrends}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
-                  dataKey="topic" 
+                  dataKey="period" 
                   angle={-45}
                   textAnchor="end"
                   height={80}
+                  fontSize={12}
+                />
+                <YAxis />
+                <Tooltip />
+                <Area 
+                  type="monotone" 
+                  dataKey="completions" 
+                  stackId="1" 
+                  stroke="hsl(var(--primary))" 
+                  fill="hsl(var(--primary))" 
+                  fillOpacity={0.6}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="activeUsers" 
+                  stackId="2" 
+                  stroke="hsl(var(--secondary))" 
+                  fill="hsl(var(--secondary))" 
+                  fillOpacity={0.6}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Content Type Performance
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {contentPerformance.length} content types tracked
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {contentPerformance.map((item, index) => (
+                <div key={item.contentType} className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: COLORS[index % COLORS.length] }} 
+                      />
+                      <span className="font-medium">{item.contentType}</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>{item.completions.toLocaleString()} completions</span>
+                      <span>{item.completionRate}% rate</span>
+                      <span>⭐ {item.avgRating}</span>
+                    </div>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div
+                      className="h-2 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${Math.min(item.completionRate, 100)}%`,
+                        backgroundColor: COLORS[index % COLORS.length]
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Popular Skills and Top Providers */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Popular Skills
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Top {popularSkills.length} skills by learner engagement
+            </p>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={popularSkills}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="skill" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  fontSize={12}
                 />
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="learners" fill="hsl(var(--primary))" />
               </BarChart>
             </ResponsiveContainer>
-          </ChartCard>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                Engagement Goals
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Monthly Active Learners</span>
-                  <span className="text-sm text-muted-foreground">{Math.min(Math.round((metrics.activeUsersThisWeek / metrics.totalLearners) * 100), 100)}%</span>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Top Performing Providers
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Ranked by total completions
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {sortedProviders.map((provider: any, index) => (
+              <div key={provider.provider} className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <div className="font-medium">{provider.provider}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {provider.completions.toLocaleString()} completions
+                  </div>
                 </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-green-500 h-2 rounded-full" style={{ width: `${Math.min(Math.round((metrics.activeUsersThisWeek / metrics.totalLearners) * 100), 100)}%` }} />
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Course Completion Rate</span>
-                  <span className="text-sm text-muted-foreground">{metrics.avgCompletionRate}%</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${metrics.avgCompletionRate}%` }} />
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Learning Hours Goal</span>
-                  <span className="text-sm text-muted-foreground">65%</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-orange-500 h-2 rounded-full" style={{ width: '65%' }} />
+                <div className="text-right">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span className="font-medium">{provider.avgRating.toFixed(1)}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    #{index + 1}
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                Quick Stats
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Avg. Learning Time</span>
-                <span className="font-medium">{learningEngagementData.learningHours.avgPerLearner}h/month</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Most Popular Format</span>
-                <span className="font-medium">
-                  {filteredContentModalities.length > 0 
-                    ? filteredContentModalities.sort((a, b) => b.completionRate - a.completionRate)[0].type 
-                    : "Videos"} 
-                  ({filteredContentModalities.length > 0 
-                    ? filteredContentModalities.sort((a, b) => b.completionRate - a.completionRate)[0].completionRate 
-                    : 85}%)
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Peak Learning Day</span>
-                <span className="font-medium">Tuesday</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Mobile Usage</span>
-                <span className="font-medium">43%</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Learning Velocity */}
-      <ChartCard
-        title="Learning Velocity by Job Role"
-        subtitle={`Average learning hours per employee - ${roleData.length} roles shown`}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {roleData.map((dept, index) => (
-            <div key={index} className="p-4 border rounded-lg space-y-2">
-              <div className="flex justify-between items-center">
-                <h4 className="font-medium">{dept.dept}</h4>
-                <span className={`text-sm ${dept.trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {dept.trend > 0 ? '+' : ''}{dept.trend}%
-                </span>
+      {/* Learning Activity Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Learning Activity Summary
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Filtered view showing {filteredData.length} activities
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="text-center p-4 border rounded-lg">
+              <div className="text-2xl font-bold text-primary">
+                {filteredData.filter(a => a.contentType === 'Course').length}
               </div>
-              <div className="text-2xl font-bold text-primary">{dept.hours}h</div>
-              <div className="text-sm text-muted-foreground">{dept.learners} learners</div>
+              <div className="text-sm text-muted-foreground">Courses</div>
             </div>
-          ))}
-        </div>
-      </ChartCard>
+            <div className="text-center p-4 border rounded-lg">
+              <div className="text-2xl font-bold text-secondary">
+                {filteredData.filter(a => a.contentType === 'Article').length}
+              </div>
+              <div className="text-sm text-muted-foreground">Articles</div>
+            </div>
+            <div className="text-center p-4 border rounded-lg">
+              <div className="text-2xl font-bold text-accent">
+                {filteredData.filter(a => a.contentType === 'Assessment').length}
+              </div>
+              <div className="text-sm text-muted-foreground">Assessments</div>
+            </div>
+            <div className="text-center p-4 border rounded-lg">
+              <div className="text-2xl font-bold text-orange-500">
+                {filteredData.filter(a => a.contentType === 'Event').length}
+              </div>
+              <div className="text-sm text-muted-foreground">Events</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
