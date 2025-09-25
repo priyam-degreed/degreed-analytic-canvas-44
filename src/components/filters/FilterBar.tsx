@@ -9,6 +9,7 @@ interface FilterState {
   contentType: string[];
   provider: string[];
   skills: string[];
+  groups: string[];
 }
 
 interface FilterBarProps {
@@ -53,6 +54,21 @@ const skillsOptions = [
   "Big Data Analysis"
 ];
 
+const groupsOptions = [
+  "Engineering Team",
+  "Product Team",
+  "Marketing Team",
+  "Sales Team",
+  "Data Science Team",
+  "Design Team",
+  "Operations Team",
+  "HR Team",
+  "Finance Team",
+  "Executive Team",
+  "Customer Success Team",
+  "Quality Assurance Team"
+];
+
 export function FilterBar({ onFilterChange }: FilterBarProps) {
   const [filters, setFilters] = useState<FilterState>({
     dateRange: {
@@ -61,7 +77,8 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
     },
     contentType: [],
     provider: [],
-    skills: []
+    skills: [],
+    groups: []
   });
 
   const handleFilterChange = (filterType: keyof FilterState, value: any) => {
@@ -112,6 +129,17 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
             options={skillsOptions}
             selected={filters.skills}
             onChange={(value) => handleFilterChange('skills', value)}
+            placeholder="All"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground min-w-fit">Groups</span>
+          <MultiSelectFilter
+            label="Groups"
+            options={groupsOptions}
+            selected={filters.groups}
+            onChange={(value) => handleFilterChange('groups', value)}
             placeholder="All"
           />
         </div>
