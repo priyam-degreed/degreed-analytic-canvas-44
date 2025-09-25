@@ -16,13 +16,13 @@ interface MultiSelectFilterProps {
 export function MultiSelectFilter({ 
   label, 
   options, 
-  selected, 
+  selected = [], 
   onChange, 
   placeholder = "All" 
 }: MultiSelectFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [tempSelected, setTempSelected] = useState<string[]>(selected);
+  const [tempSelected, setTempSelected] = useState<string[]>(selected || []);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const filteredOptions = options.filter(option =>

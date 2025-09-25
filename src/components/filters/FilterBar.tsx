@@ -164,7 +164,7 @@ export function FilterBar({ showRoles = false }: FilterBarProps) {
           <MultiSelectFilter
             label="Custom Attribute"
             options={customAttributeOptions}
-            selected={filters.customAttribute}
+            selected={filters.customAttribute || []}
             onChange={(value) => updateFilter('customAttribute', value)}
             placeholder="All"
           />
