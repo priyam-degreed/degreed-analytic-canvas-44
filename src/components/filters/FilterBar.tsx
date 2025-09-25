@@ -88,61 +88,57 @@ export function FilterBar({ onFilterChange }: FilterBarProps) {
   };
 
   return (
-    <div className="flex items-center gap-4 p-4 bg-muted/30 border border-border rounded-lg mb-6">
-      <span className="text-sm font-medium text-muted-foreground min-w-fit">Filters:</span>
-      
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground min-w-fit">Date Range</span>
-          <DateRangeFilter
-            value={filters.dateRange}
-            onChange={(value) => handleFilterChange('dateRange', value)}
-          />
-        </div>
+    <div className="flex items-center gap-3 p-4 bg-muted/30 border border-border rounded-lg mb-6 flex-wrap">
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground min-w-fit">Date Range</span>
+        <DateRangeFilter
+          value={filters.dateRange}
+          onChange={(value) => handleFilterChange('dateRange', value)}
+        />
+      </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground min-w-fit">Content Type</span>
-          <MultiSelectFilter
-            label="Content Type"
-            options={contentTypeOptions}
-            selected={filters.contentType}
-            onChange={(value) => handleFilterChange('contentType', value)}
-            placeholder="All"
-          />
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground min-w-fit">Content Type</span>
+        <MultiSelectFilter
+          label="Content Type"
+          options={contentTypeOptions}
+          selected={filters.contentType}
+          onChange={(value) => handleFilterChange('contentType', value)}
+          placeholder="All"
+        />
+      </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground min-w-fit">Provider</span>
-          <MultiSelectFilter
-            label="Provider"
-            options={providerOptions}
-            selected={filters.provider}
-            onChange={(value) => handleFilterChange('provider', value)}
-            placeholder="All"
-          />
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground min-w-fit">Provider</span>
+        <MultiSelectFilter
+          label="Provider"
+          options={providerOptions}
+          selected={filters.provider}
+          onChange={(value) => handleFilterChange('provider', value)}
+          placeholder="All"
+        />
+      </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground min-w-fit">Skills</span>
-          <MultiSelectFilter
-            label="Skills"
-            options={skillsOptions}
-            selected={filters.skills}
-            onChange={(value) => handleFilterChange('skills', value)}
-            placeholder="All"
-          />
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground min-w-fit">Skills</span>
+        <MultiSelectFilter
+          label="Skills"
+          options={skillsOptions}
+          selected={filters.skills}
+          onChange={(value) => handleFilterChange('skills', value)}
+          placeholder="All"
+        />
+      </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground min-w-fit">Groups</span>
-          <MultiSelectFilter
-            label="Groups"
-            options={groupsOptions}
-            selected={filters.groups}
-            onChange={(value) => handleFilterChange('groups', value)}
-            placeholder="All"
-          />
-        </div>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground min-w-fit">Groups</span>
+        <MultiSelectFilter
+          label="Groups"
+          options={groupsOptions}
+          selected={filters.groups}
+          onChange={(value) => handleFilterChange('groups', value)}
+          placeholder="All"
+        />
       </div>
     </div>
   );
