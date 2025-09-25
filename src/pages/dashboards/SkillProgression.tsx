@@ -143,17 +143,19 @@ export default function SkillProgression() {
   
   const availablePeriods = filters.timePeriod.length > 0 ? filters.timePeriod : allPeriods;
 
-  // Pagination state - reset to 0 when filters change
-  const [currentPage, setCurrentPage] = useState(0);
+  // Pagination state - separate for each chart
+  const [heatmapCurrentPage, setHeatmapCurrentPage] = useState(0);
+  const [gapsCurrentPage, setGapsCurrentPage] = useState(0);
   const itemsPerPage = 10;
 
   // Reset pagination when filters change
   useEffect(() => {
-    setCurrentPage(0);
+    setHeatmapCurrentPage(0);
+    setGapsCurrentPage(0);
   }, [filters]);
 
   // Apply pagination to all data - limit to 10 entries by default
-  const paginatedData = filteredData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+  const paginatedData = filteredData.slice(heatmapCurrentPage * itemsPerPage, (heatmapCurrentPage + 1) * itemsPerPage);
 
   // Prepare line chart data for Progress Over Time - use paginated skills
   const paginatedSkills = availableSkills.slice(0, Math.min(10, availableSkills.length));
@@ -253,12 +255,12 @@ export default function SkillProgression() {
   }));
 
   // Apply pagination to heatmap and bubble data
-  const heatmapData = allHeatmapData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
-  const bubbleData = allBubbleData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+  const heatmapData = allHeatmapData.slice(heatmapCurrentPage * itemsPerPage, (heatmapCurrentPage + 1) * itemsPerPage);
+  const bubbleData = allBubbleData.slice(gapsCurrentPage * 5, (gapsCurrentPage + 1) * 5);
   
   // Pagination info
   const totalHeatmapPages = Math.ceil(allHeatmapData.length / itemsPerPage);
-  const totalBubblePages = Math.ceil(allBubbleData.length / itemsPerPage);
+  const totalGapsPages = Math.ceil(allBubbleData.length / 5);
   const totalFilteredPages = Math.ceil(filteredData.length / itemsPerPage);
 
   // Calculate filtered metrics
@@ -512,27 +514,27 @@ export default function SkillProgression() {
             <CardTitle>Skill vs Time Heatmap</CardTitle>
             <CardDescription>Average ratings across skills and time periods</CardDescription>
           </div>
-          {totalFilteredPages > 1 && (
+          {totalHeatmapPages > 1 && (
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
-                Showing {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+                Showing {heatmapCurrentPage * itemsPerPage + 1}-{Math.min((heatmapCurrentPage + 1) * itemsPerPage, allHeatmapData.length)} of {allHeatmapData.length} entries
               </span>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                disabled={currentPage === 0}
+                onClick={() => setHeatmapCurrentPage(Math.max(0, heatmapCurrentPage - 1))}
+                disabled={heatmapCurrentPage === 0}
               >
                 Previous
               </Button>
               <span className="text-sm text-muted-foreground">
-                {currentPage + 1} of {totalFilteredPages}
+                {heatmapCurrentPage + 1} of {totalHeatmapPages}
               </span>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(Math.min(totalFilteredPages - 1, currentPage + 1))}
-                disabled={currentPage === totalFilteredPages - 1}
+                onClick={() => setHeatmapCurrentPage(Math.min(totalHeatmapPages - 1, heatmapCurrentPage + 1))}
+                disabled={heatmapCurrentPage === totalHeatmapPages - 1}
               >
                 Next
               </Button>
@@ -618,27 +620,27 @@ export default function SkillProgression() {
             <CardTitle>Current Skill Gaps & Targets</CardTitle>
             <CardDescription>Skills requiring attention based on target ratings</CardDescription>
           </div>
-          {Math.ceil(allBubbleData.length / 5) > 1 && (
+          {totalGapsPages > 1 && (
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
-                Showing {currentPage * 5 + 1}-{Math.min((currentPage + 1) * 5, allBubbleData.length)} of {allBubbleData.length} skills
+                Showing {gapsCurrentPage * 5 + 1}-{Math.min((gapsCurrentPage + 1) * 5, allBubbleData.length)} of {allBubbleData.length} skills
               </span>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                disabled={currentPage === 0}
+                onClick={() => setGapsCurrentPage(Math.max(0, gapsCurrentPage - 1))}
+                disabled={gapsCurrentPage === 0}
               >
                 Previous
               </Button>
               <span className="text-sm text-muted-foreground">
-                {currentPage + 1} of {Math.ceil(allBubbleData.length / 5)}
+                {gapsCurrentPage + 1} of {totalGapsPages}
               </span>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(Math.min(Math.ceil(allBubbleData.length / 5) - 1, currentPage + 1))}
-                disabled={currentPage === Math.ceil(allBubbleData.length / 5) - 1}
+                onClick={() => setGapsCurrentPage(Math.min(totalGapsPages - 1, gapsCurrentPage + 1))}
+                disabled={gapsCurrentPage === totalGapsPages - 1}
               >
                 Next
               </Button>
@@ -647,7 +649,7 @@ export default function SkillProgression() {
         </CardHeader>
         <CardContent>
           <div className="space-y-1.5">
-            {allBubbleData.slice(currentPage * 5, (currentPage + 1) * 5).map((skill) => {
+            {allBubbleData.slice(gapsCurrentPage * 5, (gapsCurrentPage + 1) * 5).map((skill) => {
               const currentRating = skill.avgRating || 0;
               const targetRating = skill.targetRating || (6 + Math.random() * 2); // Use target from data or random 6-8
               const gap = Math.max(0, targetRating - currentRating);
