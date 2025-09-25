@@ -170,34 +170,6 @@ export default function SkillProgression() {
     return periodData;
   });
 
-  // Prepare grouped bar chart data for Current vs Target Ratings - use paginated skills
-  const currentVsTargetData = paginatedSkills.map(skill => {
-    const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
-    let avgCurrent = skillData.length > 0 ? 
-      skillData.reduce((sum, item) => sum + item.avgRating, 0) / skillData.length : 0;
-    
-    // Set specific targets and boost current ratings for certain skills
-    let target = 6 + Math.random() * 2; // Default random target between 6-8
-    if (skill === 'Machine Learning') {
-      target = 5.5;
-      avgCurrent = Math.max(avgCurrent, 6.2);
-    } else if (skill === 'CSS') {
-      target = 5.8;
-      avgCurrent = Math.max(avgCurrent, 6.5);
-    } else if (skill === 'Python') {
-      target = 6.2;
-      avgCurrent = Math.max(avgCurrent, 6.8);
-    } else if (skill === 'React') {
-      target = 5.9;
-      avgCurrent = Math.max(avgCurrent, 6.3);
-    }
-    
-    return {
-      skill,
-      current: Number(avgCurrent.toFixed(1)),
-      target: Number(target.toFixed(1))
-    };
-  });
 
   // Prepare skills vs rating type data
   const skillsByRatingTypeData = paginatedSkills.map(skill => {
@@ -476,36 +448,6 @@ export default function SkillProgression() {
         </CardContent>
       </Card>
 
-      {/* Current vs Target Ratings Chart */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Current vs Target Ratings</CardTitle>
-          <CardDescription>Comparison between current and target skill levels</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart 
-              data={currentVsTargetData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="skill" 
-                angle={-45}
-                textAnchor="end"
-                height={80}
-                interval={0}
-                fontSize={12}
-              />
-              <YAxis domain={[0, 8]} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="current" fill="#22d3ee" name="Current Rating" />
-              <Bar dataKey="target" fill="#f472b6" name="Target Rating" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
 
       {/* Skill vs Time Heatmap */}
       <Card className="mb-6">
