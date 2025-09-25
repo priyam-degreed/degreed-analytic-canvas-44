@@ -12,6 +12,8 @@ export interface FilterableDataItem {
   groups?: string[];
   roles?: string[];
   customAttribute?: string[];
+  rating?: number;
+  region?: string;
   [key: string]: any;
 }
 
@@ -82,6 +84,20 @@ export function filterData<T extends FilterableDataItem>(
         filters.customAttribute.includes(attr)
       );
       if (!hasMatchingCustomAttribute) {
+        return false;
+      }
+    }
+
+    // Ratings filter
+    if (filters.ratings.length > 0 && item.rating !== undefined) {
+      if (!filters.ratings.includes(item.rating)) {
+        return false;
+      }
+    }
+
+    // Region filter
+    if (filters.region.length > 0 && item.region) {
+      if (!filters.region.includes(item.region)) {
         return false;
       }
     }

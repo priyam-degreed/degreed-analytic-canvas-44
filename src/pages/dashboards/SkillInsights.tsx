@@ -14,6 +14,7 @@ import {
   comprehensiveTrendingTopics
 } from '@/data/comprehensiveMockData';
 import { useMemo } from 'react';
+import { useSkillMetrics, useTopSkillsGained } from "@/hooks/useSkillMetrics";
 import { 
   BarChart, 
   Bar, 
@@ -32,30 +33,14 @@ const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accen
 export default function SkillInsights() {
   const { filters } = useFilters();
   
-  // Use comprehensive filtered data
+  // Use enhanced hooks for better filter responsiveness
+  const skillMetrics = useSkillMetrics(comprehensiveLearningData, comprehensiveSkillRatings, filters);
+  const filteredTopSkillsGained = useTopSkillsGained(comprehensiveLearningData, filters);
+  
+  // Use comprehensive filtered data for remaining calculations
   const filteredLearningData = useFilteredData(comprehensiveLearningData, filters);
   const filteredSkillRatings = useFilteredData(comprehensiveSkillRatings, filters);
   
-  // Calculate metrics from filtered data
-  const skillMetrics = useMemo(() => {
-    const uniqueSkills = new Set([
-      ...filteredLearningData.flatMap(item => item.skills),
-      ...filteredSkillRatings.map(item => item.skill)
-    ]);
-    
-    const expertRatings = filteredSkillRatings.filter(rating => rating.currentRating >= 4.0);
-    const skillDecayAlerts = filteredSkillRatings.filter(rating => 
-      (rating.targetRating - rating.currentRating) > 1.0
-    );
-    
-    return {
-      totalSkills: uniqueSkills.size || strategicOverviewData.totalSkills,
-      expertSkills: expertRatings.length || 205,
-      activeSkillPlans: Math.floor(filteredLearningData.length * 1.2) || strategicOverviewData.activeSkillPlans,
-      skillsInDecay: skillDecayAlerts.length || 3
-    };
-  }, [filteredLearningData, filteredSkillRatings]);
-
   // Generate filtered skill gaps
   const filteredSkillGaps = useMemo(() => {
     console.log('Generating skill gaps from:', filteredSkillRatings.length, 'ratings');
@@ -107,34 +92,6 @@ export default function SkillInsights() {
     console.log('Generated diverse skill gaps by role:', result);
     return result;
   }, [filteredSkillRatings]);
-
-  // Generate filtered top skills gained
-  const filteredTopSkillsGained = useMemo(() => {
-    const skillLearningCounts = filteredLearningData.reduce((acc: any, item) => {
-      item.skills.forEach(skill => {
-        if (!acc[skill]) {
-          acc[skill] = {
-            skill: skill,
-            learners: 0,
-            totalHours: 0,
-            assessments: 0
-          };
-        }
-        acc[skill].learners += item.learners;
-        acc[skill].totalHours += item.avgHours * item.learners;
-      });
-      return acc;
-    }, {});
-
-    return Object.values(skillLearningCounts)
-      .map((skill: any) => ({
-        ...skill,
-        averageGrowth: `${(Math.random() * 3 + 1).toFixed(1)} pts`,
-        marketDemand: Math.floor(Math.random() * 20) + 80
-      }))
-      .sort((a: any, b: any) => b.learners - a.learners)
-      .slice(0, 6);
-  }, [filteredLearningData]);
 
   // Generate filtered skill decay alerts
   const filteredSkillDecayAlerts = useMemo(() => {
@@ -378,7 +335,7 @@ export default function SkillInsights() {
             <CardContent className="space-y-4">
               {filteredSkillAssessments.map((assessment: any, index) => (
                 <div key={index} className="flex justify-between items-center">
-                  <span className="text-sm font-medium">{assessment.month}</span>
+                  <span className="text-sm font-medium">{assessment.period}</span>
                   <div className="text-right">
                     <div className="text-sm font-medium">{assessment.avgScore}%</div>
                     <div className="text-xs text-muted-foreground">{assessment.totalAssessments} assessments</div>

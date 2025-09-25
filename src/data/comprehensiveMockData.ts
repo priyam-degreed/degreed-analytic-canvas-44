@@ -576,8 +576,17 @@ export function aggregateDataByPeriod<T extends { date: string }>(
 }
 
 // Generate comprehensive datasets - Force regeneration with updated baselines
-export const comprehensiveLearningData = generateComprehensiveLearningData();
-export const comprehensiveSkillRatings = generateSkillRatingData();
+export const comprehensiveLearningData = generateComprehensiveLearningData().map(item => ({
+  ...item,
+  rating: Math.floor(Math.random() * 5) + 1, // 1-5 star rating
+  region: ['North America (NA)', 'Europe, Middle East & Africa (EMEA)', 'Asia-Pacific (APAC)'][Math.floor(Math.random() * 3)]
+}));
+
+export const comprehensiveSkillRatings = generateSkillRatingData().map(rating => ({
+  ...rating,
+  rating: Math.floor(Math.random() * 5) + 1, // 1-5 star rating  
+  region: ['North America (NA)', 'Europe, Middle East & Africa (EMEA)', 'Asia-Pacific (APAC)'][Math.floor(Math.random() * 3)]
+}));
 
 console.log('🚀 Updated Mock Data Generated:', {
   learningDataCount: comprehensiveLearningData.length,

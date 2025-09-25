@@ -10,6 +10,9 @@ export interface FilterState {
   groups: string[];
   roles: string[];
   customAttribute: string[];
+  ratings: number[];
+  region: string[];
+  period: 'month' | 'quarter' | 'year';
 }
 
 export interface FilterContextType {
@@ -31,7 +34,10 @@ const defaultFilters: FilterState = {
   skills: [],
   groups: [],
   roles: [],
-  customAttribute: []
+  customAttribute: [],
+  ratings: [],
+  region: [],
+  period: 'month'
 };
 
 export function FilterProvider({ children }: { children: ReactNode }) {
