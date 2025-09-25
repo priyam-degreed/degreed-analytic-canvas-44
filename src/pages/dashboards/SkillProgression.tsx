@@ -408,7 +408,21 @@ export default function SkillProgression() {
               data={skillsByRatingTypeData}
               margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <defs>
+                <linearGradient id="selfGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#a7f3d0" stopOpacity={0.9}/>
+                  <stop offset="100%" stopColor="#6ee7b7" stopOpacity={0.7}/>
+                </linearGradient>
+                <linearGradient id="peerGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#bfdbfe" stopOpacity={0.9}/>
+                  <stop offset="100%" stopColor="#93c5fd" stopOpacity={0.7}/>
+                </linearGradient>
+                <linearGradient id="managerGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#fde68a" stopOpacity={0.9}/>
+                  <stop offset="100%" stopColor="#fcd34d" stopOpacity={0.7}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.3} />
               <XAxis 
                 dataKey="skill" 
                 angle={-45}
@@ -416,20 +430,43 @@ export default function SkillProgression() {
                 height={80}
                 interval={0}
                 fontSize={12}
+                stroke="hsl(var(--muted-foreground))"
               />
-              <YAxis domain={[0, 8]} />
-              <Tooltip />
+              <YAxis domain={[0, 8]} stroke="hsl(var(--muted-foreground))" />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px hsl(var(--foreground) / 0.1)'
+                }}
+              />
               <Legend />
-              <Bar dataKey="Self" fill="#10b981" name="Self Rating" />
-              <Bar dataKey="Peer" fill="#3b82f6" name="Peer Rating" />
-              <Bar dataKey="Manager" fill="#f59e0b" name="Manager Rating" />
+              <Bar 
+                dataKey="Self" 
+                fill="url(#selfGradient)" 
+                name="Self Rating"
+                radius={[2, 2, 0, 0]}
+              />
+              <Bar 
+                dataKey="Peer" 
+                fill="url(#peerGradient)" 
+                name="Peer Rating"
+                radius={[2, 2, 0, 0]}
+              />
+              <Bar 
+                dataKey="Manager" 
+                fill="url(#managerGradient)" 
+                name="Manager Rating"
+                radius={[2, 2, 0, 0]}
+              />
               <Line 
                 type="monotone" 
                 dataKey="Target" 
-                stroke="#ef4444" 
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                dot={{ fill: '#ef4444', r: 4 }}
+                stroke="hsl(var(--destructive))" 
+                strokeWidth={2.5}
+                strokeDasharray="4 4"
+                dot={{ fill: 'hsl(var(--destructive))', r: 3, strokeWidth: 1, stroke: 'hsl(var(--background))' }}
                 name="Target Level"
               />
             </ComposedChart>
