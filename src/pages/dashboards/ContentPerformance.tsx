@@ -142,7 +142,7 @@ export default function ContentPerformance() {
 
       {/* Content Ratings Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           <ChartCard
             title="Content Rating Distribution"
             subtitle="How learners rate our content across all formats"
@@ -163,50 +163,51 @@ export default function ContentPerformance() {
             </ResponsiveContainer>
           </ChartCard>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Award className="h-5 w-5" />
-              Content Quality Metrics
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Overall Satisfaction</span>
-                <span className="text-sm font-bold text-green-600">4.3/5</span>
-              </div>
-              <Progress value={86} className="h-2" />
-            </div>
-            
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Completion Rate</span>
-                <span className="text-sm font-bold text-blue-600">74%</span>
-              </div>
-              <Progress value={74} className="h-2" />
-            </div>
-            
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Engagement Score</span>
-                <span className="text-sm font-bold text-purple-600">82%</span>
-              </div>
-              <Progress value={82} className="h-2" />
-            </div>
-
-            <div className="pt-4 space-y-2">
-              <div className="text-xs text-muted-foreground">Key Insights:</div>
-              <div className="space-y-1">
-                <div className="text-xs">• Video content has highest completion rates</div>
-                <div className="text-xs">• Interactive labs show best engagement</div>
-                <div className="text-xs">• Mobile usage growing 23% monthly</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Content Quality Metrics */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Award className="h-5 w-5" />
+            Content Quality Metrics
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">Overall Satisfaction</span>
+              <span className="text-sm font-bold text-green-600">4.3/5</span>
+            </div>
+            <Progress value={86} className="h-2" />
+          </div>
+          
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">Completion Rate</span>
+              <span className="text-sm font-bold text-blue-600">74%</span>
+            </div>
+            <Progress value={74} className="h-2" />
+          </div>
+          
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">Engagement Score</span>
+              <span className="text-sm font-bold text-purple-600">82%</span>
+            </div>
+            <Progress value={82} className="h-2" />
+          </div>
+
+          <div className="pt-4 space-y-2">
+            <div className="text-xs text-muted-foreground">Key Insights:</div>
+            <div className="space-y-1">
+              <div className="text-xs">• Video content has highest completion rates</div>
+              <div className="text-xs">• Interactive labs show best engagement</div>
+              <div className="text-xs">• Mobile usage growing 23% monthly</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Content Performance by Category */}
       <ChartCard
