@@ -14,11 +14,6 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
   ScatterChart,
   Scatter,
   Cell
@@ -27,12 +22,6 @@ import {
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', '#8884d8'];
 
 export default function SkillInsights() {
-  const radarData = strategicOverviewData.topSkills.slice(0, 6).map(skill => ({
-    skill: skill.name.length > 15 ? skill.name.substring(0, 12) + "..." : skill.name,
-    current: skill.selfRating * 20,
-    market: skill.marketDemand || 60,
-    users: skill.users / 10
-  }));
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -75,40 +64,22 @@ export default function SkillInsights() {
         />
       </div>
 
-      {/* Skill Gaps vs Market Demand */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard
-          title="Critical Skill Gaps by Job Role"
-          subtitle="Skills with highest demand vs current capability"
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={skillGrowthData.skillGaps}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="skill" angle={-45} textAnchor="end" height={60} />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="current" fill="hsl(var(--secondary))" name="Current Level" />
-              <Bar dataKey="required" fill="hsl(var(--primary))" name="Required Level" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <ChartCard
-          title="Skill Development Radar"
-          subtitle="Current skills vs market demand alignment"
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            <RadarChart data={radarData}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="skill" />
-              <PolarRadiusAxis angle={90} domain={[0, 100]} />
-              <Radar name="Current Skills" dataKey="current" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
-              <Radar name="Market Demand" dataKey="market" stroke="hsl(var(--accent))" fill="hsl(var(--accent))" fillOpacity={0.6} />
-              <Tooltip />
-            </RadarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
+      {/* Critical Skill Gaps */}
+      <ChartCard
+        title="Critical Skill Gaps by Job Role"
+        subtitle="Skills with highest demand vs current capability"
+      >
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={skillGrowthData.skillGaps}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="skill" angle={-45} textAnchor="end" height={60} />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="current" fill="hsl(var(--secondary))" name="Current Level" />
+            <Bar dataKey="required" fill="hsl(var(--primary))" name="Required Level" />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
 
       {/* Top Growing Skills */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
