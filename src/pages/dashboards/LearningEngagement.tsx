@@ -3,11 +3,16 @@ import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, Clock, BookOpen, Play, Award, Target, Share, Edit, Download, ChevronLeft, ChevronRight } from "lucide-react";
-import { learningEngagementData } from "@/data/mockData";
 import { FilterBar } from "@/components/filters/FilterBar";
 import { useFilters } from "@/contexts/FilterContext";
 import { useFilteredData, useFilteredMetrics } from "@/hooks/useFilteredData";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { 
+  comprehensiveLearningData, 
+  comprehensiveSkillRatings, 
+  comprehensiveTrendingTopics,
+  aggregateDataByPeriod 
+} from '@/data/comprehensiveMockData';
 import { 
   AreaChart, 
   Area, 
@@ -28,32 +33,63 @@ const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accen
 export default function LearningEngagement() {
   const { filters } = useFilters();
   
-  // Debug logging
-  console.log('Learning Engagement Data:', learningEngagementData);
-  console.log('Current Filters:', filters);
+  // Use comprehensive filtered data
+  const filteredLearningData = useFilteredData(comprehensiveLearningData, filters);
+  const filteredSkillRatings = useFilteredData(comprehensiveSkillRatings, filters);
+  const filteredTrendingTopics = useFilteredData(comprehensiveTrendingTopics, filters);
+
+  // Calculate aggregated metrics from filtered data
+  const aggregatedMetrics = useMemo(() => {
+    const totalLearners = filteredLearningData.reduce((sum, item) => sum + item.learners, 0);
+    const totalCompletions = filteredLearningData.reduce((sum, item) => sum + item.completions, 0);
+    const totalHours = filteredLearningData.reduce((sum, item) => sum + item.hours, 0);
+    const totalActiveUsers = filteredLearningData.reduce((sum, item) => sum + item.activeUsers, 0);
+    const avgEngagement = filteredLearningData.length > 0 
+      ? filteredLearningData.reduce((sum, item) => sum + item.engagementRate, 0) / filteredLearningData.length 
+      : 0;
+
+    // Engagement trends from filtered data grouped by date
+    const trendsByDate = filteredLearningData.reduce((acc: any, item) => {
+      const key = item.date.substring(0, 7); // YYYY-MM format
+      if (!acc[key]) {
+        acc[key] = { date: key, completions: 0, activeUsers: 0, hours: 0 };
+      }
+      acc[key].completions += item.completions;
+      acc[key].activeUsers += item.activeUsers;
+      acc[key].hours += item.hours;
+      return acc;
+    }, {});
+
+    const engagementTrends = Object.values(trendsByDate).sort((a: any, b: any) => 
+      a.date.localeCompare(b.date)
+    );
+
+    return {
+      totalLearners: Math.max(totalLearners, 0),
+      totalCompletions: Math.max(totalCompletions, 0),
+      totalHours: Math.max(totalHours, 0),
+      totalActiveUsers: Math.max(totalActiveUsers, 0),
+      avgEngagement: Math.max(avgEngagement, 0),
+      engagementTrends
+    };
+  }, [filteredLearningData]);
+  
+  // Debug logging - show filtered results
+  console.log('Filtered Learning Data Count:', filteredLearningData.length);
+  console.log('Filtered Metrics:', aggregatedMetrics);
+  console.log('Current Filters Applied:', filters);
   
   // Pagination state for Current vs Target Ratings
   const [ratingsCurrentPage, setRatingsCurrentPage] = useState(0);
   const ratingsItemsPerPage = 5;
   
-  // Mock Current vs Target Ratings data
-  const currentVsTargetData = [
-    { skill: "JavaScript", current: 4.2, target: 4.8, employees: 45 },
-    { skill: "React", current: 3.8, target: 4.5, employees: 38 },
-    { skill: "Python", current: 4.1, target: 4.7, employees: 52 },
-    { skill: "Data Analysis", current: 3.5, target: 4.2, employees: 28 },
-    { skill: "Machine Learning", current: 3.2, target: 4.0, employees: 22 },
-    { skill: "Project Management", current: 4.0, target: 4.6, employees: 31 },
-    { skill: "Communication", current: 4.3, target: 4.8, employees: 67 },
-    { skill: "Leadership", current: 3.7, target: 4.4, employees: 19 },
-    { skill: "DevOps", current: 3.9, target: 4.5, employees: 33 },
-    { skill: "UI/UX Design", current: 3.6, target: 4.3, employees: 24 }
-  ].filter(item => {
-    if (filters.skills.length === 0) return true;
-    return filters.skills.some(skill => 
-      item.skill.toLowerCase().includes(skill.toLowerCase())
-    );
-  });
+  // Use filtered skill ratings data for current vs target
+  const currentVsTargetData = filteredSkillRatings.map(rating => ({
+    skill: rating.skill,
+    current: rating.currentRating,
+    target: rating.targetRating,
+    employees: Math.floor(Math.random() * 50) + 20 // Mock employee count
+  })).slice(0, 15); // Limit to 15 skills for display
 
   const paginatedRatingsData = currentVsTargetData.slice(
     ratingsCurrentPage * ratingsItemsPerPage,
@@ -62,35 +98,14 @@ export default function LearningEngagement() {
 
   const totalRatingsPages = Math.ceil(currentVsTargetData.length / ratingsItemsPerPage);
   
-  // Filter the data based on current filters
-  const filteredEngagementTrends = useFilteredData(learningEngagementData.engagementTrends, filters);
-  const filteredContentModalities = useFilteredData(learningEngagementData.contentModalities, filters);
-  const filteredTrendingTopics = useFilteredData(learningEngagementData.trendingTopics, filters);
-  
-  // Calculate filtered metrics
-  const metrics = useFilteredMetrics(
-    [...filteredEngagementTrends, ...filteredContentModalities, ...filteredTrendingTopics], 
-    filters,
-    (data) => {
-      const totalCompletions = filteredEngagementTrends.reduce((sum, item) => sum + item.completions, 0);
-      const totalHours = filteredEngagementTrends.reduce((sum, item) => sum + item.hours, 0);
-      const totalActiveUsers = filteredEngagementTrends.reduce((sum, item) => sum + item.activeUsers, 0);
-      const avgActiveUsers = filteredEngagementTrends.length > 0 ? Math.floor(totalActiveUsers / filteredEngagementTrends.length) : 0;
-      
-      const totalModalityUsage = filteredContentModalities.reduce((sum, item) => sum + item.usage, 0);
-      const avgCompletionRate = filteredContentModalities.length > 0 
-        ? filteredContentModalities.reduce((sum, item) => sum + item.completionRate, 0) / filteredContentModalities.length 
-        : 0;
-      
-      return {
-        totalLearners: filteredTrendingTopics.reduce((sum, topic) => sum + topic.learners, 0) || learningEngagementData.totalLearners,
-        activeUsersThisWeek: avgActiveUsers || learningEngagementData.activeUsersThisWeek,
-        courseCompletions: totalCompletions || learningEngagementData.courseCompletions.thisQuarter,
-        learningHours: totalHours || learningEngagementData.learningHours.total,
-        avgCompletionRate: Math.round(avgCompletionRate) || 75
-      };
-    }
-  );
+  // Calculate filtered metrics from aggregated data (no longer need separate filtering)
+  const metrics = {
+    totalLearners: aggregatedMetrics.totalLearners || 15420,
+    activeUsersThisWeek: aggregatedMetrics.totalActiveUsers || 8934,
+    courseCompletions: aggregatedMetrics.totalCompletions || 3847,
+    learningHours: aggregatedMetrics.totalHours || 12847,
+    avgCompletionRate: Math.round(aggregatedMetrics.avgEngagement) || 75
+  };
 
   // Job role data filtered by current filters
   const roleData = [
@@ -136,7 +151,7 @@ export default function LearningEngagement() {
         <MetricCard
           title="Course Completions"
           value={metrics.courseCompletions.toLocaleString()}
-          change={{ value: learningEngagementData.courseCompletions.change, type: "positive" }}
+          change={{ value: 28.9, type: "positive" }}
           icon={<Award className="h-5 w-5" />}
         />
         <MetricCard
@@ -212,11 +227,11 @@ export default function LearningEngagement() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard
           title="Learning Engagement Trends"
-          subtitle={`Showing data for ${filteredEngagementTrends.length} periods`}
+          subtitle={`Showing data for ${aggregatedMetrics.engagementTrends.length} periods`}
         >
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart 
-              data={filteredEngagementTrends}
+              data={aggregatedMetrics.engagementTrends}
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
@@ -237,10 +252,27 @@ export default function LearningEngagement() {
 
         <ChartCard
           title="Content Modality Performance"
-          subtitle={`${filteredContentModalities.length} content types filtered`}
+          subtitle={`Showing filtered content performance`}
         >
           <div className="space-y-4">
-            {filteredContentModalities.map((modality, index) => (
+            {/* Show content type performance from filtered data */}
+            {Object.entries(
+              filteredLearningData.reduce((acc: any, item) => {
+                const key = item.contentType;
+                if (!acc[key]) {
+                  acc[key] = { type: key, usage: 0, completionRate: 0, avgRating: 0, count: 0 };
+                }
+                acc[key].usage += item.learners;
+                acc[key].completionRate += item.engagementRate;
+                acc[key].avgRating += item.avgRating;
+                acc[key].count += 1;
+                return acc;
+              }, {})
+            ).map(([key, modality]: [string, any], index) => {
+              const avgCompletionRate = modality.completionRate / modality.count;
+              const avgRating = modality.avgRating / modality.count;
+              
+              return (
               <div key={index} className="space-y-2">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
@@ -249,21 +281,22 @@ export default function LearningEngagement() {
                   </div>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span>{modality.usage.toLocaleString()} users</span>
-                    <span>{modality.completionRate}% completion</span>
-                    <span>⭐ {modality.avgRating}</span>
+                    <span>{Math.round(avgCompletionRate)}% completion</span>
+                    <span>⭐ {avgRating.toFixed(1)}</span>
                   </div>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
                   <div
                     className="h-2 rounded-full"
                     style={{
-                      width: `${modality.completionRate}%`,
+                      width: `${Math.min(100, avgCompletionRate)}%`,
                       backgroundColor: COLORS[index % COLORS.length]
                     }}
                   />
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </ChartCard>
       </div>
@@ -352,17 +385,12 @@ export default function LearningEngagement() {
             <CardContent className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Avg. Learning Time</span>
-                <span className="font-medium">{learningEngagementData.learningHours.avgPerLearner}h/month</span>
+                <span className="font-medium">4.2h/month</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Most Popular Format</span>
                 <span className="font-medium">
-                  {filteredContentModalities.length > 0 
-                    ? filteredContentModalities.sort((a, b) => b.completionRate - a.completionRate)[0].type 
-                    : "Videos"} 
-                  ({filteredContentModalities.length > 0 
-                    ? filteredContentModalities.sort((a, b) => b.completionRate - a.completionRate)[0].completionRate 
-                    : 85}%)
+                  Course (78%)
                 </span>
               </div>
               <div className="flex justify-between">
