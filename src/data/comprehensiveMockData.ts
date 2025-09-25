@@ -301,33 +301,169 @@ function getContentTypeMultiplier(contentType: string): number {
 function getRoleSkillBaseline(role: string, skill: string): number {
   // Define skill affinity by role for realistic baselines
   const roleSkillMatrix: Record<string, Record<string, number>> = {
-    "Data Scientist": {
-      "Python Programming": 4.2,
-      "Machine Learning": 4.0,
-      "Data Analytics": 4.3,
-      "Business Intelligence": 3.8,
-      "Leadership": 3.2
-    },
     "Software Engineer": {
       "Python Programming": 3.8,
       "Java": 4.0,
       "Cloud Computing": 3.6,
+      "Data Analytics": 3.2,
+      "Machine Learning": 2.8,
       "Leadership": 3.0,
       "Project Management": 3.2
     },
-    "Product Manager": {
+    "Senior Software Engineer": {
+      "Python Programming": 4.2,
+      "Java": 4.3,
+      "Cloud Computing": 4.0,
+      "Data Analytics": 3.5,
+      "Machine Learning": 3.2,
+      "Leadership": 3.5,
+      "Project Management": 3.8
+    },
+    "Tech Lead": {
+      "Python Programming": 4.0,
+      "Java": 3.8,
+      "Cloud Computing": 3.9,
       "Leadership": 4.1,
-      "Project Management": 4.3,
-      "Business Analysis": 4.0,
-      "Data Visualization": 3.5,
-      "Innovation": 3.8
+      "Project Management": 4.2,
+      "Innovation": 3.7
     },
     "Engineering Manager": {
       "Leadership": 4.4,
       "Project Management": 4.2,
       "Python Programming": 3.5,
       "Innovation": 3.9,
-      "Business Analysis": 3.7
+      "Business Analysis": 3.7,
+      "Data Visualization": 3.3
+    },
+    "Product Manager": {
+      "Leadership": 4.1,
+      "Project Management": 4.3,
+      "Business Analysis": 4.0,
+      "Data Visualization": 3.5,
+      "Innovation": 3.8,
+      "Business Intelligence": 3.6
+    },
+    "Senior Product Manager": {
+      "Leadership": 4.4,
+      "Project Management": 4.5,
+      "Business Analysis": 4.2,
+      "Innovation": 4.1,
+      "Business Intelligence": 3.9,
+      "Data Visualization": 3.8
+    },
+    "Data Scientist": {
+      "Python Programming": 4.2,
+      "Machine Learning": 4.0,
+      "Data Analytics": 4.3,
+      "Business Intelligence": 3.8,
+      "Big Data Analysis": 4.1,
+      "Leadership": 3.2,
+      "Data Visualization": 4.0
+    },
+    "Senior Data Scientist": {
+      "Python Programming": 4.5,
+      "Machine Learning": 4.4,
+      "Data Analytics": 4.5,
+      "Business Intelligence": 4.2,
+      "Big Data Analysis": 4.3,
+      "Leadership": 3.8,
+      "Data Visualization": 4.2
+    },
+    "Data Analyst": {
+      "Data Analytics": 4.0,
+      "Business Intelligence": 3.8,
+      "Data Visualization": 3.9,
+      "Python Programming": 3.2,
+      "Big Data Analysis": 3.5,
+      "Business Analysis": 3.6
+    },
+    "UX Designer": {
+      "Innovation": 3.9,
+      "Data Visualization": 3.7,
+      "Leadership": 3.1,
+      "Project Management": 3.4,
+      "Business Analysis": 3.3
+    },
+    "Senior UX Designer": {
+      "Innovation": 4.2,
+      "Data Visualization": 4.0,
+      "Leadership": 3.6,
+      "Project Management": 3.8,
+      "Business Analysis": 3.6
+    },
+    "Marketing Manager": {
+      "Leadership": 3.9,
+      "Project Management": 3.7,
+      "Data Analytics": 3.4,
+      "Business Intelligence": 3.5,
+      "Innovation": 3.6,
+      "Data Visualization": 3.2
+    },
+    "Sales Manager": {
+      "Leadership": 4.0,
+      "Business Analysis": 3.8,
+      "Project Management": 3.6,
+      "Data Analytics": 3.2,
+      "Innovation": 3.4
+    },
+    "DevOps Engineer": {
+      "Cloud Computing": 4.2,
+      "Python Programming": 3.7,
+      "Java": 3.5,
+      "Leadership": 3.2,
+      "Project Management": 3.4
+    },
+    "QA Engineer": {
+      "Java": 3.6,
+      "Python Programming": 3.4,
+      "Project Management": 3.5,
+      "Leadership": 3.0,
+      "Cloud Computing": 3.2
+    },
+    "Business Analyst": {
+      "Business Analysis": 4.2,
+      "Data Analytics": 3.8,
+      "Business Intelligence": 3.9,
+      "Project Management": 3.7,
+      "Data Visualization": 3.6,
+      "Leadership": 3.3
+    },
+    "Project Manager": {
+      "Project Management": 4.3,
+      "Leadership": 3.9,
+      "Business Analysis": 3.6,
+      "Data Visualization": 3.3,
+      "Innovation": 3.4
+    },
+    "Scrum Master": {
+      "Project Management": 4.1,
+      "Leadership": 3.8,
+      "Business Analysis": 3.5,
+      "Innovation": 3.6
+    },
+    "Director": {
+      "Leadership": 4.6,
+      "Project Management": 4.3,
+      "Business Analysis": 4.0,
+      "Innovation": 4.2,
+      "Business Intelligence": 3.9,
+      "Data Visualization": 3.7
+    },
+    "VP Engineering": {
+      "Leadership": 4.7,
+      "Project Management": 4.5,
+      "Innovation": 4.4,
+      "Business Analysis": 4.1,
+      "Python Programming": 3.6,
+      "Cloud Computing": 3.8
+    },
+    "CTO": {
+      "Leadership": 4.8,
+      "Innovation": 4.6,
+      "Project Management": 4.4,
+      "Cloud Computing": 4.0,
+      "Business Analysis": 4.2,
+      "Python Programming": 3.7
     }
   };
 
