@@ -128,7 +128,19 @@ export default function SkillProgression() {
 
   // Get available values for current context (for chart display)
   const availableRoles = filters.roles.length > 0 ? filters.roles : allRoles;
-  const availableSkills = filters.skills.length > 0 ? filters.skills : allSkills;
+  
+  // Skills should be filtered based on selected roles if any are selected
+  const availableSkills = (() => {
+    if (filters.skills.length > 0) {
+      return filters.skills;
+    } else if (filters.roles.length > 0) {
+      // If roles are selected, show only skills applicable to those roles
+      return Array.from(new Set(filters.roles.flatMap(role => roleSkillMapping[role] || [])));
+    } else {
+      return allSkills;
+    }
+  })();
+  
   const availablePeriods = filters.timePeriod.length > 0 ? filters.timePeriod : allPeriods;
 
   // Pagination state - reset to 0 when filters change
