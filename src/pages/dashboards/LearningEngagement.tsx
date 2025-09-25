@@ -2,11 +2,12 @@ import { MetricCard } from "@/components/dashboard/MetricCard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Users, Clock, BookOpen, Play, Award, Target, Share, Edit, Download } from "lucide-react";
+import { TrendingUp, Users, Clock, BookOpen, Play, Award, Target, Share, Edit, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { learningEngagementData } from "@/data/mockData";
 import { FilterBar } from "@/components/filters/FilterBar";
 import { useFilters } from "@/contexts/FilterContext";
 import { useFilteredData, useFilteredMetrics } from "@/hooks/useFilteredData";
+import { useState } from "react";
 import { 
   AreaChart, 
   Area, 
@@ -26,6 +27,36 @@ const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accen
 
 export default function LearningEngagement() {
   const { filters } = useFilters();
+  
+  // Pagination state for Current vs Target Ratings
+  const [ratingsCurrentPage, setRatingsCurrentPage] = useState(0);
+  const ratingsItemsPerPage = 5;
+  
+  // Mock Current vs Target Ratings data
+  const currentVsTargetData = [
+    { skill: "JavaScript", current: 4.2, target: 4.8, employees: 45 },
+    { skill: "React", current: 3.8, target: 4.5, employees: 38 },
+    { skill: "Python", current: 4.1, target: 4.7, employees: 52 },
+    { skill: "Data Analysis", current: 3.5, target: 4.2, employees: 28 },
+    { skill: "Machine Learning", current: 3.2, target: 4.0, employees: 22 },
+    { skill: "Project Management", current: 4.0, target: 4.6, employees: 31 },
+    { skill: "Communication", current: 4.3, target: 4.8, employees: 67 },
+    { skill: "Leadership", current: 3.7, target: 4.4, employees: 19 },
+    { skill: "DevOps", current: 3.9, target: 4.5, employees: 33 },
+    { skill: "UI/UX Design", current: 3.6, target: 4.3, employees: 24 }
+  ].filter(item => {
+    if (filters.skills.length === 0) return true;
+    return filters.skills.some(skill => 
+      item.skill.toLowerCase().includes(skill.toLowerCase())
+    );
+  });
+
+  const paginatedRatingsData = currentVsTargetData.slice(
+    ratingsCurrentPage * ratingsItemsPerPage,
+    (ratingsCurrentPage + 1) * ratingsItemsPerPage
+  );
+
+  const totalRatingsPages = Math.ceil(currentVsTargetData.length / ratingsItemsPerPage);
   
   // Filter the data based on current filters
   const filteredEngagementTrends = useFilteredData(learningEngagementData.engagementTrends, filters);
@@ -111,6 +142,58 @@ export default function LearningEngagement() {
           icon={<Clock className="h-5 w-5" />}
         />
       </div>
+
+      {/* Current vs Target Ratings Chart with Pagination */}
+      <ChartCard
+        title="Current vs Target Ratings"
+        subtitle={`Skill ratings comparison - Page ${ratingsCurrentPage + 1} of ${totalRatingsPages} (${currentVsTargetData.length} skills total)`}
+      >
+        <div className="space-y-4">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={paginatedRatingsData} layout="horizontal">
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" domain={[0, 5]} />
+              <YAxis type="category" dataKey="skill" width={120} />
+              <Tooltip 
+                formatter={(value, name) => [
+                  `${value}/5`, 
+                  name === 'current' ? 'Current Rating' : 'Target Rating'
+                ]}
+                labelFormatter={(label) => `Skill: ${label}`}
+              />
+              <Bar dataKey="current" fill="hsl(var(--primary))" name="current" />
+              <Bar dataKey="target" fill="hsl(var(--secondary))" name="target" />
+            </BarChart>
+          </ResponsiveContainer>
+          
+          {/* Pagination Controls */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setRatingsCurrentPage(prev => Math.max(0, prev - 1))}
+                disabled={ratingsCurrentPage === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setRatingsCurrentPage(prev => Math.min(totalRatingsPages - 1, prev + 1))}
+                disabled={ratingsCurrentPage === totalRatingsPages - 1}
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <span className="text-sm text-muted-foreground">
+              Showing {ratingsCurrentPage * ratingsItemsPerPage + 1}-{Math.min((ratingsCurrentPage + 1) * ratingsItemsPerPage, currentVsTargetData.length)} of {currentVsTargetData.length} skills
+            </span>
+          </div>
+        </div>
+      </ChartCard>
 
       {/* Engagement Trends */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
