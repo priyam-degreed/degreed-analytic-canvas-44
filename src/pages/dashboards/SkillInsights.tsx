@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, AlertTriangle, Target, Brain, Award, Users, ArrowUp, ArrowDown, Share, Edit, Download } from "lucide-react";
 import { skillGrowthData, strategicOverviewData } from "@/data/mockData";
-import { FilterBar } from "@/components/filters/FilterBar";
+import { SkillInsightsFilterBar } from "@/components/filters/SkillInsightsFilterBar";
 import { 
   BarChart, 
   Bar, 
@@ -34,7 +34,7 @@ export default function SkillInsights() {
       </div>
 
       {/* Filter Bar */}
-      <FilterBar />
+      <SkillInsightsFilterBar />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
