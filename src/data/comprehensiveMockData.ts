@@ -2,7 +2,7 @@
 import { FilterableDataItem } from '@/hooks/useFilteredData';
 import { addDays, subDays, format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter } from 'date-fns';
 
-// Enhanced filter options (matching FilterBar components)
+// Enhanced filter options (matching FilterBar components exactly)
 export const FILTER_OPTIONS = {
   contentTypes: [
     "Academy", "Article", "Assessment", "Book", "Course", "Event", "Podcast", "Task"

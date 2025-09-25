@@ -76,8 +76,7 @@ export default function LearningEngagement() {
   
   // Debug logging - show filtered results
   console.log('Filtered Learning Data Count:', filteredLearningData.length);
-  console.log('Filtered Metrics:', aggregatedMetrics);
-  console.log('Current Filters Applied:', filters);
+  console.log('Applied Filters:', filters);
   
   // Pagination state for Current vs Target Ratings
   const [ratingsCurrentPage, setRatingsCurrentPage] = useState(0);

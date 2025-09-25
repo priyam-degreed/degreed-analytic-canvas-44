@@ -23,8 +23,8 @@ const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 const defaultFilters: FilterState = {
   dateRange: {
-    from: subDays(new Date(), 29),
-    to: new Date()
+    from: new Date("2024-04-01"), // Start of FY25 to match comprehensive data
+    to: new Date("2025-03-31")    // End of FY25 to match comprehensive data  
   },
   contentType: [],
   provider: [],
