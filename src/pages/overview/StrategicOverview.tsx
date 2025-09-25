@@ -62,7 +62,7 @@ export default function StrategicOverview() {
           </Button>
           <Button variant="outline" size="sm">
             <Filter className="h-4 w-4 mr-2" />
-            All Departments
+            All Job Roles
           </Button>
           <Button variant="default" size="sm">
             <Download className="h-4 w-4 mr-2" />

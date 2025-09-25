@@ -211,8 +211,8 @@ export default function LearningEngagement() {
 
       {/* Learning Velocity */}
       <ChartCard
-        title="Learning Velocity by Department"
-        subtitle="Average learning hours per employee by department"
+        title="Learning Velocity by Job Role"
+        subtitle="Average learning hours per employee by job role"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[

@@ -112,11 +112,11 @@ export const searchData: SearchResult[] = [
     id: "skills-adoption", 
     type: "dashboard",
     title: "Skills Adoption",
-    description: "Track adoption rates of new skills and competencies across different departments and roles",
+    description: "Track adoption rates of new skills and competencies across different job roles and roles",
     category: "Skills",
     path: "/skills/adoption", 
     icon: Zap,
-    tags: ["adoption", "skills", "departments", "roles", "uptake"],
+    tags: ["adoption", "skills", "job roles", "roles", "uptake"],
     synonyms: ["skill uptake", "competency adoption", "skill implementation", "new skills"]
   },
 
@@ -211,7 +211,7 @@ export const recentSearches = [
 export const suggestedQueries = [
   { query: "engagement trends", icon: TrendingUp, category: "Analytics" },
   { query: "skill gaps analysis", icon: Target, category: "Skills" },
-  { query: "completion rates by department", icon: BarChart3, category: "Metrics" },
+  { query: "completion rates by job role", icon: BarChart3, category: "Metrics" },
   { query: "content satisfaction scores", icon: BookOpen, category: "Content" },
   { query: "career development pathways", icon: Award, category: "Career" },
   { query: "learning impact measurement", icon: Activity, category: "Impact" }

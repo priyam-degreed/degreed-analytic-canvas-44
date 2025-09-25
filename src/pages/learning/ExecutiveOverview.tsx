@@ -32,7 +32,7 @@ export default function ExecutiveOverview() {
     {
       title: "Total Learning Duration",
       value: `${learningOverviewData.learningDuration.total}h`,
-      subtitle: "Across all roles and departments"
+      subtitle: "Across all roles and job roles"
     },
     {
       title: "Active Learners",

@@ -78,7 +78,7 @@ export default function SkillInsights() {
       {/* Skill Gaps vs Market Demand */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard
-          title="Critical Skill Gaps by Department"
+          title="Critical Skill Gaps by Job Role"
           subtitle="Skills with highest demand vs current capability"
         >
           <ResponsiveContainer width="100%" height={300}>

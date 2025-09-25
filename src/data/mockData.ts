@@ -146,10 +146,10 @@ export const skillGrowthData = {
     { skill: "React Framework", affectedUsers: 156, lastActivity: "52 days", urgency: "high" }
   ],
   skillGaps: [
-    { department: "Engineering", skill: "Kubernetes", current: 23, required: 78, gap: 55 },
-    { department: "Data Science", skill: "MLOps", current: 12, required: 45, gap: 33 },
-    { department: "Product", skill: "User Research", current: 34, required: 56, gap: 22 },
-    { department: "Marketing", skill: "Analytics", current: 18, required: 32, gap: 14 }
+    { jobRole: "Engineering", skill: "Kubernetes", current: 23, required: 78, gap: 55 },
+    { jobRole: "Data Science", skill: "MLOps", current: 12, required: 45, gap: 33 },
+    { jobRole: "Product", skill: "User Research", current: 34, required: 56, gap: 22 },
+    { jobRole: "Marketing", skill: "Analytics", current: 18, required: 32, gap: 14 }
   ]
 };
 
@@ -307,7 +307,7 @@ export const conversationStarters = [
     questions: [
       "What are the top 5 skills trending for 6 months period?",
       "Which content pathways have the highest completion rates?",
-      "Show me learning engagement by department",
+      "Show me learning engagement by job role",
       "What's the average learning velocity this month?"
     ]
   },
@@ -324,7 +324,7 @@ export const conversationStarters = [
     category: "Career Insights",
     questions: [
       "How many learners are preparing for leadership roles?",
-      "What's the internal mobility readiness across departments?",
+      "What's the internal mobility readiness across job roles?",
       "Show me the most successful learning pathways",
       "Which roles have the highest skill development activity?"
     ]
@@ -343,7 +343,7 @@ export const conversationStarters = [
 // Dashboard Filters (Enhanced)
 export const dashboardFilters = {
   timeperiods: ["Last 7 days", "Last 30 days", "Last quarter", "Last 6 months", "Last year", "Custom range"],
-  departments: ["All Departments", "Engineering", "Product", "Data Science", "QA", "Design", "Marketing", "Sales", "HR"],
+  jobRoles: ["All Job Roles", "Engineering", "Product", "Data Science", "QA", "Design", "Marketing", "Sales", "HR"],
   roles: ["All Roles", "Developer", "SDET", "Product Manager", "Data Scientist", "Data Analyst", "Designer", "Team Lead"],
   skills: ["All Skills", "Leadership", "Python", "Data Analytics", "Project Management", "Machine Learning", "Cloud Computing"],
   learnerPersonas: ["All Learners", "New Hires", "High Performers", "Skill Gap Focus", "Leadership Track", "Technical Track"],

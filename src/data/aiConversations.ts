@@ -31,7 +31,7 @@ export const conversationExamples: ConversationExample[] = [
     followUpSuggestions: [
       "Show skill gaps for engineering team",
       "Compare Q3 vs Q2 skill trends",
-      "Break down by department",
+      "Break down by job role",
       "Add skill decay analysis"
     ]
   },
@@ -86,7 +86,7 @@ export const conversationExamples: ConversationExample[] = [
     category: "career",
     response: "Based on current data analysis:\n\n876 learners are actively engaged in leadership development pathways with strong progression indicators:\n\n• Leadership Development Journey: 59% completion rate\n• Management Fundamentals: 234 active learners\n• Team Leadership modules showing high engagement\n• 40% of product managers ready for senior roles",
     followUpSuggestions: [
-      "Show leadership readiness by department",
+      "Show leadership readiness by job role",
       "Track career progression timelines",
       "Compare internal vs external leadership hires",
       "Add succession planning insights"
@@ -95,15 +95,15 @@ export const conversationExamples: ConversationExample[] = [
 
   {
     id: "engagement-trends",
-    query: "Show learning engagement by department over time",
+    query: "Show learning engagement by job role over time",
     category: "engagement", 
-    response: "Creating new visualization...\n\nHere is a line chart showing Learning Engagement Trends by Department Over the Past 6 Months.\n\nPositive trends identified:\n• Engineering leads with 94% engagement score\n• Product team shows consistent 88% engagement\n• 66% overall increase in learning hours since April",
+    response: "Creating new visualization...\n\nHere is a line chart showing Learning Engagement Trends by Job Role Over the Past 6 Months.\n\nPositive trends identified:\n• Engineering leads with 94% engagement score\n• Product team shows consistent 88% engagement\n• 66% overall increase in learning hours since April",
     visualization: {
       type: "line",
-      title: "Learning Engagement Trends by Department (6 Months)",
+      title: "Learning Engagement Trends by Job Role (6 Months)",
       insights: [
         "Engineering maintains highest engagement (94%)",
-        "All departments show upward trajectory",
+        "All job roles show upward trajectory",
         "Q3 marked significant acceleration in learning activity"
       ]
     },
@@ -152,7 +152,7 @@ export const generateSuggestions = (context: string, category: string): string[]
       "Add completion rate trends", 
       "Show engagement drivers",
       "Break down by content type",
-      "Compare departments",
+      "Compare job roles",
       "Add seasonal patterns",
       "Show learner personas"
     ],
@@ -175,7 +175,7 @@ export const generateSuggestions = (context: string, category: string): string[]
     analytics: [
       "Switch to bar chart",
       "Add time filter",
-      "Break down by department",
+      "Break down by job role",
       "Show comparative metrics", 
       "Add drill-down options",
       "Export to dashboard"

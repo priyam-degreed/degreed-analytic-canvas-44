@@ -66,7 +66,7 @@ const availableMetrics = [
 ];
 
 const availableDimensions = [
-  { id: "department", label: "Department", icon: Users },
+  { id: "job_role", label: "Job Role", icon: Users },
   { id: "role", label: "Job Role", icon: Users },
   { id: "skill", label: "Skill Category", icon: BookOpen },
   { id: "content_type", label: "Content Type", icon: BookOpen },

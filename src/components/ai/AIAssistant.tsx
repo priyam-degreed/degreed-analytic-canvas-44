@@ -66,7 +66,7 @@ const sampleQueries = [
   "Which content pathways have the highest completion rates?", 
   "Show me the skill gaps for our engineering team vs market demand",
   "How many learners are preparing for leadership roles?",
-  "Show learning engagement by department over time",
+  "Show learning engagement by job role over time",
   "What content has the highest satisfaction scores?"
 ];
 
@@ -187,7 +187,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         title: "Engineering Team Skill Gaps vs Market Demand",
         metrics: ["Current Level %", "Market Demand %", "Gap"],
         attributes: ["Technical Skills"],
-        filters: ["Engineering Department", "Market Analysis 2024"],
+        filters: ["Engineering Job Role", "Market Analysis 2024"],
         data: [
           { name: "Kubernetes", current: 35, demand: 85, gap: 50 },
           { name: "Machine Learning", current: 42, demand: 78, gap: 36 },
@@ -207,7 +207,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         type: "pie",
         title: "Learners Preparing for Leadership Roles",
         metrics: ["Learner Count", "Progress %"],
-        attributes: ["Leadership Track", "Department"],
+        attributes: ["Leadership Track", "Job Role"],
         filters: ["Active Leadership Programs"],
         data: [
           { name: "Middle Management", value: 312, progress: 67 },
@@ -221,51 +221,51 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       };
     }
     
-    // Learning engagement by department over time
-    if (lowerQuery.includes("engagement") && (lowerQuery.includes("department") || lowerQuery.includes("time"))) {
+    // Learning engagement by job role over time
+    if (lowerQuery.includes("engagement") && (lowerQuery.includes("job role") || lowerQuery.includes("time"))) {
       return {
         id: `viz-${Date.now()}`,
         type: "line",
-        title: "Learning Engagement by Department - 6 Month Trend",
+        title: "Learning Engagement by Job Role - 6 Month Trend",
         metrics: ["Engagement Score (%)", "Active Learners", "Course Completions"],
-        attributes: ["Department", "Month", "Engagement Rate"],
-        filters: ["All Departments", "Past 6 months"],
+        attributes: ["Job Role", "Month", "Engagement Rate"],
+        filters: ["All Job Roles", "Past 6 months"],
         data: [
           { 
             month: "Apr 2024", 
             name: "Apr",
             engagement: 76,
-            departments: "8 departments"
+            jobRoles: "8 job roles"
           },
           { 
             month: "May 2024", 
             name: "May",
             engagement: 79,
-            departments: "8 departments"
+            jobRoles: "8 job roles"
           },
           { 
             month: "Jun 2024", 
             name: "Jun",
             engagement: 82,
-            departments: "8 departments"
+            jobRoles: "8 job roles"
           },
           { 
             month: "Jul 2024", 
             name: "Jul",
             engagement: 85,
-            departments: "8 departments"
+            jobRoles: "8 job roles"
           },
           { 
             month: "Aug 2024", 
             name: "Aug",
             engagement: 88,
-            departments: "8 departments"
+            jobRoles: "8 job roles"
           },
           { 
             month: "Sep 2024", 
             name: "Sep",
             engagement: 91,
-            departments: "8 departments"
+            jobRoles: "8 job roles"
           }
         ],
         canModify: true,
@@ -322,8 +322,8 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return "Analyzing leadership preparation programs...\n\nHere's a pie chart showing Learners Preparing for Leadership Roles.\n\nCurrent status:\n• 780 total learners actively engaged in leadership tracks\n• Middle Management track has highest enrollment (312 learners)\n• Team Lead track shows best progress at 78% completion\n• Executive preparation programs need additional support";
     }
     
-    if (lowerQuery.includes("engagement") && (lowerQuery.includes("department") || lowerQuery.includes("time"))) {
-      return "Creating new visualization...\n\nHere's a line chart showing Learning Engagement by Department Over Time.\n\nPositive trends identified:\n• All departments show consistent improvement\n• HR leads with 95% engagement score\n• Engineering shows strongest growth (78% to 94%)\n• 6-month average improvement: 16 percentage points";
+    if (lowerQuery.includes("engagement") && (lowerQuery.includes("job role") || lowerQuery.includes("time"))) {
+      return "Creating new visualization...\n\nHere's a line chart showing Learning Engagement by Job Role Over Time.\n\nPositive trends identified:\n• All job roles show consistent improvement\n• HR leads with 95% engagement score\n• Engineering shows strongest growth (78% to 94%)\n• 6-month average improvement: 16 percentage points";
     }
     
     if (lowerQuery.includes("satisfaction") || (lowerQuery.includes("content") && lowerQuery.includes("score"))) {
@@ -337,7 +337,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     const lowerQuery = queryText.toLowerCase();
     const allSuggestions = [
       "Switch to a bar chart",
-      "Break down by department",
+      "Break down by job role",
       "Add time filter for last quarter", 
       "Show by learning pathway",
       "Compare with previous period",
@@ -447,7 +447,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     }));
   };
 
-  const handleDepartmentBreakdown = (messageId: string) => {
+  const handleJobRoleBreakdown = (messageId: string) => {
     setChatMessages(prev => prev.map(message => {
       if (message.id === messageId && message.visualization) {
         const deptData = [
@@ -463,11 +463,11 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           ...message,
           visualization: {
             ...message.visualization,
-            type: "bar", // Horizontal bar chart for department breakdown
-            title: message.visualization.title.replace(/by Pathway|by Engineering|by Skills/gi, "by Department"),
+            type: "bar", // Horizontal bar chart for job role breakdown
+            title: message.visualization.title.replace(/by Pathway|by Engineering|by Skills/gi, "by Job Role"),
             data: deptData,
-            attributes: ["Department", "Learning Progress"],
-            filters: [...message.visualization.filters, "Department Breakdown"]
+            attributes: ["Job Role", "Learning Progress"],
+            filters: [...message.visualization.filters, "Job Role Breakdown"]
           }
         };
       }
@@ -824,10 +824,10 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 variant="outline" 
                 size="sm" 
                 className="text-xs h-7"
-                onClick={() => handleDepartmentBreakdown(message.id)}
+                onClick={() => handleJobRoleBreakdown(message.id)}
               >
                 <Users className="h-3 w-3 mr-1" />
-                Break down by department
+                Break down by job role
               </Button>
             </div>
           )}
