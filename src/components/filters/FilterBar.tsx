@@ -75,6 +75,15 @@ const rolesOptions = [
   "Engineering Manager"
 ];
 
+const customAttributeOptions = [
+  "Budget",
+  "Completion Status",
+  "Compliance",
+  "Learning Hours",
+  "Onboarding",
+  "Skill Proficiency"
+].sort();
+
 interface FilterBarProps {
   showRoles?: boolean;
 }
@@ -149,6 +158,17 @@ export function FilterBar({ showRoles = false }: FilterBarProps) {
             />
           </div>
         )}
+
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground min-w-fit">Custom Attribute</span>
+          <MultiSelectFilter
+            label="Custom Attribute"
+            options={customAttributeOptions}
+            selected={filters.customAttribute}
+            onChange={(value) => updateFilter('customAttribute', value)}
+            placeholder="All"
+          />
+        </div>
       </div>
 
       <Button

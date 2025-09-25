@@ -11,6 +11,7 @@ export interface FilterableDataItem {
   skills?: string[];
   groups?: string[];
   roles?: string[];
+  customAttribute?: string[];
   [key: string]: any;
 }
 
@@ -71,6 +72,16 @@ export function filterData<T extends FilterableDataItem>(
         filters.roles.includes(role)
       );
       if (!hasMatchingRole) {
+        return false;
+      }
+    }
+
+    // Custom Attribute filter
+    if (filters.customAttribute.length > 0 && item.customAttribute) {
+      const hasMatchingCustomAttribute = item.customAttribute.some(attr => 
+        filters.customAttribute.includes(attr)
+      );
+      if (!hasMatchingCustomAttribute) {
         return false;
       }
     }
