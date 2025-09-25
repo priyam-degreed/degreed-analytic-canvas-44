@@ -257,7 +257,7 @@ export default function SkillProgression() {
         {/* Stacked Column Chart */}
         <ChartCard 
           title="Skill Distribution Over Time"
-          subtitle={`Rating distribution for ${selectedRole} - ${selectedSkill}`}
+          subtitle="Rating distribution across different skill levels over time"
         >
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={stackedData}>
@@ -281,7 +281,7 @@ export default function SkillProgression() {
         {/* Line Chart */}
         <ChartCard 
           title="Skill Progression Score" 
-          subtitle={`Average rating progression for ${selectedRole}`}
+          subtitle="Average rating progression across multiple skills"
         >
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={lineData}>
