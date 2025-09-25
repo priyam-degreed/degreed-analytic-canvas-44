@@ -114,17 +114,17 @@ export function SkillInsightsFilterBar({ onFilterChange }: SkillInsightsFilterBa
   };
 
   return (
-    <div className="flex items-center gap-3 p-4 bg-muted/30 border border-border rounded-lg mb-6 flex-wrap">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground min-w-fit">Date Range</span>
+    <div className="flex items-center gap-2 p-3 bg-muted/30 border border-border rounded-lg mb-6 flex-wrap">
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Date:</span>
         <DateRangeFilter
           value={filters.dateRange}
           onChange={(value) => handleFilterChange('dateRange', value)}
         />
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground min-w-fit">Content Type</span>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Type:</span>
         <MultiSelectFilter
           label="Content Type"
           options={contentTypeOptions}
@@ -134,8 +134,8 @@ export function SkillInsightsFilterBar({ onFilterChange }: SkillInsightsFilterBa
         />
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground min-w-fit">Provider</span>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Provider:</span>
         <MultiSelectFilter
           label="Provider"
           options={providerOptions}
@@ -145,8 +145,8 @@ export function SkillInsightsFilterBar({ onFilterChange }: SkillInsightsFilterBa
         />
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground min-w-fit">Skills</span>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Skills:</span>
         <MultiSelectFilter
           label="Skills"
           options={skillsOptions}
@@ -156,8 +156,8 @@ export function SkillInsightsFilterBar({ onFilterChange }: SkillInsightsFilterBa
         />
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground min-w-fit">Groups</span>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Groups:</span>
         <MultiSelectFilter
           label="Groups"
           options={groupsOptions}
@@ -167,8 +167,8 @@ export function SkillInsightsFilterBar({ onFilterChange }: SkillInsightsFilterBa
         />
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground min-w-fit">Role</span>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Role:</span>
         <MultiSelectFilter
           label="Role"
           options={rolesOptions}
