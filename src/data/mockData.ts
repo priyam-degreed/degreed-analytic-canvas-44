@@ -1,6 +1,61 @@
 // Comprehensive LXP Mock Data for Degreed Analytics Platform
+import { FilterableDataItem } from '@/hooks/useFilteredData';
 
-// Learning Engagement Data
+// Enhanced data interfaces with filterable properties
+export interface LearningActivityItem extends FilterableDataItem {
+  id: string;
+  date: string;
+  contentType: string;
+  provider: string;
+  skills: string[];
+  groups: string[];
+  roles: string[];
+  title: string;
+  completionRate: number;
+  avgRating: number;
+  learners: number;
+  hours: number;
+}
+
+export interface EngagementMetricsItem extends FilterableDataItem {
+  id: string;
+  date: string;
+  contentType: string;
+  provider: string;
+  skills: string[];
+  groups: string[];
+  roles: string[];
+  activeUsers: number;
+  completions: number;
+  hours: number;
+  avgRating: number;
+}
+
+// Sample filter values for consistency
+const sampleContentTypes = ["Article", "Course", "Video", "Assessment", "Podcast", "Book", "Event", "Academy"];
+const sampleProviders = ["Codecademy", "Udemy", "Coursera", "LinkedIn Learning", "Pluralsight", "Cloud Academy", "edX", "Skillsoft"];
+const sampleSkills = ["Leadership", "Data Analytics", "Machine Learning", "Python Programming", "Project Management", "Cloud Computing", "Business Intelligence", "Innovation", "Java", "Business Analysis"];
+const sampleGroups = ["Engineering Team", "Data Science Team", "Product Team", "Marketing Team", "Sales Team", "Design Team", "Operations Team", "HR Team"];
+const sampleRoles = ["Developer", "Data Scientist", "Product Manager", "Designer", "Marketing Specialist", "SDET", "DevOps Engineer", "Business Analyst"];
+
+// Function to generate random filterable properties
+function generateFilterableProps(): Partial<FilterableDataItem> {
+  return {
+    contentType: sampleContentTypes[Math.floor(Math.random() * sampleContentTypes.length)],
+    provider: sampleProviders[Math.floor(Math.random() * sampleProviders.length)],
+    skills: Array.from({ length: Math.floor(Math.random() * 3) + 1 }, () => 
+      sampleSkills[Math.floor(Math.random() * sampleSkills.length)]
+    ).filter((skill, index, arr) => arr.indexOf(skill) === index),
+    groups: Array.from({ length: Math.floor(Math.random() * 2) + 1 }, () => 
+      sampleGroups[Math.floor(Math.random() * sampleGroups.length)]
+    ).filter((group, index, arr) => arr.indexOf(group) === index),
+    roles: Array.from({ length: Math.floor(Math.random() * 2) + 1 }, () => 
+      sampleRoles[Math.floor(Math.random() * sampleRoles.length)]
+    ).filter((role, index, arr) => arr.indexOf(role) === index),
+  };
+}
+
+// Enhanced Learning Engagement Data
 export const learningEngagementData = {
   totalLearners: 15420,
   activeUsersThisWeek: 8934,
@@ -14,24 +69,133 @@ export const learningEngagementData = {
     thisMonth: 2045,
     avgPerLearner: 4.2
   },
+  // Enhanced with filterable properties
   engagementTrends: [
-    { date: "2024-07", completions: 892, hours: 3420, activeUsers: 7234 },
-    { date: "2024-08", completions: 1045, hours: 3890, activeUsers: 7892 },
-    { date: "2024-09", completions: 1234, hours: 4201, activeUsers: 8934 }
+    { 
+      id: "eng-1", 
+      date: "2024-07-15", 
+      completions: 892, 
+      hours: 3420, 
+      activeUsers: 7234,
+      ...generateFilterableProps()
+    },
+    { 
+      id: "eng-2", 
+      date: "2024-08-15", 
+      completions: 1045, 
+      hours: 3890, 
+      activeUsers: 7892,
+      ...generateFilterableProps()
+    },
+    { 
+      id: "eng-3", 
+      date: "2024-09-15", 
+      completions: 1234, 
+      hours: 4201, 
+      activeUsers: 8934,
+      ...generateFilterableProps()
+    }
   ],
+  // Enhanced content modalities with filterable properties
   contentModalities: [
-    { type: "Articles", usage: 4521, completionRate: 78, avgRating: 4.2 },
-    { type: "Videos", usage: 3892, completionRate: 85, avgRating: 4.5 },
-    { type: "Pathways", usage: 2156, completionRate: 67, avgRating: 4.3 },
-    { type: "Assessments", usage: 1734, completionRate: 92, avgRating: 3.9 },
-    { type: "Podcasts", usage: 1223, completionRate: 74, avgRating: 4.1 }
+    { 
+      id: "mod-1",
+      type: "Articles", 
+      usage: 4521, 
+      completionRate: 78, 
+      avgRating: 4.2,
+      date: "2024-09-15",
+      contentType: "Article",
+      ...generateFilterableProps()
+    },
+    { 
+      id: "mod-2",
+      type: "Videos", 
+      usage: 3892, 
+      completionRate: 85, 
+      avgRating: 4.5,
+      date: "2024-09-15",
+      contentType: "Course",
+      ...generateFilterableProps()
+    },
+    { 
+      id: "mod-3",
+      type: "Pathways", 
+      usage: 2156, 
+      completionRate: 67, 
+      avgRating: 4.3,
+      date: "2024-09-15",
+      contentType: "Course",
+      ...generateFilterableProps()
+    },
+    { 
+      id: "mod-4",
+      type: "Assessments", 
+      usage: 1734, 
+      completionRate: 92, 
+      avgRating: 3.9,
+      date: "2024-09-15",
+      contentType: "Assessment",
+      ...generateFilterableProps()
+    },
+    { 
+      id: "mod-5",
+      type: "Podcasts", 
+      usage: 1223, 
+      completionRate: 74, 
+      avgRating: 4.1,
+      date: "2024-09-15",
+      contentType: "Podcast",
+      ...generateFilterableProps()
+    }
   ],
+  // Enhanced trending topics
   trendingTopics: [
-    { topic: "Artificial Intelligence", learners: 2340, growth: 145 },
-    { topic: "Cloud Computing", learners: 1987, growth: 89 },
-    { topic: "Data Science", learners: 1765, growth: 67 },
-    { topic: "Cybersecurity", learners: 1543, growth: 123 },
-    { topic: "Agile Methodology", learners: 1432, growth: 56 }
+    { 
+      id: "topic-1",
+      topic: "Artificial Intelligence", 
+      learners: 2340, 
+      growth: 145,
+      date: "2024-09-15",
+      skills: ["Machine Learning", "Data Analytics"],
+      ...generateFilterableProps()
+    },
+    { 
+      id: "topic-2",
+      topic: "Cloud Computing", 
+      learners: 1987, 
+      growth: 89,
+      date: "2024-09-15",
+      skills: ["Cloud Computing"],
+      ...generateFilterableProps()
+    },
+    { 
+      id: "topic-3",
+      topic: "Data Science", 
+      learners: 1765, 
+      growth: 67,
+      date: "2024-09-15",
+      skills: ["Data Analytics", "Python Programming"],
+      ...generateFilterableProps()
+    },
+    { 
+      id: "topic-4",
+      topic: "Cybersecurity", 
+      learners: 1543, 
+      growth: 123,
+      date: "2024-09-15",
+      skills: ["Business Intelligence"],
+      ...generateFilterableProps()
+    },
+    { 
+      id: "topic-5",
+      topic: "Agile Methodology", 
+      learners: 1432, 
+      growth: 56,
+      date: "2024-09-15",
+      skills: ["Project Management"],
+      ...generateFilterableProps()
+    }
   ]
 };
 

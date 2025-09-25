@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ViewModeProvider } from "@/contexts/ViewModeContext";
+import { FilterProvider } from "@/contexts/FilterContext";
 import Dashboard from "./pages/Dashboard";
 import { ManagerView } from "./pages/manager/ManagerView";
 import { ManagerDashboard } from "./pages/manager/ManagerDashboard";
@@ -34,10 +35,11 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <ViewModeProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+      <FilterProvider>
+        <ViewModeProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<AppLayout />}>
               <Route index element={<Dashboard />} />
@@ -78,8 +80,9 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </ViewModeProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </FilterProvider>
+  </TooltipProvider>
+</QueryClientProvider>
 );
 
 export default App;

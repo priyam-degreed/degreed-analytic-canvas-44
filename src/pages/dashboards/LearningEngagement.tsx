@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, Clock, BookOpen, Play, Award, Target, Share, Edit, Download } from "lucide-react";
 import { learningEngagementData } from "@/data/mockData";
 import { FilterBar } from "@/components/filters/FilterBar";
+import { useFilters } from "@/contexts/FilterContext";
+import { useFilteredData, useFilteredMetrics } from "@/hooks/useFilteredData";
 import { 
   AreaChart, 
   Area, 
@@ -23,6 +25,52 @@ import {
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', '#8884d8'];
 
 export default function LearningEngagement() {
+  const { filters } = useFilters();
+  
+  // Filter the data based on current filters
+  const filteredEngagementTrends = useFilteredData(learningEngagementData.engagementTrends, filters);
+  const filteredContentModalities = useFilteredData(learningEngagementData.contentModalities, filters);
+  const filteredTrendingTopics = useFilteredData(learningEngagementData.trendingTopics, filters);
+  
+  // Calculate filtered metrics
+  const metrics = useFilteredMetrics(
+    [...filteredEngagementTrends, ...filteredContentModalities, ...filteredTrendingTopics], 
+    filters,
+    (data) => {
+      const totalCompletions = filteredEngagementTrends.reduce((sum, item) => sum + item.completions, 0);
+      const totalHours = filteredEngagementTrends.reduce((sum, item) => sum + item.hours, 0);
+      const totalActiveUsers = filteredEngagementTrends.reduce((sum, item) => sum + item.activeUsers, 0);
+      const avgActiveUsers = filteredEngagementTrends.length > 0 ? Math.floor(totalActiveUsers / filteredEngagementTrends.length) : 0;
+      
+      const totalModalityUsage = filteredContentModalities.reduce((sum, item) => sum + item.usage, 0);
+      const avgCompletionRate = filteredContentModalities.length > 0 
+        ? filteredContentModalities.reduce((sum, item) => sum + item.completionRate, 0) / filteredContentModalities.length 
+        : 0;
+      
+      return {
+        totalLearners: filteredTrendingTopics.reduce((sum, topic) => sum + topic.learners, 0) || learningEngagementData.totalLearners,
+        activeUsersThisWeek: avgActiveUsers || learningEngagementData.activeUsersThisWeek,
+        courseCompletions: totalCompletions || learningEngagementData.courseCompletions.thisQuarter,
+        learningHours: totalHours || learningEngagementData.learningHours.total,
+        avgCompletionRate: Math.round(avgCompletionRate) || 75
+      };
+    }
+  );
+
+  // Job role data filtered by current filters
+  const roleData = [
+    { dept: "Engineering", hours: 8.5, learners: 1240, trend: 15 },
+    { dept: "Product", hours: 6.8, learners: 340, trend: 8 },
+    { dept: "Data Science", hours: 9.2, learners: 180, trend: 22 },
+    { dept: "Marketing", hours: 4.3, learners: 290, trend: -3 }
+  ].filter(role => {
+    if (filters.roles.length === 0) return true;
+    return filters.roles.some(selectedRole => 
+      role.dept.toLowerCase().includes(selectedRole.toLowerCase()) ||
+      selectedRole.toLowerCase().includes(role.dept.toLowerCase())
+    );
+  });
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -34,31 +82,31 @@ export default function LearningEngagement() {
       </div>
 
       {/* Filter Bar */}
-      <FilterBar />
+      <FilterBar showRoles={true} />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Total Active Learners"
-          value={learningEngagementData.totalLearners.toLocaleString()}
+          value={metrics.totalLearners.toLocaleString()}
           change={{ value: 15.3, type: "positive" }}
           icon={<Users className="h-5 w-5" />}
         />
         <MetricCard
           title="Active This Week"
-          value={learningEngagementData.activeUsersThisWeek.toLocaleString()}
+          value={metrics.activeUsersThisWeek.toLocaleString()}
           change={{ value: 8.9, type: "positive" }}
           icon={<TrendingUp className="h-5 w-5" />}
         />
         <MetricCard
           title="Course Completions"
-          value={learningEngagementData.courseCompletions.thisQuarter.toLocaleString()}
+          value={metrics.courseCompletions.toLocaleString()}
           change={{ value: learningEngagementData.courseCompletions.change, type: "positive" }}
           icon={<Award className="h-5 w-5" />}
         />
         <MetricCard
           title="Learning Hours"
-          value={`${learningEngagementData.learningHours.total.toLocaleString()}h`}
+          value={`${metrics.learningHours.toLocaleString()}h`}
           change={{ value: 12.4, type: "positive" }}
           icon={<Clock className="h-5 w-5" />}
         />
@@ -68,10 +116,10 @@ export default function LearningEngagement() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard
           title="Learning Engagement Trends"
-          subtitle="Monthly learning activity and user engagement"
+          subtitle={`Showing data for ${filteredEngagementTrends.length} periods`}
         >
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={learningEngagementData.engagementTrends}>
+            <AreaChart data={filteredEngagementTrends}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis />
@@ -84,14 +132,14 @@ export default function LearningEngagement() {
 
         <ChartCard
           title="Content Modality Performance"
-          subtitle="Usage and completion rates by content type"
+          subtitle={`${filteredContentModalities.length} content types filtered`}
         >
           <div className="space-y-4">
-            {learningEngagementData.contentModalities.map((modality, index) => (
+            {filteredContentModalities.map((modality, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
                     <span className="font-medium">{modality.type}</span>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -105,7 +153,7 @@ export default function LearningEngagement() {
                     className="h-2 rounded-full"
                     style={{
                       width: `${modality.completionRate}%`,
-                      backgroundColor: COLORS[index]
+                      backgroundColor: COLORS[index % COLORS.length]
                     }}
                   />
                 </div>
@@ -120,10 +168,10 @@ export default function LearningEngagement() {
         <div className="lg:col-span-2">
           <ChartCard
             title="Trending Learning Topics"
-            subtitle="Most popular skills and topics this month"
+            subtitle={`${filteredTrendingTopics.length} topics filtered`}
           >
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={learningEngagementData.trendingTopics}>
+              <BarChart data={filteredTrendingTopics}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="topic" 
@@ -151,20 +199,20 @@ export default function LearningEngagement() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium">Monthly Active Learners</span>
-                  <span className="text-sm text-muted-foreground">89%</span>
+                  <span className="text-sm text-muted-foreground">{Math.min(Math.round((metrics.activeUsersThisWeek / metrics.totalLearners) * 100), 100)}%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-green-500 h-2 rounded-full" style={{ width: '89%' }} />
+                  <div className="bg-green-500 h-2 rounded-full" style={{ width: `${Math.min(Math.round((metrics.activeUsersThisWeek / metrics.totalLearners) * 100), 100)}%` }} />
                 </div>
               </div>
               
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium">Course Completion Rate</span>
-                  <span className="text-sm text-muted-foreground">72%</span>
+                  <span className="text-sm text-muted-foreground">{metrics.avgCompletionRate}%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: '72%' }} />
+                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${metrics.avgCompletionRate}%` }} />
                 </div>
               </div>
               
@@ -194,7 +242,14 @@ export default function LearningEngagement() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Most Popular Format</span>
-                <span className="font-medium">Videos (85%)</span>
+                <span className="font-medium">
+                  {filteredContentModalities.length > 0 
+                    ? filteredContentModalities.sort((a, b) => b.completionRate - a.completionRate)[0].type 
+                    : "Videos"} 
+                  ({filteredContentModalities.length > 0 
+                    ? filteredContentModalities.sort((a, b) => b.completionRate - a.completionRate)[0].completionRate 
+                    : 85}%)
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Peak Learning Day</span>
@@ -212,15 +267,10 @@ export default function LearningEngagement() {
       {/* Learning Velocity */}
       <ChartCard
         title="Learning Velocity by Job Role"
-        subtitle="Average learning hours per employee by job role"
+        subtitle={`Average learning hours per employee - ${roleData.length} roles shown`}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { dept: "Engineering", hours: 8.5, learners: 1240, trend: 15 },
-            { dept: "Product", hours: 6.8, learners: 340, trend: 8 },
-            { dept: "Data Science", hours: 9.2, learners: 180, trend: 22 },
-            { dept: "Marketing", hours: 4.3, learners: 290, trend: -3 }
-          ].map((dept, index) => (
+          {roleData.map((dept, index) => (
             <div key={index} className="p-4 border rounded-lg space-y-2">
               <div className="flex justify-between items-center">
                 <h4 className="font-medium">{dept.dept}</h4>
