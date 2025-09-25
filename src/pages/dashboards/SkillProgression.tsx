@@ -270,18 +270,18 @@ export default function SkillProgression() {
         />
       </div>
 
-      {/* Main Charts Grid */}
-      <div className="grid gap-6 lg:grid-cols-2 mb-6">
-        {/* Progress Over Time Line Chart */}
-        <ChartCard 
-          title="Progress Over Time"
-          subtitle="Skill rating progression across time periods"
-        >
+      {/* Progress Over Time Chart */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Progress Over Time</CardTitle>
+          <CardDescription>Skill rating progression across time periods</CardDescription>
+        </CardHeader>
+        <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={progressData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="period" />
-              <YAxis domain={[0, 10]} />
+              <YAxis domain={[0, 8]} />
               <Tooltip />
               <Legend />
               {availableSkills.slice(0, 6).map((skill, index) => (
@@ -296,26 +296,29 @@ export default function SkillProgression() {
               ))}
             </LineChart>
           </ResponsiveContainer>
-        </ChartCard>
+        </CardContent>
+      </Card>
 
-        {/* Current vs Target Ratings */}
-        <ChartCard 
-          title="Current vs Target Ratings"
-          subtitle="Comparison between current and target skill levels"
-        >
+      {/* Current vs Target Ratings Chart */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Current vs Target Ratings</CardTitle>
+          <CardDescription>Comparison between current and target skill levels</CardDescription>
+        </CardHeader>
+        <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={currentVsTargetData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="skill" />
-              <YAxis domain={[0, 10]} />
+              <YAxis domain={[0, 8]} />
               <Tooltip />
               <Legend />
               <Bar dataKey="current" fill="#22d3ee" name="Current Rating" />
               <Bar dataKey="target" fill="#f472b6" name="Target Rating" />
             </BarChart>
           </ResponsiveContainer>
-        </ChartCard>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Skill vs Time Heatmap */}
       <Card className="mb-6">
