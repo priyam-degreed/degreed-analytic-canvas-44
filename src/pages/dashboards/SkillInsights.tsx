@@ -58,6 +58,8 @@ export default function SkillInsights() {
 
   // Generate filtered skill gaps
   const filteredSkillGaps = useMemo(() => {
+    console.log('Generating skill gaps from:', filteredSkillRatings.length, 'ratings');
+    
     const skillGaps = filteredSkillRatings.reduce((acc: any, rating) => {
       const skill = rating.skill;
       const gap = Math.max(0, rating.targetRating - rating.currentRating);
@@ -80,7 +82,9 @@ export default function SkillInsights() {
       return acc;
     }, {});
     
-    return Object.values(skillGaps).slice(0, 8); // Top 8 gaps
+    const result = Object.values(skillGaps).slice(0, 8); // Top 8 gaps
+    console.log('Generated skill gaps:', result);
+    return result;
   }, [filteredSkillRatings]);
 
   // Generate filtered top skills gained

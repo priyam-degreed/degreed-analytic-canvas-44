@@ -1,4 +1,4 @@
-// Comprehensive Mock Data Generator with Full Filter Coverage
+// Comprehensive Mock Data Generator with Full Filter Coverage - Updated with realistic role baselines
 import { FilterableDataItem } from '@/hooks/useFilteredData';
 import { addDays, subDays, format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter } from 'date-fns';
 
@@ -505,15 +505,23 @@ export function aggregateDataByPeriod<T extends { date: string }>(
   return grouped;
 }
 
-// Generate comprehensive datasets
+// Generate comprehensive datasets - Force regeneration with updated baselines
 export const comprehensiveLearningData = generateComprehensiveLearningData();
 export const comprehensiveSkillRatings = generateSkillRatingData();
 
-console.log('🚀 Mock Data Generated:', {
+console.log('🚀 Updated Mock Data Generated:', {
   learningDataCount: comprehensiveLearningData.length,
   skillRatingsCount: comprehensiveSkillRatings.length,
   sampleLearningItem: comprehensiveLearningData[0],
-  uniqueRoles: [...new Set(comprehensiveLearningData.flatMap(item => item.roles))]
+  sampleSkillRating: comprehensiveSkillRatings[0],
+  uniqueRoles: [...new Set(comprehensiveLearningData.flatMap(item => item.roles))],
+  skillRatingSample: comprehensiveSkillRatings.slice(0, 5).map(r => ({
+    role: r.roles[0], 
+    skill: r.skill, 
+    current: r.currentRating, 
+    target: r.targetRating,
+    gap: r.targetRating - r.currentRating
+  }))
 });
 
 // Export aggregated views for dashboard consumption
