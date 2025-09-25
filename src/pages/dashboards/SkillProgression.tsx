@@ -102,31 +102,49 @@ export default function SkillProgression() {
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
 
-  // Prepare stacked column chart data for selected role and skill
-  const stackedData = filteredData
-    .filter(item => item.role === selectedRole && item.skill === selectedSkill)
-    .map(item => ({
-      period: item.timePeriod,
-      Beginner: item.beginner,
-      Capable: item.capable,
-      Intermediate: item.intermediate,
-      Effective: item.effective,
-      Experienced: item.experienced,
-      Advanced: item.advanced,
-      Distinguished: item.distinguished,
-      Master: item.master
-    }));
-
-  // Prepare line chart data for skill progression
-  const lineData = availablePeriods.map(period => {
+  // Prepare line chart data for Progress Over Time
+  const progressData = availablePeriods.map(period => {
     const periodData: any = { period };
-    availableSkills.slice(0, 5).forEach(skill => { // Limit to 5 skills for readability
+    availableSkills.slice(0, 6).forEach(skill => { // Show top 6 skills
       const skillData = filteredData.find(
         item => item.timePeriod === period && item.skill === skill && availableRoles.includes(item.role)
       );
       periodData[skill] = skillData?.avgRating || 0;
     });
     return periodData;
+  });
+
+  // Prepare grouped bar chart data for Current vs Target Ratings
+  const currentVsTargetData = availableSkills.slice(0, 6).map(skill => {
+    const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
+    const avgCurrent = skillData.length > 0 ? 
+      skillData.reduce((sum, item) => sum + item.avgRating, 0) / skillData.length : 0;
+    const target = Math.min(avgCurrent + Math.random() * 2 + 0.5, 10); // Simulate target slightly higher
+    
+    return {
+      skill,
+      current: avgCurrent,
+      target: target
+    };
+  });
+
+  // Prepare skill gaps data for horizontal progress bars
+  const skillGapsData = availableSkills.slice(0, 6).map(skill => {
+    const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
+    const avgCurrent = skillData.length > 0 ? 
+      skillData.reduce((sum, item) => sum + item.avgRating, 0) / skillData.length : 0;
+    const target = Math.min(avgCurrent + Math.random() * 2 + 0.5, 10);
+    const gap = target - avgCurrent;
+    const priority = gap > 1.5 ? 'HIGH' : gap > 0.8 ? 'MEDIUM' : 'LOW';
+    
+    return {
+      skill,
+      current: avgCurrent,
+      target: target,
+      gap: gap,
+      priority: priority,
+      progress: (avgCurrent / target) * 100
+    };
   });
 
   // Generate dynamic data based on filters  
@@ -252,200 +270,214 @@ export default function SkillProgression() {
         />
       </div>
 
-      {/* Main Charts Grid */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Stacked Column Chart */}
-        <ChartCard 
-          title="Skill Distribution Over Time"
-          subtitle="Rating distribution across different skill levels over time"
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={stackedData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="period" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Beginner" stackId="a" fill={ratingColors.beginner} />
-              <Bar dataKey="Capable" stackId="a" fill={ratingColors.capable} />
-              <Bar dataKey="Intermediate" stackId="a" fill={ratingColors.intermediate} />
-              <Bar dataKey="Effective" stackId="a" fill={ratingColors.effective} />
-              <Bar dataKey="Experienced" stackId="a" fill={ratingColors.experienced} />
-              <Bar dataKey="Advanced" stackId="a" fill={ratingColors.advanced} />
-              <Bar dataKey="Distinguished" stackId="a" fill={ratingColors.distinguished} />
-              <Bar dataKey="Master" stackId="a" fill={ratingColors.master} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        {/* Line Chart */}
-        <ChartCard 
-          title="Skill Progression Score" 
-          subtitle="Average rating progression across multiple skills"
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={lineData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="period" />
-              <YAxis domain={[0, 8]} />
-              <Tooltip />
-              <Legend />
-              {availableSkills.slice(0, 5).map((skill, index) => (
-                <Line 
-                  key={skill}
-                  type="monotone" 
-                  dataKey={skill} 
-                  stroke={`hsl(${index * 60}, 70%, 50%)`}
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
-
-      {/* Bottom Row - Heatmap and Priority View */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Heatmap */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+      {/* Skill Progression Heatmap - Full Width */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🔥</span>
             <div>
-              <CardTitle>Skill vs Time Heatmap</CardTitle>
+              <CardTitle>Skill Progression Heatmap</CardTitle>
               <CardDescription>Average ratings across skills and time periods</CardDescription>
             </div>
-            {totalHeatmapPages > 1 && (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                  disabled={currentPage === 0}
-                >
-                  Previous
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  {currentPage + 1} of {totalHeatmapPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.min(totalHeatmapPages - 1, currentPage + 1))}
-                  disabled={currentPage === totalHeatmapPages - 1}
-                >
-                  Next
-                </Button>
-              </div>
-            )}
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {heatmapData.map((skillRow) => (
-                <div key={skillRow.skill} className="flex items-center gap-2">
-                  <div className="w-24 text-sm font-medium truncate">{skillRow.skill}</div>
-                  <div className="flex gap-1 flex-1">
-                     {availablePeriods.map((period) => {
-                       const value = skillRow[period] || 0;
-                       let backgroundColor, textColor;
-                       
-                       if (value >= 1 && value <= 2) {
-                         // Red gradient for 1-2
-                         const intensity = (value - 1) * 100; // 0-100%
-                         backgroundColor = `hsl(0, 75%, ${Math.max(85 - intensity, 45)}%)`;
-                         textColor = intensity > 50 ? 'white' : 'black';
-                       } else if (value >= 3 && value <= 4) {
-                         // Amber gradient for 3-4  
-                         const intensity = (value - 3) * 100; // 0-100%
-                         backgroundColor = `hsl(45, 85%, ${Math.max(85 - intensity, 35)}%)`;
-                         textColor = intensity > 50 ? 'black' : 'black';
-                       } else if (value >= 5 && value <= 8) {
-                         // Green gradient for 5-8
-                         const intensity = (value - 5) / 3 * 100; // 0-100%
-                         backgroundColor = `hsl(142, 76%, ${Math.max(85 - intensity, 25)}%)`;
-                         textColor = intensity > 50 ? 'white' : 'black';
-                       } else {
-                         // Default for 0 or invalid values
-                         backgroundColor = 'hsl(var(--muted))';
-                         textColor = 'hsl(var(--muted-foreground))';
-                       }
-                       
-                       return (
-                          <div
-                           key={period}
-                           className="flex-1 h-8 rounded border border-border flex items-center justify-center text-xs font-medium"
-                           style={{
-                             backgroundColor,
-                             color: textColor
-                           }}
-                           title={`${period}: ${value.toFixed(1)}`}
-                         >
-                           {value.toFixed(1)}
-                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Priority View - Bubble Chart */}
-        <div className="space-y-4">
-          <ChartCard 
-            title="Skill Investment Priorities" 
-            subtitle="Bubble size = employee count, color = change vs last quarter"
-          >
-          <ResponsiveContainer width="100%" height={300}>
-            <ScatterChart data={bubbleData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="importance" 
-                domain={[0, 10]}
-                name="Skill Importance"
-                type="number"
-              />
-              <YAxis 
-                dataKey="avgRating" 
-                domain={[0, 8]}
-                name="Average Rating"
-                type="number"
-              />
-              <Tooltip content={<CustomBubbleTooltip />} />
-              <Scatter name="Skills" dataKey="employeeCount">
-                {bubbleData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Scatter>
-            </ScatterChart>
-          </ResponsiveContainer>
-        </ChartCard>
-        
-        {totalBubblePages > 1 && (
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-              disabled={currentPage === 0}
-            >
-              Previous
-            </Button>
-            <span className="text-sm text-muted-foreground">
-              {currentPage + 1} of {totalBubblePages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(Math.min(totalBubblePages - 1, currentPage + 1))}
-              disabled={currentPage === totalBubblePages - 1}
-            >
-              Next
-            </Button>
           </div>
-        )}
+          {totalHeatmapPages > 1 && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                disabled={currentPage === 0}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {currentPage + 1} of {totalHeatmapPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.min(totalHeatmapPages - 1, currentPage + 1))}
+                disabled={currentPage === totalHeatmapPages - 1}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {heatmapData.map((skillRow) => (
+              <div key={skillRow.skill} className="flex items-center gap-2">
+                <div className="w-24 text-sm font-medium truncate">{skillRow.skill}</div>
+                <div className="flex gap-1 flex-1">
+                   {availablePeriods.map((period) => {
+                     const value = skillRow[period] || 0;
+                     let backgroundColor, textColor;
+                     
+                     if (value >= 1 && value <= 2) {
+                       // Red gradient for 1-2
+                       const intensity = (value - 1) * 100; // 0-100%
+                       backgroundColor = `hsl(0, 75%, ${Math.max(85 - intensity, 45)}%)`;
+                       textColor = intensity > 50 ? 'white' : 'black';
+                     } else if (value >= 3 && value <= 4) {
+                       // Amber gradient for 3-4  
+                       const intensity = (value - 3) * 100; // 0-100%
+                       backgroundColor = `hsl(45, 85%, ${Math.max(85 - intensity, 35)}%)`;
+                       textColor = intensity > 50 ? 'black' : 'black';
+                     } else if (value >= 5 && value <= 8) {
+                       // Green gradient for 5-8
+                       const intensity = (value - 5) / 3 * 100; // 0-100%
+                       backgroundColor = `hsl(142, 76%, ${Math.max(85 - intensity, 25)}%)`;
+                       textColor = intensity > 50 ? 'white' : 'black';
+                     } else {
+                       // Default for 0 or invalid values
+                       backgroundColor = 'hsl(var(--muted))';
+                       textColor = 'hsl(var(--muted-foreground))';
+                     }
+                     
+                     return (
+                        <div
+                         key={period}
+                         className="flex-1 h-8 rounded border border-border flex items-center justify-center text-xs font-medium"
+                         style={{
+                           backgroundColor,
+                           color: textColor
+                         }}
+                         title={`${period}: ${value.toFixed(1)}`}
+                       >
+                         {value.toFixed(1)}
+                       </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Heatmap Legend */}
+          <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t">
+            <span className="text-sm text-muted-foreground">Low</span>
+            <div className="flex gap-1">
+              <div className="w-4 h-4 rounded bg-blue-600"></div>
+              <div className="w-4 h-4 rounded bg-blue-500"></div>
+              <div className="w-4 h-4 rounded bg-blue-400"></div>
+              <div className="w-4 h-4 rounded bg-blue-300"></div>
+              <div className="w-4 h-4 rounded bg-blue-200"></div>
+            </div>
+            <span className="text-sm text-muted-foreground">High</span>
+            <div className="flex items-center gap-1 ml-4 text-sm text-muted-foreground">
+              <span>0</span>
+              <span className="mx-2">5</span>
+              <span>10</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Main Charts Grid */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Progress Over Time Line Chart */}
+        <div className="flex items-start gap-2">
+          <span className="text-lg mt-1">📊</span>
+          <ChartCard 
+            title="Progress Over Time"
+            subtitle="Skill rating progression across time periods"
+          >
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={progressData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="period" />
+                <YAxis domain={[0, 10]} />
+                <Tooltip />
+                <Legend />
+                {availableSkills.slice(0, 6).map((skill, index) => (
+                  <Line 
+                    key={skill}
+                    type="monotone" 
+                    dataKey={skill} 
+                    stroke={`hsl(${index * 60}, 70%, 50%)`}
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        </div>
+
+        {/* Current vs Target Ratings */}
+        <div className="flex items-start gap-2">
+          <span className="text-lg mt-1">🎯</span>
+          <ChartCard 
+            title="Current vs Target Ratings"
+            subtitle="Comparison between current and target skill levels"
+          >
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={currentVsTargetData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="skill" />
+                <YAxis domain={[0, 10]} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="current" fill="#22d3ee" name="Current Rating" />
+                <Bar dataKey="target" fill="#f472b6" name="Target Rating" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
         </div>
       </div>
+
+      {/* Skill Gaps & Priority Areas */}
+      <Card>
+        <CardHeader className="flex flex-row items-center gap-2">
+          <span className="text-lg">⚡</span>
+          <div>
+            <CardTitle>Skill Gaps & Priority Areas</CardTitle>
+            <CardDescription>Priority areas requiring skill development focus</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {skillGapsData.map((skill) => (
+              <div key={skill.skill} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="font-medium min-w-[120px]">{skill.skill}</span>
+                    <Badge 
+                      variant={skill.priority === 'HIGH' ? 'destructive' : skill.priority === 'MEDIUM' ? 'secondary' : 'outline'}
+                      className="text-xs"
+                    >
+                      {skill.priority}
+                    </Badge>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg font-bold text-red-500">
+                      {skill.gap > 0 ? '-' : ''}{Math.abs(skill.gap).toFixed(1)}
+                    </span>
+                    <div className="text-xs text-muted-foreground">to target</div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="w-full bg-muted rounded-full h-6">
+                    <div 
+                      className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-6 rounded-full flex items-center justify-end pr-2"
+                      style={{ width: `${Math.min(skill.progress, 100)}%` }}
+                    >
+                      <span className="text-white text-xs font-medium">
+                        {skill.current.toFixed(1)}
+                      </span>
+                    </div>
+                  </div>
+                  <div 
+                    className="absolute top-0 w-1 h-6 bg-red-400"
+                    style={{ left: `${Math.min((skill.target / 10) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Skills Summary Table */}
       <Card>
