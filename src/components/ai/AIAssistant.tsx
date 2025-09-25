@@ -878,10 +878,19 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       />
       
       {/* Modal */}
-      <div className={cn(
-        "fixed bottom-6 right-6 w-[480px] bg-white rounded-xl shadow-2xl border z-50 transition-all duration-300 animate-scale-in",
-        isMinimized ? "h-16" : "h-[700px]"
-      )}>
+      <div 
+        className={cn(
+          "fixed w-[480px] bg-white rounded-xl shadow-2xl border z-40 transition-all duration-200",
+          isMinimized ? "h-16" : "h-[700px]"
+        )}
+        style={{ 
+          bottom: '24px', 
+          right: '88px', // Positioned to the left of sticky icon
+          transform: isOpen ? 'scale(1)' : 'scale(0.95)',
+          opacity: isOpen ? 1 : 0,
+          pointerEvents: isOpen ? 'auto' : 'none'
+        }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-xl">
           <div className="flex items-center gap-3">
