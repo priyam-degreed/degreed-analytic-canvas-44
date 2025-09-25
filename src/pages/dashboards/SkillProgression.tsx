@@ -524,36 +524,86 @@ export default function SkillProgression() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {allBubbleData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).map((skill) => (
-              <div key={skill.skill} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="font-medium">{skill.skill}</div>
-                   <Badge variant={skill.avgRating >= 6 ? "default" : skill.avgRating >= 4 ? "secondary" : "destructive"}>
-                     {(skill.avgRating || 0).toFixed(1)}/8.0
-                   </Badge>
-                 </div>
-                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                   <span>Gap: {Math.max(0, 6 - (skill.avgRating || 0)).toFixed(1)}</span>
-                   <span>Employees: {skill.employeeCount || 0}</span>
-                   <div className="flex items-center gap-1">
-                     {(skill.changeVsLastQuarter || 0) > 0 ? (
-                       <ArrowUpIcon className="w-4 h-4 text-green-600" />
-                     ) : (skill.changeVsLastQuarter || 0) < 0 ? (
-                       <ArrowDownIcon className="w-4 h-4 text-red-600" />
-                     ) : (
-                       <MinusIcon className="w-4 h-4 text-muted-foreground" />
-                     )}
-                     <span className={
-                       (skill.changeVsLastQuarter || 0) > 0 ? "text-green-600" :
-                       (skill.changeVsLastQuarter || 0) < 0 ? "text-red-600" :
-                       "text-muted-foreground"
-                     }>
-                       {Math.abs((skill.changeVsLastQuarter || 0) * 100).toFixed(1)}%
-                     </span>
+            {allBubbleData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).map((skill) => {
+              const currentRating = skill.avgRating || 0;
+              const targetRating = 6; // Target rating of 6
+              const gap = Math.max(0, targetRating - currentRating);
+              const progressPercentage = (currentRating / 8) * 100; // Scale to 8-point system
+              const targetPercentage = (targetRating / 8) * 100;
+              
+              return (
+                <div key={skill.skill} className="p-4 border border-border rounded-lg space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="font-medium text-lg">{skill.skill}</div>
+                      <Badge variant={currentRating >= 6 ? "default" : currentRating >= 4 ? "secondary" : "destructive"}>
+                        Current: {currentRating.toFixed(1)}/8.0
+                      </Badge>
+                      <Badge variant="outline">
+                        Target: {targetRating.toFixed(1)}/8.0
+                      </Badge>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-muted-foreground">Gap to Target</div>
+                      <span className="text-lg font-bold text-red-500">
+                        {gap > 0 ? '-' : ''}{gap.toFixed(1)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Horizontal Gauge */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>Current Level: {currentRating.toFixed(1)}</span>
+                      <span>Target: {targetRating.toFixed(1)}</span>
+                    </div>
+                    <div className="relative">
+                      <div className="w-full bg-muted rounded-full h-8">
+                        <div 
+                          className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-8 rounded-full flex items-center justify-end pr-3 transition-all duration-300"
+                          style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                        >
+                          <span className="text-white text-sm font-medium">
+                            {currentRating.toFixed(1)}
+                          </span>
+                        </div>
+                      </div>
+                      {/* Target marker */}
+                      <div 
+                        className="absolute top-0 w-1 h-8 bg-red-500 rounded-full"
+                        style={{ left: `${Math.min(targetPercentage, 100)}%` }}
+                        title={`Target: ${targetRating}`}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>0</span>
+                      <span>8</span>
+                    </div>
+                  </div>
+                  
+                  {/* Additional Info */}
+                  <div className="flex items-center justify-between text-sm text-muted-foreground pt-2 border-t">
+                    <span>Employees: {skill.employeeCount || 0}</span>
+                    <div className="flex items-center gap-1">
+                      {(skill.changeVsLastQuarter || 0) > 0 ? (
+                        <ArrowUpIcon className="w-4 h-4 text-green-600" />
+                      ) : (skill.changeVsLastQuarter || 0) < 0 ? (
+                        <ArrowDownIcon className="w-4 h-4 text-red-600" />
+                      ) : (
+                        <MinusIcon className="w-4 h-4 text-muted-foreground" />
+                      )}
+                      <span className={
+                        (skill.changeVsLastQuarter || 0) > 0 ? "text-green-600" :
+                        (skill.changeVsLastQuarter || 0) < 0 ? "text-red-600" :
+                        "text-muted-foreground"
+                      }>
+                        {Math.abs((skill.changeVsLastQuarter || 0) * 100).toFixed(1)}% vs last quarter
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           
           {Math.ceil(allBubbleData.length / itemsPerPage) > 1 && (
