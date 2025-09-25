@@ -518,13 +518,41 @@ export default function SkillProgression() {
 
       {/* Skills Summary Table */}
       <Card>
-        <CardHeader>
-          <CardTitle>Current Skill Gaps & Targets</CardTitle>
-          <CardDescription>Skills requiring attention based on target ratings</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Current Skill Gaps & Targets</CardTitle>
+            <CardDescription>Skills requiring attention based on target ratings</CardDescription>
+          </div>
+          {Math.ceil(allBubbleData.length / 5) > 1 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                Showing {currentPage * 5 + 1}-{Math.min((currentPage + 1) * 5, allBubbleData.length)} of {allBubbleData.length} skills
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                disabled={currentPage === 0}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {currentPage + 1} of {Math.ceil(allBubbleData.length / 5)}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.min(Math.ceil(allBubbleData.length / 5) - 1, currentPage + 1))}
+                disabled={currentPage === Math.ceil(allBubbleData.length / 5) - 1}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {allBubbleData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).map((skill) => {
+            {allBubbleData.slice(currentPage * 5, (currentPage + 1) * 5).map((skill) => {
               const currentRating = skill.avgRating || 0;
               const targetRating = skill.targetRating || (6 + Math.random() * 2); // Use target from data or random 6-8
               const gap = Math.max(0, targetRating - currentRating);
@@ -536,9 +564,6 @@ export default function SkillProgression() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="font-medium text-lg">{skill.skill}</div>
-                      <Badge variant="outline">
-                        Target: {targetRating.toFixed(1)}/8.0
-                      </Badge>
                     </div>
                     <div className="text-right">
                       <div className="text-sm text-muted-foreground">Gap to Target</div>
@@ -550,10 +575,6 @@ export default function SkillProgression() {
                   
                   {/* Horizontal Gauge */}
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>Current Level: {currentRating.toFixed(1)}</span>
-                      <span>Target: {targetRating.toFixed(1)}</span>
-                    </div>
                     <div className="relative">
                       <div className="w-full bg-muted rounded-full h-8">
                         <div 
@@ -569,7 +590,7 @@ export default function SkillProgression() {
                       <div 
                         className="absolute top-0 w-1 h-8 bg-red-500 rounded-full"
                         style={{ left: `${Math.min(targetPercentage, 100)}%` }}
-                        title={`Target: ${targetRating}`}
+                        title={`Target: ${targetRating.toFixed(1)}`}
                       ></div>
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground">
@@ -602,30 +623,6 @@ export default function SkillProgression() {
               );
             })}
           </div>
-          
-          {Math.ceil(allBubbleData.length / itemsPerPage) > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-4 border-t">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                disabled={currentPage === 0}
-              >
-                Previous
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                {currentPage + 1} of {Math.ceil(allBubbleData.length / itemsPerPage)}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(Math.min(Math.ceil(allBubbleData.length / itemsPerPage) - 1, currentPage + 1))}
-                disabled={currentPage === Math.ceil(allBubbleData.length / itemsPerPage) - 1}
-              >
-                Next
-              </Button>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>
