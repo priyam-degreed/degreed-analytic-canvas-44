@@ -525,7 +525,6 @@ export default function SkillProgression() {
               <Tooltip content={<CustomLineTooltip />} />
               <Legend />
               {paginatedSkills.map((skill, index) => {
-                // Only dim the entire chart when a data point is highlighted
                 const isChartDimmed = highlightedDataPoint !== null;
                 
                 return (
@@ -537,22 +536,29 @@ export default function SkillProgression() {
                     strokeWidth={2}
                     strokeOpacity={isChartDimmed ? 0.2 : 1}
                     dot={(props: any) => {
+                      const currentPeriod = props.payload?.period;
                       const isThisDataPointHighlighted = highlightedDataPoint && 
                         highlightedDataPoint.skill === skill && 
-                        highlightedDataPoint.period === progressData[props.index]?.period;
+                        highlightedDataPoint.period === currentPeriod;
                       
                       return (
                         <circle
+                          key={`${skill}-${currentPeriod}-${props.index}`}
                           cx={props.cx}
                           cy={props.cy}
                           r={isThisDataPointHighlighted ? 8 : 4}
-                          fill={isThisDataPointHighlighted ? `hsl(${index * 60}, 70%, 50%)` : `hsl(${index * 60}, 70%, 50%)`}
+                          fill={`hsl(${index * 60}, 70%, 50%)`}
                           fillOpacity={isThisDataPointHighlighted ? 1 : (isChartDimmed ? 0.2 : 1)}
                           stroke={isThisDataPointHighlighted ? 'hsl(var(--background))' : undefined}
                           strokeWidth={isThisDataPointHighlighted ? 3 : 0}
-                          strokeOpacity={isThisDataPointHighlighted ? 1 : (isChartDimmed ? 0.2 : 1)}
                           style={{ cursor: 'pointer' }}
-                          onClick={() => handleLineChartClick({ activeLabel: progressData[props.index]?.period, activePayload: [{ dataKey: skill, value: props.payload[skill] }] }, skill)}
+                          onClick={() => {
+                            const clickData = {
+                              activeLabel: currentPeriod,
+                              activePayload: [{ dataKey: skill, value: props.payload[skill] }]
+                            };
+                            handleLineChartClick(clickData, skill);
+                          }}
                         />
                       );
                     }}
