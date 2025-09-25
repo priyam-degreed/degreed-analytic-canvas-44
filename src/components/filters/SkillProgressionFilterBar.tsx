@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { MultiSelectFilter } from "./MultiSelectFilter";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
@@ -19,18 +18,12 @@ interface FilterState {
 }
 
 interface SkillProgressionFilterBarProps {
-  onFilterChange?: (filters: FilterState) => void;
+  filters: FilterState;
+  onFilterChange: (filters: FilterState) => void;
 }
 
 
-export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFilterBarProps) {
-  const [filters, setFilters] = useState<FilterState>({
-    roles: [],
-    skills: [],
-    timePeriod: [],
-    ratingLevels: [],
-    ratingTypes: []
-  });
+export function SkillProgressionFilterBar({ filters, onFilterChange }: SkillProgressionFilterBarProps) {
 
   const handleFilterChange = (filterType: keyof FilterState, value: any) => {
     const newFilters = { ...filters, [filterType]: value };
@@ -45,8 +38,7 @@ export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFi
       newFilters.skills = newFilters.skills.filter((skill: string) => applicableSkills.includes(skill));
     }
     
-    setFilters(newFilters);
-    onFilterChange?.(newFilters);
+    onFilterChange(newFilters);
   };
 
   const handleReset = () => {
@@ -57,8 +49,7 @@ export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFi
       ratingLevels: [],
       ratingTypes: []
     };
-    setFilters(resetFilters);
-    onFilterChange?.(resetFilters);
+    onFilterChange(resetFilters);
   };
 
   const ratingLevelOptions = ratingLevels.map(level => `${level.value} - ${level.label}`);
