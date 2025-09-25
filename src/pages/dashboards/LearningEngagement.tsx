@@ -74,28 +74,62 @@ export default function LearningEngagement() {
     };
   }, [filteredLearningData]);
   
-  // Debug logging - show filtered results
-  console.log('Filtered Learning Data Count:', filteredLearningData.length);
-  console.log('Applied Filters:', filters);
-  
-  // Pagination state for Current vs Target Ratings
-  const [ratingsCurrentPage, setRatingsCurrentPage] = useState(0);
-  const ratingsItemsPerPage = 5;
-  
-  // Use filtered skill ratings data for current vs target
-  const currentVsTargetData = filteredSkillRatings.map(rating => ({
-    skill: rating.skill,
-    current: rating.currentRating,
-    target: rating.targetRating,
-    employees: Math.floor(Math.random() * 50) + 20 // Mock employee count
-  })).slice(0, 15); // Limit to 15 skills for display
+  // Calculate current vs previous period comparison
+  const currentVsPrevComparison = useMemo(() => {
+    // Sort filtered data by date to get chronological order
+    const sortedData = [...filteredLearningData].sort((a, b) => a.date.localeCompare(b.date));
+    
+    if (sortedData.length === 0) {
+      return {
+        current: { completions: 0, hours: 0, activeUsers: 0 },
+        previous: { completions: 0, hours: 0, activeUsers: 0 },
+        comparison: []
+      };
+    }
 
-  const paginatedRatingsData = currentVsTargetData.slice(
-    ratingsCurrentPage * ratingsItemsPerPage,
-    (ratingsCurrentPage + 1) * ratingsItemsPerPage
-  );
+    // Split data into two halves (current vs previous period)
+    const midPoint = Math.floor(sortedData.length / 2);
+    const previousPeriod = sortedData.slice(0, midPoint);
+    const currentPeriod = sortedData.slice(midPoint);
 
-  const totalRatingsPages = Math.ceil(currentVsTargetData.length / ratingsItemsPerPage);
+    // Aggregate totals for each period
+    const currentTotals = currentPeriod.reduce((acc, item) => ({
+      completions: acc.completions + item.completions,
+      hours: acc.hours + item.hours,
+      activeUsers: acc.activeUsers + item.activeUsers
+    }), { completions: 0, hours: 0, activeUsers: 0 });
+
+    const previousTotals = previousPeriod.reduce((acc, item) => ({
+      completions: acc.completions + item.completions,
+      hours: acc.hours + item.hours,
+      activeUsers: acc.activeUsers + item.activeUsers
+    }), { completions: 0, hours: 0, activeUsers: 0 });
+
+    // Create comparison data for chart
+    const comparison = [
+      {
+        metric: 'Completions',
+        current: currentTotals.completions,
+        previous: previousTotals.completions
+      },
+      {
+        metric: 'Learning Hours',
+        current: currentTotals.hours,
+        previous: previousTotals.hours
+      },
+      {
+        metric: 'Active Users',
+        current: currentTotals.activeUsers,
+        previous: previousTotals.activeUsers
+      }
+    ];
+
+    return {
+      current: currentTotals,
+      previous: previousTotals,
+      comparison
+    };
+  }, [filteredLearningData]);
   
   // Calculate filtered metrics from aggregated data (no longer need separate filtering)
   const metrics = {
@@ -161,63 +195,78 @@ export default function LearningEngagement() {
         />
       </div>
 
-      {/* Current vs Target Ratings Chart with Pagination */}
+      {/* Current vs Previous Period Learning Completion */}
       <ChartCard
-        title="Current vs Target Ratings"
-        subtitle={`Skill ratings comparison - Page ${ratingsCurrentPage + 1} of ${totalRatingsPages} (${currentVsTargetData.length} skills total)`}
+        title="How much learning was completed in this period? Current vs Prev"
+        subtitle="Comparison of learning metrics between current and previous periods"
       >
-        <div className="space-y-4">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart 
-                data={paginatedRatingsData} 
-                layout="horizontal" 
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" domain={[0, 5]} />
-                <YAxis type="category" dataKey="skill" width={120} />
-                <Tooltip 
-                  formatter={(value, name) => [
-                    `${value}/5`, 
-                    name === 'current' ? 'Current Rating' : 'Target Rating'
-                  ]}
-                  labelFormatter={(label) => `Skill: ${label}`}
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--popover))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '6px'
-                  }}
-                />
-                <Bar dataKey="current" fill="hsl(var(--primary))" name="current" />
-                <Bar dataKey="target" fill="hsl(var(--secondary))" name="target" />
-              </BarChart>
-            </ResponsiveContainer>
+        <div className="space-y-6">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart 
+              data={currentVsPrevComparison.comparison}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="metric" />
+              <YAxis />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--popover))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+              />
+              <Bar dataKey="current" fill="hsl(var(--primary))" name="Current Period" />
+              <Bar dataKey="previous" fill="hsl(var(--secondary))" name="Previous Period" />
+            </BarChart>
+          </ResponsiveContainer>
           
-          {/* Pagination Controls */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setRatingsCurrentPage(prev => Math.max(0, prev - 1))}
-                disabled={ratingsCurrentPage === 0}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setRatingsCurrentPage(prev => Math.min(totalRatingsPages - 1, prev + 1))}
-                disabled={ratingsCurrentPage === totalRatingsPages - 1}
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 border rounded-lg">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {currentVsPrevComparison.current.completions.toLocaleString()}
+                </div>
+                <div className="text-sm text-muted-foreground">Current Completions</div>
+                <div className="text-xs text-green-600 mt-1">
+                  {currentVsPrevComparison.previous.completions > 0 
+                    ? `${((currentVsPrevComparison.current.completions - currentVsPrevComparison.previous.completions) / currentVsPrevComparison.previous.completions * 100).toFixed(1)}%`
+                    : 'N/A'
+                  } vs prev
+                </div>
+              </div>
             </div>
-            <span className="text-sm text-muted-foreground">
-              Showing {ratingsCurrentPage * ratingsItemsPerPage + 1}-{Math.min((ratingsCurrentPage + 1) * ratingsItemsPerPage, currentVsTargetData.length)} of {currentVsTargetData.length} skills
-            </span>
+            
+            <div className="p-4 border rounded-lg">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {currentVsPrevComparison.current.hours.toLocaleString()}h
+                </div>
+                <div className="text-sm text-muted-foreground">Current Hours</div>
+                <div className="text-xs text-green-600 mt-1">
+                  {currentVsPrevComparison.previous.hours > 0 
+                    ? `${((currentVsPrevComparison.current.hours - currentVsPrevComparison.previous.hours) / currentVsPrevComparison.previous.hours * 100).toFixed(1)}%`
+                    : 'N/A'
+                  } vs prev
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 border rounded-lg">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {currentVsPrevComparison.current.activeUsers.toLocaleString()}
+                </div>
+                <div className="text-sm text-muted-foreground">Current Active Users</div>
+                <div className="text-xs text-green-600 mt-1">
+                  {currentVsPrevComparison.previous.activeUsers > 0 
+                    ? `${((currentVsPrevComparison.current.activeUsers - currentVsPrevComparison.previous.activeUsers) / currentVsPrevComparison.previous.activeUsers * 100).toFixed(1)}%`
+                    : 'N/A'
+                  } vs prev
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </ChartCard>
