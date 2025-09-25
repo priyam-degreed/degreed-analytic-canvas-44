@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Search, 
@@ -83,6 +85,9 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [visualizationToSave, setVisualizationToSave] = useState<VisualizationData | null>(null);
+  const [visualizationName, setVisualizationName] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -493,11 +498,28 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     }));
   };
 
-  const handleSaveVisualization = () => {
+  const handleSaveVisualization = (visualization?: VisualizationData) => {
+    if (visualization) {
+      setVisualizationToSave(visualization);
+      setVisualizationName(visualization.title);
+      setShowSaveDialog(true);
+    }
+  };
+
+  const handleConfirmSave = () => {
     toast({
       title: "Visualization Saved",
-      description: "Your visualization has been saved to your dashboard library.",
+      description: `"${visualizationName}" has been saved to your dashboard library.`,
     });
+    setShowSaveDialog(false);
+    setVisualizationToSave(null);
+    setVisualizationName("");
+  };
+
+  const handleCancelSave = () => {
+    setShowSaveDialog(false);
+    setVisualizationToSave(null);
+    setVisualizationName("");
   };
 
   const handleOpenInAnalyze = () => {
@@ -785,7 +807,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                       variant="ghost" 
                       size="sm" 
                       className="w-full justify-start text-sm"
-                      onClick={handleSaveVisualization}
+                      onClick={() => handleSaveVisualization(viz)}
                     >
                       <BookmarkPlus className="h-4 w-4 mr-2" />
                       Save
@@ -1095,6 +1117,48 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           </div>
         )}
       </div>
+
+      {/* Save Visualization Dialog */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white">Name your visualization</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-300">
+              Give your new visualization a new descriptive name, so it's easier to find it later on.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="viz-name" className="text-white text-sm font-medium">
+                NAME
+              </Label>
+              <Input
+                id="viz-name"
+                value={visualizationName}
+                onChange={(e) => setVisualizationName(e.target.value)}
+                placeholder="Enter visualization name..."
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={handleCancelSave}
+                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmSave}
+                disabled={!visualizationName.trim()}
+                className="bg-pink-600 hover:bg-pink-700 text-white"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
