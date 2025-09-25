@@ -231,11 +231,40 @@ function generateRatingDistribution(avgRating: number) {
 
 export const skillDistributionData: SkillDistribution[] = generateSkillDistributionData();
 
+// Skill-specific target levels for more realistic targets
+const skillTargets: Record<string, number> = {
+  'Machine Learning': 6.5,
+  'Python': 7.2,
+  'React': 6.8,
+  'CSS': 6.0,
+  'JavaScript': 6.9,
+  'SQL': 7.0,
+  'Leadership': 6.3,
+  'AWS': 6.4,
+  'Docker': 5.8,
+  'TypeScript': 6.6,
+  'Node.js': 6.7,
+  'System Design': 7.1,
+  'Communication': 6.2,
+  'Analytics': 6.1,
+  'Design Systems': 5.9,
+  'Java': 6.5,
+  'Kubernetes': 6.0,
+  'Product Strategy': 6.4,
+};
+
+// Get target level for a skill (with fallback)
+function getSkillTarget(skill: string): number {
+  return skillTargets[skill] || (5.5 + Math.random() * 1.5); // Default range 5.5-7.0
+}
+
 // Generate diversified mock skill progression entries with realistic rating type patterns
 function generateSkillProgressionEntries(): SkillProgressionEntry[] {
   const entries: SkillProgressionEntry[] = [];
   
   skillDistributionData.forEach((item, index) => {
+    const skillTarget = getSkillTarget(item.skill);
+    
     // Create entries for each rating type with realistic variations
     ['Self', 'Peer', 'Manager'].forEach((ratingType, typeIndex) => {
       let adjustedRating = item.avgRating;
@@ -270,15 +299,18 @@ function generateSkillProgressionEntries(): SkillProgressionEntry[] {
         employeeCount: Math.floor(Math.random() * 30) + 15, // Smaller groups for each rating type
         avgRating: Math.round(adjustedRating * 10) / 10,
         progressionPercent: Math.random() * 25 + 5, // 5-30% progression
-        skillGapToTarget: Math.max(0, 6 - adjustedRating), // Target rating of 6
+        skillGapToTarget: Math.max(0, skillTarget - adjustedRating),
         skillImportance: Math.random() * 10 + 1, // 1-10 importance scale
-        targetRating: 6
+        targetRating: Number(skillTarget.toFixed(1))
       });
     });
   });
   
   return entries;
 }
+
+// Export the getSkillTarget function for use in components
+export { getSkillTarget };
 
 export const skillProgressionEntries: SkillProgressionEntry[] = generateSkillProgressionEntries();
 

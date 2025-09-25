@@ -12,6 +12,7 @@ import {
   Line, 
   ScatterChart, 
   Scatter, 
+  ComposedChart,
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -36,7 +37,8 @@ import {
   generateHeatmapData,
   generateBubbleData,
   roleSkillMapping,
-  periodLabels
+  periodLabels,
+  getSkillTarget
 } from "@/data/skillProgressionData";
 
 // Custom colors for different rating levels
@@ -205,7 +207,8 @@ export default function SkillProgression() {
       skill,
       Self: selfRatings.length > 0 ? Number((selfRatings.reduce((sum, e) => sum + e.avgRating, 0) / selfRatings.length).toFixed(1)) : 0,
       Peer: peerRatings.length > 0 ? Number((peerRatings.reduce((sum, e) => sum + e.avgRating, 0) / peerRatings.length).toFixed(1)) : 0,
-      Manager: managerRatings.length > 0 ? Number((managerRatings.reduce((sum, e) => sum + e.avgRating, 0) / managerRatings.length).toFixed(1)) : 0
+      Manager: managerRatings.length > 0 ? Number((managerRatings.reduce((sum, e) => sum + e.avgRating, 0) / managerRatings.length).toFixed(1)) : 0,
+      Target: getSkillTarget(skill)
     };
   });
 
@@ -385,11 +388,11 @@ export default function SkillProgression() {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Skills vs Rating Type</CardTitle>
-          <CardDescription>Comparison of ratings across Self, Peer, and Manager assessments</CardDescription>
+          <CardDescription>Comparison of ratings across Self, Peer, and Manager assessments with target levels</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <BarChart 
+            <ComposedChart 
               data={skillsByRatingTypeData}
               margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
             >
@@ -408,7 +411,16 @@ export default function SkillProgression() {
               <Bar dataKey="Self" fill="#10b981" name="Self Rating" />
               <Bar dataKey="Peer" fill="#3b82f6" name="Peer Rating" />
               <Bar dataKey="Manager" fill="#f59e0b" name="Manager Rating" />
-            </BarChart>
+              <Line 
+                type="monotone" 
+                dataKey="Target" 
+                stroke="#ef4444" 
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ fill: '#ef4444', r: 4 }}
+                name="Target Level"
+              />
+            </ComposedChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
