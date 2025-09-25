@@ -502,7 +502,7 @@ export default function SkillProgression() {
           )}
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
+          <div className="space-y-1">
             {allBubbleData.slice(currentPage * 5, (currentPage + 1) * 5).map((skill) => {
               const currentRating = skill.avgRating || 0;
               const targetRating = skill.targetRating || (6 + Math.random() * 2); // Use target from data or random 6-8
@@ -511,62 +511,51 @@ export default function SkillProgression() {
               const targetPercentage = (targetRating / 8) * 100;
               
               return (
-                <div key={skill.skill} className="p-2 border border-border rounded-lg space-y-2">
+                <div key={skill.skill} className="p-1 border border-border rounded space-y-1">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="font-medium text-base">{skill.skill}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs text-muted-foreground">Gap to Target</div>
-                      <span className="text-base font-bold text-red-500">
-                        {gap > 0 ? '-' : ''}{gap.toFixed(1)}
-                      </span>
-                    </div>
+                    <div className="font-medium text-sm">{skill.skill}</div>
+                    <span className="text-sm font-bold text-red-500">
+                      {gap > 0 ? '-' : ''}{gap.toFixed(1)}
+                    </span>
                   </div>
                   
                   {/* Horizontal Gauge */}
-                  <div className="space-y-1">
-                    <div className="relative">
-                      <div className="w-full bg-muted rounded-full h-4">
-                        <div 
-                          className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-4 rounded-full flex items-center justify-end pr-2 transition-all duration-300"
-                          style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                        >
-                          <span className="text-white text-xs font-medium">
-                            {currentRating.toFixed(1)}
-                          </span>
-                        </div>
-                      </div>
-                      {/* Target marker */}
+                  <div className="relative">
+                    <div className="w-full bg-muted rounded-full h-2">
                       <div 
-                        className="absolute top-0 w-1 h-4 bg-red-500 rounded-full"
-                        style={{ left: `${Math.min(targetPercentage, 100)}%` }}
-                        title={`Target: ${targetRating.toFixed(1)}`}
-                      ></div>
+                        className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-2 rounded-full flex items-center justify-end pr-1 transition-all duration-300"
+                        style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                      >
+                        <span className="text-white text-xs font-medium">
+                          {currentRating.toFixed(1)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>0</span>
-                      <span>8</span>
-                    </div>
+                    {/* Target marker */}
+                    <div 
+                      className="absolute top-0 w-0.5 h-2 bg-red-500"
+                      style={{ left: `${Math.min(targetPercentage, 100)}%` }}
+                      title={`Target: ${targetRating.toFixed(1)}`}
+                    ></div>
                   </div>
                   
                   {/* Additional Info */}
-                  <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t">
-                    <span>Employees: {skill.employeeCount || 0}</span>
-                    <div className="flex items-center gap-1">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{skill.employeeCount || 0} emp</span>
+                    <div className="flex items-center gap-0.5">
                       {(skill.changeVsLastQuarter || 0) > 0 ? (
-                        <ArrowUpIcon className="w-3 h-3 text-green-600" />
+                        <ArrowUpIcon className="w-2 h-2 text-green-600" />
                       ) : (skill.changeVsLastQuarter || 0) < 0 ? (
-                        <ArrowDownIcon className="w-3 h-3 text-red-600" />
+                        <ArrowDownIcon className="w-2 h-2 text-red-600" />
                       ) : (
-                        <MinusIcon className="w-3 h-3 text-muted-foreground" />
+                        <MinusIcon className="w-2 h-2 text-muted-foreground" />
                       )}
                       <span className={
                         (skill.changeVsLastQuarter || 0) > 0 ? "text-green-600" :
                         (skill.changeVsLastQuarter || 0) < 0 ? "text-red-600" :
                         "text-muted-foreground"
                       }>
-                        {Math.abs((skill.changeVsLastQuarter || 0) * 100).toFixed(1)}% vs last quarter
+                        {Math.abs((skill.changeVsLastQuarter || 0) * 100).toFixed(0)}%
                       </span>
                     </div>
                   </div>
