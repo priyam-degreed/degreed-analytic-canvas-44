@@ -467,55 +467,6 @@ export default function SkillProgression() {
         </CardContent>
       </Card>
 
-      {/* Skill Gaps & Priority Areas */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Skill Gaps & Priority Areas</CardTitle>
-          <CardDescription>Priority areas requiring skill development focus</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {skillGapsData.map((skill) => (
-              <div key={skill.skill} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="font-medium min-w-[120px]">{skill.skill}</span>
-                    <Badge 
-                      variant={skill.priority === 'HIGH' ? 'destructive' : skill.priority === 'MEDIUM' ? 'secondary' : 'outline'}
-                      className="text-xs"
-                    >
-                      {skill.priority}
-                    </Badge>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-lg font-bold text-red-500">
-                      {skill.gap > 0 ? '-' : ''}{Math.abs(skill.gap).toFixed(1)}
-                    </span>
-                    <div className="text-xs text-muted-foreground">to target</div>
-                  </div>
-                </div>
-                <div className="relative">
-                  <div className="w-full bg-muted rounded-full h-6">
-                    <div 
-                      className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-6 rounded-full flex items-center justify-end pr-2"
-                      style={{ width: `${Math.min(skill.progress, 100)}%` }}
-                    >
-                      <span className="text-white text-xs font-medium">
-                        {skill.current.toFixed(1)}
-                      </span>
-                    </div>
-                  </div>
-                  <div 
-                    className="absolute top-0 w-1 h-6 bg-red-400"
-                    style={{ left: `${Math.min((skill.target / 10) * 100, 100)}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Skills Summary Table */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
