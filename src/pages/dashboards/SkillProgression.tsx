@@ -419,12 +419,6 @@ export default function SkillProgression() {
                 strokeDasharray="5 5"
                 dot={{ fill: '#ef4444', r: 4 }}
                 name="Target Level"
-                label={{ 
-                  position: 'top', 
-                  fill: '#ef4444', 
-                  fontSize: 11,
-                  fontWeight: 'bold'
-                }}
               />
             </ComposedChart>
           </ResponsiveContainer>
