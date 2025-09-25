@@ -392,6 +392,101 @@ export default function LearningEngagement() {
         </div>
       </ChartCard>
 
+      {/* Learning Completions by Provider */}
+      <ChartCard
+        title="Learning Completions (In Period) by Item & Provider"
+        subtitle="Q3 2025"
+      >
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Pie Chart */}
+          <div className="flex-1">
+            <ResponsiveContainer width="100%" height={400}>
+              <PieChart>
+                <Pie
+                  data={Object.entries(
+                    filteredLearningData.reduce((acc: Record<string, number>, item) => {
+                      const provider = item.provider || 'Unknown';
+                      if (!acc[provider]) {
+                        acc[provider] = 0;
+                      }
+                      acc[provider] += item.completions;
+                      return acc;
+                    }, {})
+                  ).map(([provider, completions], index) => ({
+                    name: provider,
+                    value: completions as number,
+                    fill: COLORS[index % COLORS.length]
+                  })).sort((a, b) => b.value - a.value)}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value }) => `${name}\n${value}`}
+                  outerRadius={120}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {Object.entries(
+                    filteredLearningData.reduce((acc: Record<string, number>, item) => {
+                      const provider = item.provider || 'Unknown';
+                      if (!acc[provider]) {
+                        acc[provider] = 0;
+                      }
+                      acc[provider] += item.completions;
+                      return acc;
+                    }, {})
+                  ).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--popover))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            
+            {/* Total Count */}
+            <div className="mt-4 text-left">
+              <div className="text-sm text-muted-foreground">Learning Completions (in Period)</div>
+              <div className="text-4xl font-bold">
+                {filteredLearningData.reduce((sum, item) => sum + item.completions, 0)}
+              </div>
+            </div>
+          </div>
+
+          {/* Legend */}
+          <div className="lg:w-64">
+            <div className="space-y-2">
+              {Object.entries(
+                filteredLearningData.reduce((acc: Record<string, number>, item) => {
+                  const provider = item.provider || 'Unknown';
+                  if (!acc[provider]) {
+                    acc[provider] = 0;
+                  }
+                  acc[provider] += item.completions;
+                  return acc;
+                }, {})
+              )
+              .map(([provider, completions], index) => ({ provider, completions: completions as number, index }))
+              .sort((a, b) => b.completions - a.completions)
+              .map(({ provider, completions, index }) => (
+                <div key={provider} className="flex items-center gap-3">
+                  <div 
+                    className="w-3 h-3 rounded-full flex-shrink-0" 
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  />
+                  <span className="text-sm font-medium flex-1">{provider}</span>
+                  <span className="text-sm text-muted-foreground">{completions}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </ChartCard>
+
       {/* Engagement Trends */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard
