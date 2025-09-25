@@ -140,19 +140,66 @@ export default function LearningEngagement() {
     avgCompletionRate: Math.round(aggregatedMetrics.avgEngagement) || 75
   };
 
-  // Job role data filtered by current filters
-  const roleData = [
-    { dept: "Engineering", hours: 8.5, learners: 1240, trend: 15 },
-    { dept: "Product", hours: 6.8, learners: 340, trend: 8 },
-    { dept: "Data Science", hours: 9.2, learners: 180, trend: 22 },
-    { dept: "Marketing", hours: 4.3, learners: 290, trend: -3 }
-  ].filter(role => {
-    if (filters.roles.length === 0) return true;
-    return filters.roles.some(selectedRole => 
-      role.dept.toLowerCase().includes(selectedRole.toLowerCase()) ||
-      selectedRole.toLowerCase().includes(role.dept.toLowerCase())
-    );
-  });
+  // Enhanced job role data structure from filtered learning data
+  const roleComparisonData = useMemo(() => {
+    // Group filtered data by role and period
+    const roleAggregation = filteredLearningData.reduce((acc: any, item) => {
+      if (!item.roles || item.roles.length === 0) return acc;
+      
+      item.roles.forEach(role => {
+        if (!acc[role]) {
+          acc[role] = {
+            role,
+            currentPeriod: { completions: 0, hours: 0, learners: 0, engagementRate: 0, count: 0 },
+            previousPeriod: { completions: 0, hours: 0, learners: 0, engagementRate: 0, count: 0 }
+          };
+        }
+        
+        // Determine period based on date (split data into current vs previous)
+        const itemDate = new Date(item.date);
+        const sortedData = [...filteredLearningData].sort((a, b) => a.date.localeCompare(b.date));
+        const midPoint = Math.floor(sortedData.length / 2);
+        const midDate = sortedData[midPoint]?.date;
+        
+        const period = item.date >= midDate ? 'currentPeriod' : 'previousPeriod';
+        
+        acc[role][period].completions += item.completions;
+        acc[role][period].hours += item.hours;
+        acc[role][period].learners += item.learners;
+        acc[role][period].engagementRate += item.engagementRate;
+        acc[role][period].count += 1;
+      });
+      
+      return acc;
+    }, {});
+
+    // Convert to array and calculate averages
+    return Object.values(roleAggregation).map((roleData: any) => ({
+      ...roleData,
+      currentPeriod: {
+        ...roleData.currentPeriod,
+        avgEngagementRate: roleData.currentPeriod.count > 0 
+          ? roleData.currentPeriod.engagementRate / roleData.currentPeriod.count 
+          : 0
+      },
+      previousPeriod: {
+        ...roleData.previousPeriod,
+        avgEngagementRate: roleData.previousPeriod.count > 0 
+          ? roleData.previousPeriod.engagementRate / roleData.previousPeriod.count 
+          : 0
+      },
+      change: roleData.currentPeriod.completions - roleData.previousPeriod.completions
+    }))
+    .filter(roleData => {
+      // Apply role filter if specified
+      if (filters.roles.length === 0) return true;
+      return filters.roles.some(selectedRole => 
+        roleData.role.toLowerCase().includes(selectedRole.toLowerCase()) ||
+        selectedRole.toLowerCase().includes(roleData.role.toLowerCase())
+      );
+    })
+    .sort((a, b) => b.currentPeriod.completions - a.currentPeriod.completions); // Sort by current completions
+  }, [filteredLearningData, filters.roles]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -277,11 +324,11 @@ export default function LearningEngagement() {
               <div className="space-y-4">
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart 
-                    data={roleData.map(role => ({
-                      role: role.dept,
-                      current: Math.floor(role.learners * 0.3), // Mock current completions
-                      previous: Math.floor(role.learners * 0.2), // Mock previous completions
-                      change: Math.floor(role.learners * 0.1)
+                    data={roleComparisonData.map(role => ({
+                      role: role.role,
+                      current: role.currentPeriod.completions,
+                      previous: role.previousPeriod.completions,
+                      change: role.change
                     }))}
                     layout="horizontal"
                     margin={{ top: 5, right: 80, left: 80, bottom: 5 }}
@@ -531,21 +578,30 @@ export default function LearningEngagement() {
       {/* Learning Velocity */}
       <ChartCard
         title="Learning Velocity by Job Role"
-        subtitle={`Average learning hours per employee - ${roleData.length} roles shown`}
+        subtitle={`Average learning hours per employee - ${roleComparisonData.length} roles shown`}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {roleData.map((dept, index) => (
-            <div key={index} className="p-4 border rounded-lg space-y-2">
-              <div className="flex justify-between items-center">
-                <h4 className="font-medium">{dept.dept}</h4>
-                <span className={`text-sm ${dept.trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {dept.trend > 0 ? '+' : ''}{dept.trend}%
-                </span>
+          {roleComparisonData.map((role, index) => {
+            const avgHours = role.currentPeriod.count > 0 
+              ? (role.currentPeriod.hours / role.currentPeriod.count).toFixed(1)
+              : '0.0';
+            const changePercent = role.previousPeriod.hours > 0
+              ? (((role.currentPeriod.hours - role.previousPeriod.hours) / role.previousPeriod.hours) * 100).toFixed(1)
+              : '0.0';
+            
+            return (
+              <div key={index} className="p-4 border rounded-lg space-y-2">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-medium">{role.role}</h4>
+                  <span className={`text-sm ${parseFloat(changePercent) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {parseFloat(changePercent) > 0 ? '+' : ''}{changePercent}%
+                  </span>
+                </div>
+                <div className="text-2xl font-bold text-primary">{avgHours}h</div>
+                <div className="text-sm text-muted-foreground">{role.currentPeriod.learners} learners</div>
               </div>
-              <div className="text-2xl font-bold text-primary">{dept.hours}h</div>
-              <div className="text-sm text-muted-foreground">{dept.learners} learners</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </ChartCard>
     </div>
