@@ -675,58 +675,38 @@ export default function LearningEngagement() {
         title="Learning Velocity by Job Role"
         subtitle={`Average learning hours per employee - ${roleComparisonData.length} roles shown`}
       >
-        <ResponsiveContainer width="100%" height={300}>
-          <AreaChart
-            data={roleComparisonData.map(role => {
-              const avgCurrentHours = role.currentPeriod.count > 0 
-                ? (role.currentPeriod.hours / role.currentPeriod.count)
-                : 0;
-              const avgPreviousHours = role.previousPeriod.count > 0 
-                ? (role.previousPeriod.hours / role.previousPeriod.count)
-                : 0;
-              
-              return {
-                role: role.role,
-                currentHours: Number(avgCurrentHours.toFixed(1)),
-                previousHours: Number(avgPreviousHours.toFixed(1)),
-                learners: role.currentPeriod.learners
-              };
-            })}
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="role" />
-            <YAxis label={{ value: 'Hours', angle: -90, position: 'insideLeft' }} />
-            <Tooltip 
-              formatter={(value, name) => [
-                `${value}h`, 
-                name === 'currentHours' ? 'Current Period' : 'Previous Period'
-              ]}
-              labelFormatter={(label) => `Role: ${label}`}
-              contentStyle={{
-                backgroundColor: 'hsl(var(--popover))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px'
-              }}
-            />
-            <Area 
-              type="monotone" 
-              dataKey="previousHours" 
-              stackId="1"
-              stroke="hsl(var(--muted-foreground))" 
-              fill="hsl(var(--muted))" 
-              name="Previous Period"
-            />
-            <Area 
-              type="monotone" 
-              dataKey="currentHours" 
-              stackId="2"
-              stroke="hsl(var(--primary))" 
-              fill="hsl(var(--primary))" 
-              name="Current Period"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        <div className="space-y-6">
+          {roleComparisonData.map((role, index) => {
+            const avgCurrentHours = role.currentPeriod.count > 0 
+              ? (role.currentPeriod.hours / role.currentPeriod.count)
+              : 0;
+            
+            // Calculate percentage based on max hours across all roles (for scaling the bars)
+            const maxHours = Math.max(...roleComparisonData.map(r => 
+              r.currentPeriod.count > 0 ? (r.currentPeriod.hours / r.currentPeriod.count) : 0
+            ));
+            const percentage = maxHours > 0 ? Math.round((avgCurrentHours / maxHours) * 100) : 0;
+            
+            // Color mapping for different roles
+            const colors = ['bg-blue-500', 'bg-green-500', 'bg-orange-500', 'bg-purple-500', 'bg-pink-500', 'bg-teal-500'];
+            const color = colors[index % colors.length];
+
+            return (
+              <div key={role.role}>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-sm font-medium text-foreground">{role.role}</span>
+                  <span className="text-sm font-semibold">{avgCurrentHours.toFixed(1)}h</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className={`${color} h-3 rounded-full transition-all duration-300`} 
+                    style={{ width: `${percentage}%` }} 
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </ChartCard>
     </div>
   );
