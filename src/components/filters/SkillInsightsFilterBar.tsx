@@ -190,7 +190,7 @@ export function SkillInsightsFilterBar({ onFilterChange }: SkillInsightsFilterBa
       </div>
 
       <div className="flex items-center gap-1.5">
-        <span className="text-xs text-muted-foreground whitespace-nowrap">Custom:</span>
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Custom Attribute:</span>
         <MultiSelectFilter
           label="Custom Attribute"
           options={customAttributeOptions}
