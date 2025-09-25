@@ -66,8 +66,8 @@ export const roleSkillMapping: Record<string, string[]> = {
   "Engineering Manager": ["Leadership", "People Management", "Strategic Planning", "Budget Management", "Process Improvement", "Team Development", "Communication", "Performance Management"]
 };
 
-// All unique skills across roles
-export const skillOptions = Array.from(new Set(Object.values(roleSkillMapping).flat())).sort();
+// All unique skills across roles, excluding 'R'
+export const skillOptions = Array.from(new Set(Object.values(roleSkillMapping).flat())).filter(skill => skill !== 'R').sort();
 
 // Time period options with fiscal structure
 export interface FiscalPeriod {

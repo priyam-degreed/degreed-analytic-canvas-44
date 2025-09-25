@@ -32,6 +32,7 @@ import {
 import { 
   skillProgressionMetrics,
   skillDistributionData,
+  skillProgressionEntries,
   generateHeatmapData,
   generateBubbleData,
   roleSkillMapping,
@@ -91,23 +92,27 @@ export default function SkillProgression() {
     // Rating level filter - independent, based on avgRating ranges
     const ratingLevelMatch = filters.ratingLevels.length === 0 || filters.ratingLevels.some(level => {
       const rating = item.avgRating;
-      switch(level) {
-        case 'Beginner (1-2)': return rating >= 1 && rating < 3;
-        case 'Capable (3-4)': return rating >= 3 && rating < 5;
-        case 'Intermediate (5-6)': return rating >= 5 && rating < 7;
-        case 'Advanced (7-8)': return rating >= 7 && rating <= 8;
-        default: return true;
-      }
+      // Extract the range from the format "1 - Beginner"
+      if (level.includes('1 - ')) return rating >= 1 && rating < 2;
+      if (level.includes('2 - ')) return rating >= 2 && rating < 3;
+      if (level.includes('3 - ')) return rating >= 3 && rating < 4;
+      if (level.includes('4 - ')) return rating >= 4 && rating < 5;
+      if (level.includes('5 - ')) return rating >= 5 && rating < 6;
+      if (level.includes('6 - ')) return rating >= 6 && rating < 7;
+      if (level.includes('7 - ')) return rating >= 7 && rating < 8;
+      if (level.includes('8 - ')) return rating >= 8 && rating <= 8;
+      return true;
     });
     
-    // Rating type filter - independent, based on data characteristics
+    // Rating type filter - independent, match against actual data
     const ratingTypeMatch = filters.ratingTypes.length === 0 || filters.ratingTypes.some(type => {
-      switch(type) {
-        case 'Self Assessment': return true; // Assuming all current data is self-assessment
-        case 'Manager Assessment': return false; // Not available in current dataset
-        case '360 Feedback': return false; // Not available in current dataset
-        default: return true;
-      }
+      // Find the actual rating type for this item from skillProgressionEntries
+      const entry = skillProgressionEntries.find(e => 
+        e.role === item.role && 
+        e.skillName === item.skill && 
+        e.timePeriod === item.timePeriod
+      );
+      return entry ? entry.ratingType === type : true;
     });
     
     // All filters must match (AND logic)
