@@ -141,17 +141,27 @@ export function generateComprehensiveLearningData(): ComprehensiveLearningItem[]
             for (let i = 0; i < entriesCount; i++) {
               const skills = getRandomElements(FILTER_OPTIONS.skills, 1, 3);
               const groups = getRandomElements(FILTER_OPTIONS.groups, 1, 2);
-              const roles = getRandomElements(FILTER_OPTIONS.roles, 1, 3);
+              
+              // Ensure better role distribution - select specific roles for variety
+              const popularRoles = [
+                "Software Engineer", "Senior Software Engineer", "Data Scientist", "Data Analyst",
+                "Product Manager", "UX Designer", "Engineering Manager", "DevOps Engineer",
+                "QA Engineer", "Business Analyst", "Tech Lead", "Project Manager"
+              ];
+              const roles = i === 0 ? [popularRoles[Math.floor(Math.random() * popularRoles.length)]] 
+                          : getRandomElements(FILTER_OPTIONS.roles, 1, 2);
+              
               const customAttribute = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
               
-              // Generate realistic metrics based on content type and provider
-              const baseLearners = getProviderMultiplier(provider) * getContentTypeMultiplier(contentType);
-              const learners = Math.max(10, getRandomInRange(baseLearners * 0.8, baseLearners * 1.2));
-              const completions = Math.floor(learners * getRandomFloat(0.6, 0.95));
-              const hours = Math.max(50, Math.floor(learners * getRandomFloat(3, 12)));
-              const engagementRate = getRandomFloat(35, 90);
+              // Generate more realistic metrics with higher completion rates for popular roles
+              const roleMultiplier = popularRoles.includes(roles[0]) ? 1.5 : 1.0;
+              const baseLearners = getProviderMultiplier(provider) * getContentTypeMultiplier(contentType) * roleMultiplier;
+              const learners = Math.max(15, getRandomInRange(baseLearners * 0.8, baseLearners * 1.3));
+              const completions = Math.floor(learners * getRandomFloat(0.65, 0.95));
+              const hours = Math.max(60, Math.floor(learners * getRandomFloat(4, 15)));
+              const engagementRate = getRandomFloat(40, 95);
               const avgRating = getRandomFloat(3.5, 4.8);
-              const activeUsers = Math.floor(learners * getRandomFloat(0.7, 0.95));
+              const activeUsers = Math.floor(learners * getRandomFloat(0.75, 0.95));
 
               data.push({
                 id: `comprehensive-${idCounter++}`,
