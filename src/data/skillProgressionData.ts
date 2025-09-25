@@ -278,8 +278,8 @@ export function generateBubbleData(filteredData: SkillDistribution[]) {
   return Array.from(skillStats.values()).map(stats => ({
     skill: stats.skill,
     importance: stats.importance,
-    avgRating: stats.totalRating / stats.count,
-    employeeCount: Math.floor(stats.employeeCount / stats.count),
+    avgRating: stats.count > 0 ? stats.totalRating / stats.count : 0,
+    employeeCount: stats.count > 0 ? Math.floor(stats.employeeCount / stats.count) : 0,
     changeVsLastQuarter: (Math.random() - 0.5) * 2
   }));
 }

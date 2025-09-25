@@ -219,21 +219,21 @@ export default function SkillProgression() {
         />
         <MetricCard
           title="Avg Skill Rating"
-          value={filteredMetrics.avgSkillRating.toFixed(1)}
+          value={(filteredMetrics.avgSkillRating || 0).toFixed(1)}
           icon={<Award className="h-5 w-5" />}
           change={{ value: "+12.5%", type: "positive" }}
           subtitle="Out of 8.0 scale"
         />
         <MetricCard
           title="Advanced+ Employees"
-          value={`${filteredMetrics.employeesAboveThreshold}%`}
+          value={`${filteredMetrics.employeesAboveThreshold || 0}%`}
           icon={<Target className="h-5 w-5" />}
           change={{ value: "+15.3%", type: "positive" }}
           subtitle="Rating 6+ (Advanced)"
         />
         <MetricCard
           title="Progression Rate"
-          value={`+${filteredMetrics.progressionPercent.toFixed(1)}%`}
+          value={`+${(filteredMetrics.progressionPercent || 0).toFixed(1)}%`}
           icon={<TrendingUp className="h-5 w-5" />}
           change={{ value: "+22.1%", type: "positive" }}
           subtitle="Vs previous period"
@@ -311,17 +311,17 @@ export default function SkillProgression() {
                       const value = skillRow[period];
                       const intensity = Math.round((value - 2) / 4 * 100); // Scale 2-6 to 0-100%
                       return (
-                        <div
-                          key={period}
-                          className="flex-1 h-8 rounded border border-border flex items-center justify-center text-xs font-medium"
-                          style={{
-                            backgroundColor: `hsl(142, 76%, ${Math.max(85 - intensity, 20)}%)`,
-                            color: intensity > 50 ? 'white' : 'black'
-                          }}
-                          title={`${period}: ${value.toFixed(1)}`}
-                        >
-                          {value.toFixed(1)}
-                        </div>
+                         <div
+                           key={period}
+                           className="flex-1 h-8 rounded border border-border flex items-center justify-center text-xs font-medium"
+                           style={{
+                             backgroundColor: `hsl(142, 76%, ${Math.max(85 - intensity, 20)}%)`,
+                             color: intensity > 50 ? 'white' : 'black'
+                           }}
+                           title={`${period}: ${(value || 0).toFixed(1)}`}
+                         >
+                           {(value || 0).toFixed(1)}
+                         </div>
                       );
                     })}
                   </div>
@@ -374,28 +374,28 @@ export default function SkillProgression() {
               <div key={skill.skill} className="flex items-center justify-between p-3 border border-border rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="font-medium">{skill.skill}</div>
-                  <Badge variant={skill.avgRating >= 6 ? "default" : skill.avgRating >= 4 ? "secondary" : "destructive"}>
-                    {skill.avgRating.toFixed(1)}/8.0
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>Gap: {Math.max(0, 6 - skill.avgRating).toFixed(1)}</span>
-                  <span>Employees: {skill.employeeCount}</span>
-                  <div className="flex items-center gap-1">
-                    {skill.changeVsLastQuarter > 0 ? (
-                      <ArrowUpIcon className="w-4 h-4 text-green-600" />
-                    ) : skill.changeVsLastQuarter < 0 ? (
-                      <ArrowDownIcon className="w-4 h-4 text-red-600" />
-                    ) : (
-                      <MinusIcon className="w-4 h-4 text-muted-foreground" />
-                    )}
-                    <span className={
-                      skill.changeVsLastQuarter > 0 ? "text-green-600" :
-                      skill.changeVsLastQuarter < 0 ? "text-red-600" :
-                      "text-muted-foreground"
-                    }>
-                      {Math.abs(skill.changeVsLastQuarter * 100).toFixed(1)}%
-                    </span>
+                   <Badge variant={skill.avgRating >= 6 ? "default" : skill.avgRating >= 4 ? "secondary" : "destructive"}>
+                     {(skill.avgRating || 0).toFixed(1)}/8.0
+                   </Badge>
+                 </div>
+                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                   <span>Gap: {Math.max(0, 6 - (skill.avgRating || 0)).toFixed(1)}</span>
+                   <span>Employees: {skill.employeeCount || 0}</span>
+                   <div className="flex items-center gap-1">
+                     {(skill.changeVsLastQuarter || 0) > 0 ? (
+                       <ArrowUpIcon className="w-4 h-4 text-green-600" />
+                     ) : (skill.changeVsLastQuarter || 0) < 0 ? (
+                       <ArrowDownIcon className="w-4 h-4 text-red-600" />
+                     ) : (
+                       <MinusIcon className="w-4 h-4 text-muted-foreground" />
+                     )}
+                     <span className={
+                       (skill.changeVsLastQuarter || 0) > 0 ? "text-green-600" :
+                       (skill.changeVsLastQuarter || 0) < 0 ? "text-red-600" :
+                       "text-muted-foreground"
+                     }>
+                       {Math.abs((skill.changeVsLastQuarter || 0) * 100).toFixed(1)}%
+                     </span>
                   </div>
                 </div>
               </div>
