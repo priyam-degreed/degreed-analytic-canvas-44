@@ -1,14 +1,10 @@
 import { useState } from "react";
 import { MultiSelectFilter } from "./MultiSelectFilter";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
 import { 
   roleOptions, 
   skillOptions, 
-  timePeriodOptions,
-  FiscalPeriod,
   ratingLevels, 
   ratingTypeOptions,
   roleSkillMapping
@@ -26,129 +22,6 @@ interface SkillProgressionFilterBarProps {
   onFilterChange?: (filters: FilterState) => void;
 }
 
-// Custom Period Filter Component
-function PeriodFilter({ 
-  selected, 
-  onChange 
-}: { 
-  selected: string[];
-  onChange: (periods: string[]) => void;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  // Group periods by fiscal year and quarter
-  const fiscalYears = Array.from(new Set(timePeriodOptions.map(p => p.fiscalYear)));
-  const groupedPeriods = fiscalYears.reduce((acc, fy) => {
-    acc[fy] = timePeriodOptions.filter(p => p.fiscalYear === fy);
-    return acc;
-  }, {} as Record<string, FiscalPeriod[]>);
-
-  const handlePeriodToggle = (value: string, checked: boolean) => {
-    if (checked) {
-      onChange([...selected, value]);
-    } else {
-      onChange(selected.filter(p => p !== value));
-    }
-  };
-
-  const handleSelectAll = () => {
-    const allPeriods = timePeriodOptions.map(p => p.value);
-    onChange(allPeriods);
-  };
-
-  const handleClearAll = () => {
-    onChange([]);
-  };
-
-  const getDisplayText = () => {
-    if (selected.length === 0) return "All Periods";
-    if (selected.length === 1) return selected[0];
-    return `${selected.length} periods selected`;
-  };
-
-  return (
-    <div className="relative">
-      <div 
-        className="flex h-8 items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-xs cursor-pointer hover:bg-accent hover:text-accent-foreground min-w-[120px]"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="truncate">{getDisplayText()}</span>
-        <svg className="h-3 w-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-        </svg>
-      </div>
-      
-      {isOpen && (
-        <div className="absolute z-50 mt-1 max-h-60 w-80 overflow-auto rounded-md border bg-popover p-2 shadow-lg">
-          <div className="flex items-center justify-between mb-3 pb-2 border-b">
-            <button 
-              className="text-xs text-blue-600 hover:text-blue-800 font-medium"
-              onClick={handleSelectAll}
-            >
-              Select All
-            </button>
-            <button 
-              className="text-xs text-muted-foreground hover:text-foreground"
-              onClick={handleClearAll}
-            >
-              Clear All
-            </button>
-          </div>
-          {Object.entries(groupedPeriods).map(([fiscalYear, periods]) => {
-            const quarters = Array.from(new Set(periods.filter(p => p.quarter).map(p => p.quarter)));
-            
-            return (
-              <div key={fiscalYear} className="mb-3">
-                <div className="font-medium text-sm mb-2 text-foreground">{fiscalYear}</div>
-                {quarters.map(quarter => {
-                  const quarterPeriods = periods.filter(p => p.quarter === quarter);
-                  const quarterValue = `${fiscalYear}-${quarter}`;
-                  
-                  return (
-                    <div key={quarter} className="ml-2 mb-2">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Checkbox
-                          id={quarterValue}
-                          checked={selected.includes(quarterValue)}
-                          onCheckedChange={(checked) => handlePeriodToggle(quarterValue, checked as boolean)}
-                        />
-                        <label htmlFor={quarterValue} className="text-sm font-medium cursor-pointer">
-                          {quarter}
-                        </label>
-                      </div>
-                      <div className="ml-6 space-y-1">
-                        {quarterPeriods.filter(p => p.month).map(period => (
-                          <div key={period.value} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={period.value}
-                              checked={selected.includes(period.value)}
-                              onCheckedChange={(checked) => handlePeriodToggle(period.value, checked as boolean)}
-                            />
-                            <label htmlFor={period.value} className="text-xs cursor-pointer">
-                              {period.month}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
-          <div className="pt-2 border-t">
-            <button 
-              className="text-xs text-muted-foreground hover:text-foreground"
-              onClick={() => setIsOpen(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFilterBarProps) {
   const [filters, setFilters] = useState<FilterState>({
@@ -223,7 +96,7 @@ export function SkillProgressionFilterBar({ onFilterChange }: SkillProgressionFi
         <span className="text-xs text-muted-foreground whitespace-nowrap">Period:</span>
           <MultiSelectFilter
             label="Time Period"
-            options={timePeriodOptions.map(p => p.value)}
+            options={["FY24-Q1", "FY24-Q2", "FY24-Q3", "FY24-Q4", "FY25-Q1", "FY25-Q2"]}
             selected={filters.timePeriod}
             onChange={(value) => handleFilterChange('timePeriod', value)}
             placeholder="All Periods"
