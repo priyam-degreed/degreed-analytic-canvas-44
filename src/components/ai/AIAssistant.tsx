@@ -1122,14 +1122,14 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-white">Name your visualization</DialogTitle>
+            <DialogTitle className="text-left text-foreground">Name your Visualisation</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-sm text-gray-300">
+            <p className="text-sm text-foreground">
               Give your new visualization a new descriptive name, so it's easier to find it later on.
             </p>
             <div className="space-y-2">
-              <Label htmlFor="viz-name" className="text-white text-sm font-medium">
+              <Label htmlFor="viz-name" className="text-foreground text-sm font-medium">
                 NAME
               </Label>
               <Input
@@ -1137,21 +1137,20 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 value={visualizationName}
                 onChange={(e) => setVisualizationName(e.target.value)}
                 placeholder="Enter visualization name..."
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-background border-border text-foreground"
               />
             </div>
             <div className="flex justify-end gap-3 pt-4">
               <Button
                 variant="outline"
                 onClick={handleCancelSave}
-                className="border-gray-600 text-gray-300 hover:bg-gray-800"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmSave}
                 disabled={!visualizationName.trim()}
-                className="bg-pink-600 hover:bg-pink-700 text-white"
+                className="bg-primary hover:bg-primary-hover text-primary-foreground"
               >
                 Save
               </Button>
