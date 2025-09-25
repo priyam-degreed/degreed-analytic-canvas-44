@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronDown, Calendar as CalendarIcon, Clock } from "lucide-react";
-import { format, subDays, subWeeks, subMonths, subYears, subHours, subMinutes, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfDay, endOfDay } from "date-fns";
+import { format, subMonths, subYears, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
 
@@ -29,41 +29,19 @@ const relativePeriods: RelativePeriod[] = [
   { label: "Last year", category: "YEAR", getValue: () => ({ from: startOfYear(subYears(new Date(), 1)), to: endOfYear(subYears(new Date(), 1)) }) },
   
   // QUARTER
-  { label: "This quarter", category: "QUARTER", getValue: () => ({ from: startOfMonth(new Date()), to: endOfMonth(new Date()) }) },
-  { label: "Last quarter", category: "QUARTER", getValue: () => ({ from: startOfMonth(subMonths(new Date(), 3)), to: endOfMonth(subMonths(new Date(), 1)) }) },
-  { label: "Last 4 quarters", category: "QUARTER", getValue: () => ({ from: subMonths(new Date(), 12), to: new Date() }) },
+  { label: "This quarter", category: "QUARTER", getValue: () => ({ from: startOfQuarter(new Date()), to: endOfQuarter(new Date()) }) },
+  { label: "Last quarter", category: "QUARTER", getValue: () => ({ from: startOfQuarter(subQuarters(new Date(), 1)), to: endOfQuarter(subQuarters(new Date(), 1)) }) },
+  { label: "Last 4 quarters", category: "QUARTER", getValue: () => ({ from: startOfQuarter(subQuarters(new Date(), 3)), to: endOfQuarter(new Date()) }) },
   
   // MONTH
   { label: "This month", category: "MONTH", getValue: () => ({ from: startOfMonth(new Date()), to: endOfMonth(new Date()) }) },
   { label: "Last month", category: "MONTH", getValue: () => ({ from: startOfMonth(subMonths(new Date(), 1)), to: endOfMonth(subMonths(new Date(), 1)) }) },
-  { label: "Last 12 months", category: "MONTH", getValue: () => ({ from: subMonths(new Date(), 12), to: new Date() }) },
-  
-  // WEEK
-  { label: "This week", category: "WEEK", getValue: () => ({ from: startOfWeek(new Date()), to: endOfWeek(new Date()) }) },
-  { label: "Last week", category: "WEEK", getValue: () => ({ from: startOfWeek(subWeeks(new Date(), 1)), to: endOfWeek(subWeeks(new Date(), 1)) }) },
-  { label: "Last 2 weeks", category: "WEEK", getValue: () => ({ from: subWeeks(new Date(), 2), to: new Date() }) },
-  
-  // DAY
-  { label: "Today", category: "DAY", getValue: () => ({ from: startOfDay(new Date()), to: endOfDay(new Date()) }) },
-  { label: "Yesterday", category: "DAY", getValue: () => ({ from: startOfDay(subDays(new Date(), 1)), to: endOfDay(subDays(new Date(), 1)) }) },
-  { label: "Last 7 days", category: "DAY", getValue: () => ({ from: subDays(new Date(), 7), to: new Date() }) },
-  { label: "Last 30 days", category: "DAY", getValue: () => ({ from: subDays(new Date(), 30), to: new Date() }) },
-  { label: "Last 90 days", category: "DAY", getValue: () => ({ from: subDays(new Date(), 90), to: new Date() }) },
-  
-  // HOUR
-  { label: "Last hour", category: "HOUR", getValue: () => ({ from: subHours(new Date(), 1), to: new Date() }) },
-  { label: "Last 8 hours", category: "HOUR", getValue: () => ({ from: subHours(new Date(), 8), to: new Date() }) },
-  { label: "Last 12 hours", category: "HOUR", getValue: () => ({ from: subHours(new Date(), 12), to: new Date() }) },
-  { label: "Last 24 hours", category: "HOUR", getValue: () => ({ from: subHours(new Date(), 24), to: new Date() }) },
-  
-  // MINUTE
-  { label: "Last 15 minutes", category: "MINUTE", getValue: () => ({ from: subMinutes(new Date(), 15), to: new Date() }) },
-  { label: "Last 30 minutes", category: "MINUTE", getValue: () => ({ from: subMinutes(new Date(), 30), to: new Date() }) },
-  { label: "Last 45 minutes", category: "MINUTE", getValue: () => ({ from: subMinutes(new Date(), 45), to: new Date() }) },
-  { label: "Last 60 minutes", category: "MINUTE", getValue: () => ({ from: subMinutes(new Date(), 60), to: new Date() }) },
+  { label: "Last 3 months", category: "MONTH", getValue: () => ({ from: startOfMonth(subMonths(new Date(), 2)), to: endOfMonth(new Date()) }) },
+  { label: "Last 6 months", category: "MONTH", getValue: () => ({ from: startOfMonth(subMonths(new Date(), 5)), to: endOfMonth(new Date()) }) },
+  { label: "Last 12 months", category: "MONTH", getValue: () => ({ from: startOfMonth(subMonths(new Date(), 11)), to: endOfMonth(new Date()) }) },
 ];
 
-const categories = ["YEAR", "QUARTER", "MONTH", "WEEK", "DAY", "HOUR", "MINUTE"];
+const categories = ["YEAR", "QUARTER", "MONTH"];
 
 export function DateRangeFilter({ value, onChange }: DateRangeFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -201,17 +179,13 @@ export function DateRangeFilter({ value, onChange }: DateRangeFilterProps) {
             {/* Static Period Content */}
             {periodType === "static" && (
               <div className="space-y-4 mb-4">
-                <Tabs defaultValue="months" className="w-full">
-                  <TabsList className="grid w-full grid-cols-7 text-xs">
-                    <TabsTrigger value="years">Years</TabsTrigger>
-                    <TabsTrigger value="quarters">Quarters</TabsTrigger>
-                    <TabsTrigger value="months">Months</TabsTrigger>
-                    <TabsTrigger value="weeks">Weeks</TabsTrigger>
-                    <TabsTrigger value="days">Days</TabsTrigger>
-                    <TabsTrigger value="hours">Hours</TabsTrigger>
-                    <TabsTrigger value="minutes">Minutes</TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                 <Tabs defaultValue="months" className="w-full">
+                   <TabsList className="grid w-full grid-cols-3 text-xs">
+                     <TabsTrigger value="years">Years</TabsTrigger>
+                     <TabsTrigger value="quarters">Quarters</TabsTrigger>
+                     <TabsTrigger value="months">Months</TabsTrigger>
+                   </TabsList>
+                 </Tabs>
 
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
