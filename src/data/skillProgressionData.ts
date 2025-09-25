@@ -136,19 +136,22 @@ export const ratingTypeOptions = ["Self", "Peer", "Manager"];
 function generateSkillDistributionData(): SkillDistribution[] {
   const data: SkillDistribution[] = [];
   
-  // Extended periods covering both quarters and individual months
+  // Extended periods covering both quarters and individual months aligned with filter structure
   const periods = [
-    // FY24 Quarters
+    // FY24 - Quarterly data points
     { period: "FY24-Q1", date: new Date(2023, 10, 15) },   // Nov 15, 2023
     { period: "FY24-Q2", date: new Date(2024, 1, 15) },    // Feb 15, 2024  
     { period: "FY24-Q3", date: new Date(2024, 4, 15) },    // May 15, 2024
     { period: "FY24-Q4", date: new Date(2024, 7, 15) },    // Aug 15, 2024
     
-    // FY25 Quarters
+    // FY25 - Quarterly data points
     { period: "FY25-Q1", date: new Date(2024, 10, 15) },   // Nov 15, 2024
     { period: "FY25-Q2", date: new Date(2025, 1, 15) },    // Feb 15, 2025
     
-    // Monthly data points for more granular filtering
+    // FY24 - Monthly data points  
+    { period: "2023-10", date: new Date(2023, 9, 15) },    // Oct 15, 2023
+    { period: "2023-11", date: new Date(2023, 10, 15) },   // Nov 15, 2023
+    { period: "2023-12", date: new Date(2023, 11, 15) },   // Dec 15, 2023
     { period: "2024-01", date: new Date(2024, 0, 15) },    // Jan 15, 2024
     { period: "2024-02", date: new Date(2024, 1, 15) },    // Feb 15, 2024
     { period: "2024-03", date: new Date(2024, 2, 15) },    // Mar 15, 2024
@@ -158,12 +161,18 @@ function generateSkillDistributionData(): SkillDistribution[] {
     { period: "2024-07", date: new Date(2024, 6, 15) },    // Jul 15, 2024
     { period: "2024-08", date: new Date(2024, 7, 15) },    // Aug 15, 2024
     { period: "2024-09", date: new Date(2024, 8, 15) },    // Sep 15, 2024
+    
+    // FY25 - Monthly data points  
     { period: "2024-10", date: new Date(2024, 9, 15) },    // Oct 15, 2024
     { period: "2024-11", date: new Date(2024, 10, 15) },   // Nov 15, 2024
     { period: "2024-12", date: new Date(2024, 11, 15) },   // Dec 15, 2024
     { period: "2025-01", date: new Date(2025, 0, 15) },    // Jan 15, 2025
     { period: "2025-02", date: new Date(2025, 1, 15) },    // Feb 15, 2025
     { period: "2025-03", date: new Date(2025, 2, 15) },    // Mar 15, 2025
+    
+    // Yearly data points for broader selections
+    { period: "FY24", date: new Date(2024, 0, 15) },       // Jan 15, 2024 (mid-year)
+    { period: "FY25", date: new Date(2024, 11, 15) },      // Dec 15, 2024 (mid-year)
   ];
   
   Object.entries(roleSkillMapping).forEach(([role, skills]) => {
