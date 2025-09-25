@@ -643,39 +643,18 @@ export default function SkillProgression() {
                        textColor = 'hsl(var(--muted-foreground))';
                      }
                      
-                     return (
-                       <DrillDownTooltip
-                         key={period}
-                         data={{
-                           skill: skillRow.skill,
-                           period: period,
-                           value: value,
-                           additionalData: {
-                             'Avg Rating': value,
-                             'Period': period,
-                             'Skill Category': 'Technical'
-                           }
-                         }}
-                         onDrillDown={handleDrillDown}
-                         title="Skill Rating Details"
-                       >
-                         <ClickableDrillDown
-                           data={{
-                             skill: skillRow.skill,
-                             period: period,
-                             value: value
-                           }}
-                           onDrillDown={handleDrillDown}
-                           className="flex-1 h-8 rounded-md border border-border/30 flex items-center justify-center text-xs font-medium shadow-sm transition-all duration-200 hover:shadow-md hover:ring-2 hover:ring-primary/20"
-                           style={{
-                             background: backgroundColor,
-                             color: textColor
-                           }}
-                         >
-                           {value.toFixed(1)}
-                         </ClickableDrillDown>
-                       </DrillDownTooltip>
-                    );
+                      return (
+                        <div
+                          key={period}
+                          className="flex-1 h-8 rounded-md border border-border/30 flex items-center justify-center text-xs font-medium shadow-sm"
+                          style={{
+                            background: backgroundColor,
+                            color: textColor
+                          }}
+                        >
+                          {value.toFixed(1)}
+                        </div>
+                     );
                   })}
                 </div>
               </div>
