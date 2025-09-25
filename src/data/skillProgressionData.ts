@@ -139,10 +139,11 @@ function generateSkillDistributionData(): SkillDistribution[] {
   Object.entries(roleSkillMapping).forEach(([role, skills]) => {
     skills.forEach(skill => {
       periods.forEach((period, periodIndex) => {
-        // Generate progressive improvement over time
-        const baseSkillLevel = Math.random() * 2 + 1; // Base level 1-3
-        const progression = periodIndex * 0.4; // Gradual improvement
-        const avgRating = Math.min(8, baseSkillLevel + progression + (Math.random() * 0.5));
+        // Generate broader range of skill levels including higher ratings
+        const baseSkillLevel = Math.random() * 4 + 2; // Base level 2-6
+        const progression = periodIndex * 0.3; // Gradual improvement
+        const randomVariation = (Math.random() - 0.5) * 2; // -1 to +1 variation
+        const avgRating = Math.max(1, Math.min(8, baseSkillLevel + progression + randomVariation));
         
         // Generate distribution based on average rating
         const distribution = generateRatingDistribution(avgRating);
@@ -162,7 +163,7 @@ function generateSkillDistributionData(): SkillDistribution[] {
 }
 
 function generateRatingDistribution(avgRating: number) {
-  // Create realistic distribution around the average
+  // Create realistic distribution around the average with better high-level representation
   const total = 100;
   const center = Math.round(avgRating);
   
@@ -177,24 +178,49 @@ function generateRatingDistribution(avgRating: number) {
     master: 0
   };
   
-  // Generate normal-ish distribution around center
+  // Generate normal-ish distribution around center with better spread
   const ratings = ['beginner', 'capable', 'intermediate', 'effective', 'experienced', 'advanced', 'distinguished', 'master'];
   
   for (let i = 0; i < total; i++) {
-    // Bias towards center rating with some spread
     const random = Math.random();
     let selectedRating;
     
-    if (random < 0.4) {
-      selectedRating = center - 1;
-    } else if (random < 0.8) {
-      selectedRating = center;
+    // Better distribution logic to ensure higher ratings are represented
+    if (avgRating >= 6) {
+      // For high average ratings, bias towards higher levels
+      if (random < 0.2) {
+        selectedRating = center - 2;
+      } else if (random < 0.4) {
+        selectedRating = center - 1;
+      } else if (random < 0.7) {
+        selectedRating = center;
+      } else if (random < 0.9) {
+        selectedRating = center + 1;
+      } else {
+        selectedRating = center + 1; // Extra weight to higher ratings
+      }
+    } else if (avgRating >= 4) {
+      // For medium ratings, normal distribution
+      if (random < 0.3) {
+        selectedRating = center - 1;
+      } else if (random < 0.7) {
+        selectedRating = center;
+      } else {
+        selectedRating = center + 1;
+      }
     } else {
-      selectedRating = center + 1;
+      // For lower ratings, slight bias upward
+      if (random < 0.4) {
+        selectedRating = center;
+      } else if (random < 0.7) {
+        selectedRating = center + 1;
+      } else {
+        selectedRating = center + 2;
+      }
     }
     
-    // Add some additional spread
-    selectedRating += Math.floor((Math.random() - 0.5) * 2);
+    // Add some controlled randomness
+    selectedRating += Math.floor((Math.random() - 0.3) * 2); // Slight upward bias
     selectedRating = Math.max(0, Math.min(7, selectedRating));
     
     distribution[ratings[selectedRating] as keyof typeof distribution]++;
