@@ -291,7 +291,8 @@ export function generateBubbleData(filteredData: SkillDistribution[]) {
         totalRating: 0,
         count: 0,
         employeeCount: 0,
-        importance: Math.random() * 10 + 1
+        importance: Math.random() * 10 + 1,
+        targetRating: 6 + Math.random() * 2 // Random target between 6-8
       });
     }
     
@@ -306,6 +307,7 @@ export function generateBubbleData(filteredData: SkillDistribution[]) {
     importance: stats.importance,
     avgRating: stats.count > 0 ? stats.totalRating / stats.count : 0,
     employeeCount: stats.count > 0 ? Math.floor(stats.employeeCount / stats.count) : 0,
-    changeVsLastQuarter: (Math.random() - 0.5) * 2
+    changeVsLastQuarter: (Math.random() - 0.5) * 2,
+    targetRating: stats.targetRating
   }));
 }

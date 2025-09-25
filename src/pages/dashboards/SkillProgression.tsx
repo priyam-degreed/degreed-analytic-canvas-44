@@ -159,7 +159,7 @@ export default function SkillProgression() {
     const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
     const avgCurrent = skillData.length > 0 ? 
       skillData.reduce((sum, item) => sum + item.avgRating, 0) / skillData.length : 0;
-    const target = Math.min(avgCurrent + Math.random() * 2 + 0.5, 8); // Target max 8, not 10
+    const target = 6 + Math.random() * 2; // Random target between 6-8
     
     return {
       skill,
@@ -168,12 +168,12 @@ export default function SkillProgression() {
     };
   });
 
-  // Prepare skill gaps data for horizontal progress bars - use paginated skills
+          // Prepare skill gaps data for horizontal progress bars - use paginated skills
   const skillGapsData = paginatedSkills.map(skill => {
     const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
     const avgCurrent = skillData.length > 0 ? 
       skillData.reduce((sum, item) => sum + item.avgRating, 0) / skillData.length : 0;
-    const target = Math.min(avgCurrent + Math.random() * 2 + 0.5, 8);
+    const target = 6 + Math.random() * 2; // Random target between 6-8
     const gap = target - avgCurrent;
     const priority = gap > 1.5 ? 'HIGH' : gap > 0.8 ? 'MEDIUM' : 'LOW';
     
@@ -526,7 +526,7 @@ export default function SkillProgression() {
           <div className="space-y-4">
             {allBubbleData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).map((skill) => {
               const currentRating = skill.avgRating || 0;
-              const targetRating = 6; // Target rating of 6
+              const targetRating = skill.targetRating || (6 + Math.random() * 2); // Use target from data or random 6-8
               const gap = Math.max(0, targetRating - currentRating);
               const progressPercentage = (currentRating / 8) * 100; // Scale to 8-point system
               const targetPercentage = (targetRating / 8) * 100;
@@ -536,9 +536,6 @@ export default function SkillProgression() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="font-medium text-lg">{skill.skill}</div>
-                      <Badge variant={currentRating >= 6 ? "default" : currentRating >= 4 ? "secondary" : "destructive"}>
-                        Current: {currentRating.toFixed(1)}/8.0
-                      </Badge>
                       <Badge variant="outline">
                         Target: {targetRating.toFixed(1)}/8.0
                       </Badge>
