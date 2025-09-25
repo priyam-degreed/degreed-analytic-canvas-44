@@ -83,6 +83,124 @@ export default function SkillInsights() {
     return Object.values(skillGaps).slice(0, 8); // Top 8 gaps
   }, [filteredSkillRatings]);
 
+  // Generate filtered top skills gained
+  const filteredTopSkillsGained = useMemo(() => {
+    const skillLearningCounts = filteredLearningData.reduce((acc: any, item) => {
+      item.skills.forEach(skill => {
+        if (!acc[skill]) {
+          acc[skill] = {
+            skill: skill,
+            learners: 0,
+            totalHours: 0,
+            assessments: 0
+          };
+        }
+        acc[skill].learners += item.learners;
+        acc[skill].totalHours += item.avgHours * item.learners;
+      });
+      return acc;
+    }, {});
+
+    return Object.values(skillLearningCounts)
+      .map((skill: any) => ({
+        ...skill,
+        averageGrowth: `${(Math.random() * 3 + 1).toFixed(1)} pts`,
+        marketDemand: Math.floor(Math.random() * 20) + 80
+      }))
+      .sort((a: any, b: any) => b.learners - a.learners)
+      .slice(0, 6);
+  }, [filteredLearningData]);
+
+  // Generate filtered skill decay alerts
+  const filteredSkillDecayAlerts = useMemo(() => {
+    return filteredSkillRatings
+      .filter(rating => (rating.targetRating - rating.currentRating) > 0.8)
+      .map(rating => ({
+        skill: rating.skill,
+        urgency: (rating.targetRating - rating.currentRating) > 1.5 ? 'high' : 'medium',
+        affectedUsers: `${Math.floor(Math.random() * 50) + 10} users`,
+        lastActivity: `${Math.floor(Math.random() * 30) + 1} days ago`
+      }))
+      .slice(0, 4);
+  }, [filteredSkillRatings]);
+
+  // Generate filtered skill assessments
+  const filteredSkillAssessments = useMemo(() => {
+    const monthlyData = ['Jan', 'Feb', 'Mar', 'Apr'].map(month => {
+      const relevantRatings = filteredSkillRatings.slice(0, Math.floor(Math.random() * 20) + 10);
+      const avgScore = relevantRatings.length > 0 
+        ? Math.round(relevantRatings.reduce((sum, r) => sum + r.currentRating * 20, 0) / relevantRatings.length)
+        : Math.floor(Math.random() * 20) + 75;
+      
+      return {
+        month,
+        avgScore,
+        totalAssessments: relevantRatings.length || Math.floor(Math.random() * 50) + 20
+      };
+    });
+    
+    return monthlyData;
+  }, [filteredSkillRatings]);
+
+  // Generate filtered expert skills for progression matrix
+  const filteredExpertSkills = useMemo(() => {
+    const skillCounts = filteredSkillRatings.reduce((acc: any, rating) => {
+      if (!acc[rating.skill]) {
+        acc[rating.skill] = {
+          name: rating.skill,
+          ratings: [],
+          growthRate: Math.random() * 15 + 5
+        };
+      }
+      acc[rating.skill].ratings.push(rating.currentRating);
+      return acc;
+    }, {});
+
+    return Object.values(skillCounts)
+      .map((skill: any) => ({
+        ...skill,
+        expertRatings: skill.ratings.filter((r: number) => r >= 4.0).length,
+        avgRating: skill.ratings.reduce((sum: number, r: number) => sum + r, 0) / skill.ratings.length
+      }))
+      .sort((a: any, b: any) => b.expertRatings - a.expertRatings)
+      .slice(0, 4);
+  }, [filteredSkillRatings]);
+
+  // Generate filtered market alignment data
+  const filteredMarketAlignment = useMemo(() => {
+    const skillUsage = filteredLearningData.reduce((acc: any, item) => {
+      item.skills.forEach(skill => {
+        if (!acc[skill]) {
+          acc[skill] = {
+            name: skill,
+            users: 0,
+            selfRating: 0,
+            ratingCount: 0
+          };
+        }
+        acc[skill].users += item.learners;
+      });
+      return acc;
+    }, {});
+
+    // Add ratings data
+    filteredSkillRatings.forEach(rating => {
+      if (skillUsage[rating.skill]) {
+        skillUsage[rating.skill].selfRating += rating.currentRating;
+        skillUsage[rating.skill].ratingCount += 1;
+      }
+    });
+
+    return Object.values(skillUsage)
+      .map((skill: any) => ({
+        ...skill,
+        selfRating: skill.ratingCount > 0 ? (skill.selfRating / skill.ratingCount).toFixed(1) : 3.5,
+        marketDemand: Math.floor(Math.random() * 30) + 70
+      }))
+      .filter((skill: any) => skill.users > 0)
+      .slice(0, 8);
+  }, [filteredLearningData, filteredSkillRatings]);
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -146,10 +264,10 @@ export default function SkillInsights() {
         <div className="lg:col-span-2">
           <ChartCard
             title="Top Skills Gained This Quarter"
-            subtitle="Skills with highest learning activity and growth"
+            subtitle={`Skills with highest learning activity and growth (${filteredTopSkillsGained.length} skills shown)`}
           >
             <div className="space-y-4">
-              {skillGrowthData.topSkillsGained.map((skill, index) => (
+              {filteredTopSkillsGained.map((skill: any, index) => (
                 <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-4">
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm">
@@ -187,7 +305,7 @@ export default function SkillInsights() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {skillGrowthData.skillDecayAlerts.map((alert, index) => (
+              {filteredSkillDecayAlerts.length > 0 ? filteredSkillDecayAlerts.map((alert: any, index) => (
                 <div key={index} className="p-3 border rounded-md space-y-2">
                   <div className="flex justify-between items-start">
                     <h5 className="font-medium text-sm">{alert.skill}</h5>
@@ -195,10 +313,14 @@ export default function SkillInsights() {
                       {alert.urgency}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">{alert.affectedUsers} users</p>
+                  <p className="text-xs text-muted-foreground">{alert.affectedUsers}</p>
                   <p className="text-xs">Last activity: {alert.lastActivity}</p>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center py-4 text-muted-foreground">
+                  <p>No skill decay alerts for current filters</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -207,7 +329,7 @@ export default function SkillInsights() {
               <CardTitle className="text-lg">Skill Assessment Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {skillGrowthData.skillAssessments.map((assessment, index) => (
+              {filteredSkillAssessments.map((assessment: any, index) => (
                 <div key={index} className="flex justify-between items-center">
                   <span className="text-sm font-medium">{assessment.month}</span>
                   <div className="text-right">
@@ -227,11 +349,11 @@ export default function SkillInsights() {
         subtitle="Current skill distribution across proficiency levels"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {strategicOverviewData.expertSkills.slice(0, 4).map((skill, index) => (
+          {filteredExpertSkills.length > 0 ? filteredExpertSkills.map((skill: any, index) => (
             <div key={index} className="space-y-4">
               <div className="text-center">
                 <h4 className="font-medium">{skill.name}</h4>
-                <p className="text-sm text-muted-foreground">+{skill.growthRate}% growth</p>
+                <p className="text-sm text-muted-foreground">+{skill.growthRate.toFixed(1)}% growth</p>
               </div>
               
               <div className="space-y-2">
@@ -239,7 +361,7 @@ export default function SkillInsights() {
                   const values = [skill.expertRatings, Math.floor(skill.expertRatings * 1.5), Math.floor(skill.expertRatings * 2), Math.floor(skill.expertRatings * 0.8)];
                   const value = values[levelIndex];
                   const maxValue = Math.max(...values);
-                  const percentage = (value / maxValue) * 100;
+                  const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
                   
                   return (
                     <div key={level} className="flex justify-between items-center">
@@ -258,7 +380,11 @@ export default function SkillInsights() {
                 })}
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="col-span-full text-center py-8 text-muted-foreground">
+              <p>No skill data available for current filters</p>
+            </div>
+          )}
         </div>
       </ChartCard>
 
@@ -269,7 +395,7 @@ export default function SkillInsights() {
           subtitle="How well our skills align with market needs"
         >
           <ResponsiveContainer width="100%" height={300}>
-            <ScatterChart data={strategicOverviewData.topSkills.slice(0, 8)}>
+            <ScatterChart data={filteredMarketAlignment}>
               <CartesianGrid />
               <XAxis dataKey="users" name="Internal Users" />
               <YAxis dataKey="marketDemand" name="Market Demand" />
@@ -282,7 +408,7 @@ export default function SkillInsights() {
                       <div className="bg-white p-3 border rounded-lg shadow-lg">
                         <p className="font-medium">{data.name}</p>
                         <p className="text-sm text-muted-foreground">Users: {data.users}</p>
-                        <p className="text-sm text-muted-foreground">Market Demand: {data.marketDemand || 'N/A'}%</p>
+                        <p className="text-sm text-muted-foreground">Market Demand: {data.marketDemand}%</p>
                         <p className="text-sm text-muted-foreground">Rating: {data.selfRating}/5</p>
                       </div>
                     );
