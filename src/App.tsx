@@ -15,6 +15,7 @@ import SkillsAdoption from "./pages/skills/SkillsAdoption";
 import SkillTracker from "./pages/analysis/SkillTracker";
 import LearningEngagement from "./pages/dashboards/LearningEngagement";
 import SkillInsights from "./pages/dashboards/SkillInsights";
+import SkillProgression from "./pages/dashboards/SkillProgression";
 import ContentPerformance from "./pages/dashboards/ContentPerformance";
 import CareerDevelopment from "./pages/dashboards/CareerDevelopment";
 import DrillDownPaths from "./pages/dashboards/DrillDownPaths";
@@ -46,6 +47,7 @@ const App = () => (
             {/* Dashboard Routes */}
             <Route path="dashboards/learning-engagement" element={<LearningEngagement />} />
             <Route path="dashboards/skill-insights" element={<SkillInsights />} />
+            <Route path="dashboards/skill-progression" element={<SkillProgression />} />
             <Route path="dashboards/content-performance" element={<ContentPerformance />} />
             <Route path="dashboards/career-development" element={<CareerDevelopment />} />
             <Route path="dashboards/drill-down" element={<DrillDownPaths />} />
