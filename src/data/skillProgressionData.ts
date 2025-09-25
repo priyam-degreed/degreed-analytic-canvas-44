@@ -286,13 +286,25 @@ export function generateBubbleData(filteredData: SkillDistribution[]) {
   
   filteredData.forEach(entry => {
     if (!skillStats.has(entry.skill)) {
+      // Set specific lower targets for certain skills to allow exceeding
+      let targetRating = 6 + Math.random() * 2; // Default random target between 6-8
+      if (entry.skill === 'Machine Learning') {
+        targetRating = 5.5; // Lower target to allow exceeding
+      } else if (entry.skill === 'CSS') {
+        targetRating = 5.8; // Lower target to allow exceeding
+      } else if (entry.skill === 'Python') {
+        targetRating = 6.2; // Slightly lower target
+      } else if (entry.skill === 'React') {
+        targetRating = 5.9; // Lower target
+      }
+      
       skillStats.set(entry.skill, {
         skill: entry.skill,
         totalRating: 0,
         count: 0,
         employeeCount: 0,
         importance: Math.random() * 10 + 1,
-        targetRating: 6 + Math.random() * 2 // Random target between 6-8
+        targetRating: targetRating
       });
     }
     
@@ -302,12 +314,27 @@ export function generateBubbleData(filteredData: SkillDistribution[]) {
     stats.employeeCount += Math.floor(Math.random() * 50) + 20;
   });
   
-  return Array.from(skillStats.values()).map(stats => ({
-    skill: stats.skill,
-    importance: stats.importance,
-    avgRating: stats.count > 0 ? stats.totalRating / stats.count : 0,
-    employeeCount: stats.count > 0 ? Math.floor(stats.employeeCount / stats.count) : 0,
-    changeVsLastQuarter: (Math.random() - 0.5) * 2,
-    targetRating: stats.targetRating
-  }));
+  return Array.from(skillStats.values()).map(stats => {
+    let avgRating = stats.count > 0 ? stats.totalRating / stats.count : 0;
+    
+    // Boost ratings for specific skills to exceed their targets
+    if (stats.skill === 'Machine Learning') {
+      avgRating = Math.max(avgRating, 6.2); // Ensure it exceeds target of 5.5
+    } else if (stats.skill === 'CSS') {
+      avgRating = Math.max(avgRating, 6.5); // Ensure it exceeds target of 5.8
+    } else if (stats.skill === 'Python') {
+      avgRating = Math.max(avgRating, 6.8); // Ensure it exceeds target of 6.2
+    } else if (stats.skill === 'React') {
+      avgRating = Math.max(avgRating, 6.3); // Ensure it exceeds target of 5.9
+    }
+    
+    return {
+      skill: stats.skill,
+      importance: stats.importance,
+      avgRating: avgRating,
+      employeeCount: stats.count > 0 ? Math.floor(stats.employeeCount / stats.count) : 0,
+      changeVsLastQuarter: (Math.random() - 0.5) * 2,
+      targetRating: stats.targetRating
+    };
+  });
 }

@@ -157,14 +157,29 @@ export default function SkillProgression() {
   // Prepare grouped bar chart data for Current vs Target Ratings - use paginated skills
   const currentVsTargetData = paginatedSkills.map(skill => {
     const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
-    const avgCurrent = skillData.length > 0 ? 
+    let avgCurrent = skillData.length > 0 ? 
       skillData.reduce((sum, item) => sum + item.avgRating, 0) / skillData.length : 0;
-    const target = 6 + Math.random() * 2; // Random target between 6-8
+    
+    // Set specific targets and boost current ratings for certain skills
+    let target = 6 + Math.random() * 2; // Default random target between 6-8
+    if (skill === 'Machine Learning') {
+      target = 5.5;
+      avgCurrent = Math.max(avgCurrent, 6.2);
+    } else if (skill === 'CSS') {
+      target = 5.8;
+      avgCurrent = Math.max(avgCurrent, 6.5);
+    } else if (skill === 'Python') {
+      target = 6.2;
+      avgCurrent = Math.max(avgCurrent, 6.8);
+    } else if (skill === 'React') {
+      target = 5.9;
+      avgCurrent = Math.max(avgCurrent, 6.3);
+    }
     
     return {
       skill,
-      current: avgCurrent,
-      target: target
+      current: Number(avgCurrent.toFixed(1)),
+      target: Number(target.toFixed(1))
     };
   });
 
@@ -347,10 +362,20 @@ export default function SkillProgression() {
           <CardDescription>Comparison between current and target skill levels</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={currentVsTargetData}>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart 
+              data={currentVsTargetData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="skill" />
+              <XAxis 
+                dataKey="skill" 
+                angle={-45}
+                textAnchor="end"
+                height={80}
+                interval={0}
+                fontSize={12}
+              />
               <YAxis domain={[0, 8]} />
               <Tooltip />
               <Legend />
