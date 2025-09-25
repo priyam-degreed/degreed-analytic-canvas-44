@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SkillProgressionFilterBar } from "@/components/filters/SkillProgressionFilterBar";
+import { DrillDownTooltip, ClickableDrillDown } from "@/components/dashboard/DrillDownTooltip";
+import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
 import { 
   BarChart, 
   Bar, 
@@ -67,6 +69,18 @@ interface FilterState {
   ratingTypes: string[];
 }
 
+interface DrillDownData {
+  skill?: string;
+  role?: string;
+  period?: string;
+  department?: string;
+  contentType?: string;
+  value?: number | string;
+  ratingType?: string;
+  employees?: number;
+  additionalData?: Record<string, any>;
+}
+
 export default function SkillProgression() {
   const [filters, setFilters] = useState<FilterState>({
     roles: [],
@@ -75,6 +89,10 @@ export default function SkillProgression() {
     ratingLevels: [],
     ratingTypes: []
   });
+
+  // Drill-down state
+  const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
+  const [drillDownData, setDrillDownData] = useState<DrillDownData | null>(null);
 
   // Apply filters to data - each filter works independently and in combination
   const filteredData = skillDistributionData.filter(item => {
@@ -251,6 +269,104 @@ export default function SkillProgression() {
     setFilters(newFilters);
   };
 
+  // Drill-down handlers
+  const handleDrillDown = (action: string, data: DrillDownData) => {
+    setDrillDownData(data);
+    setIsDrillDownOpen(true);
+  };
+
+  const handleApplyFilter = (filterType: string, filterValue: string) => {
+    const newFilters = { ...filters };
+    
+    switch (filterType) {
+      case 'skills':
+        if (!newFilters.skills.includes(filterValue)) {
+          newFilters.skills = [...newFilters.skills, filterValue];
+        }
+        break;
+      case 'roles':
+        if (!newFilters.roles.includes(filterValue)) {
+          newFilters.roles = [...newFilters.roles, filterValue];
+        }
+        break;
+      case 'timePeriod':
+        if (!newFilters.timePeriod.includes(filterValue)) {
+          newFilters.timePeriod = [...newFilters.timePeriod, filterValue];
+        }
+        break;
+      case 'ratingTypes':
+        if (!newFilters.ratingTypes.includes(filterValue)) {
+          newFilters.ratingTypes = [...newFilters.ratingTypes, filterValue];
+        }
+        break;
+    }
+    
+    setFilters(newFilters);
+  };
+
+  const handleViewDetails = () => {
+    // Navigate to detailed view or show detailed modal
+    console.log('View details for:', drillDownData);
+    setIsDrillDownOpen(false);
+  };
+
+  // Custom tooltip components
+  const CustomLineTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+          <p className="font-semibold text-foreground mb-2">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="mb-1">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm" style={{ color: entry.color }}>
+                  {entry.dataKey}:
+                </span>
+                <span className="font-medium text-foreground">
+                  {entry.value?.toFixed(1)}
+                </span>
+              </div>
+            </div>
+          ))}
+          <div className="mt-2 pt-2 border-t border-border">
+            <div className="text-xs text-muted-foreground">
+              Click data points to drill down
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const CustomBarTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+          <p className="font-semibold text-foreground mb-2">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="mb-1">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm" style={{ color: entry.fill }}>
+                  {entry.name}:
+                </span>
+                <span className="font-medium text-foreground">
+                  {entry.value?.toFixed(1)}
+                </span>
+              </div>
+            </div>
+          ))}
+          <div className="mt-2 pt-2 border-t border-border">
+            <div className="text-xs text-muted-foreground">
+              Click bars to drill down
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   // Custom tooltip for bubble chart
   const CustomBubbleTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -353,7 +469,7 @@ export default function SkillProgression() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="period" />
               <YAxis domain={[0, 8]} />
-              <Tooltip />
+              <Tooltip content={<CustomLineTooltip />} />
               <Legend />
               {paginatedSkills.map((skill, index) => (
                 <Line 
@@ -407,14 +523,7 @@ export default function SkillProgression() {
                 stroke="hsl(var(--muted-foreground))"
               />
               <YAxis domain={[0, 8]} stroke="hsl(var(--muted-foreground))" />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 12px hsl(var(--foreground) / 0.1)'
-                }}
-              />
+              <Tooltip content={<CustomBarTooltip />} />
               <Legend />
               <Bar 
                 dataKey="Self" 
@@ -535,17 +644,37 @@ export default function SkillProgression() {
                      }
                      
                      return (
-                        <div
+                       <DrillDownTooltip
                          key={period}
-                         className="flex-1 h-8 rounded-md border border-border/30 flex items-center justify-center text-xs font-medium shadow-sm transition-all duration-200 hover:shadow-md"
-                         style={{
-                           background: backgroundColor,
-                           color: textColor
+                         data={{
+                           skill: skillRow.skill,
+                           period: period,
+                           value: value,
+                           additionalData: {
+                             'Avg Rating': value,
+                             'Period': period,
+                             'Skill Category': 'Technical'
+                           }
                          }}
-                         title={`${period}: ${value.toFixed(1)}`}
+                         onDrillDown={handleDrillDown}
+                         title="Skill Rating Details"
                        >
-                         {value.toFixed(1)}
-                       </div>
+                         <ClickableDrillDown
+                           data={{
+                             skill: skillRow.skill,
+                             period: period,
+                             value: value
+                           }}
+                           onDrillDown={handleDrillDown}
+                           className="flex-1 h-8 rounded-md border border-border/30 flex items-center justify-center text-xs font-medium shadow-sm transition-all duration-200 hover:shadow-md hover:ring-2 hover:ring-primary/20"
+                           style={{
+                             background: backgroundColor,
+                             color: textColor
+                           }}
+                         >
+                           {value.toFixed(1)}
+                         </ClickableDrillDown>
+                       </DrillDownTooltip>
                     );
                   })}
                 </div>
@@ -664,6 +793,15 @@ export default function SkillProgression() {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Drill Down Dialog */}
+      <DrillDownDialog
+        isOpen={isDrillDownOpen}
+        onClose={() => setIsDrillDownOpen(false)}
+        data={drillDownData}
+        onApplyFilter={handleApplyFilter}
+        onViewDetails={handleViewDetails}
+      />
     </div>
   );
 }
