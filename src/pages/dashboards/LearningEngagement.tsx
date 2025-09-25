@@ -28,6 +28,10 @@ const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accen
 export default function LearningEngagement() {
   const { filters } = useFilters();
   
+  // Debug logging
+  console.log('Learning Engagement Data:', learningEngagementData);
+  console.log('Current Filters:', filters);
+  
   // Pagination state for Current vs Target Ratings
   const [ratingsCurrentPage, setRatingsCurrentPage] = useState(0);
   const ratingsItemsPerPage = 5;
@@ -149,22 +153,31 @@ export default function LearningEngagement() {
         subtitle={`Skill ratings comparison - Page ${ratingsCurrentPage + 1} of ${totalRatingsPages} (${currentVsTargetData.length} skills total)`}
       >
         <div className="space-y-4">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={paginatedRatingsData} layout="horizontal">
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" domain={[0, 5]} />
-              <YAxis type="category" dataKey="skill" width={120} />
-              <Tooltip 
-                formatter={(value, name) => [
-                  `${value}/5`, 
-                  name === 'current' ? 'Current Rating' : 'Target Rating'
-                ]}
-                labelFormatter={(label) => `Skill: ${label}`}
-              />
-              <Bar dataKey="current" fill="hsl(var(--primary))" name="current" />
-              <Bar dataKey="target" fill="hsl(var(--secondary))" name="target" />
-            </BarChart>
-          </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart 
+                data={paginatedRatingsData} 
+                layout="horizontal" 
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" domain={[0, 5]} />
+                <YAxis type="category" dataKey="skill" width={120} />
+                <Tooltip 
+                  formatter={(value, name) => [
+                    `${value}/5`, 
+                    name === 'current' ? 'Current Rating' : 'Target Rating'
+                  ]}
+                  labelFormatter={(label) => `Skill: ${label}`}
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--popover))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                />
+                <Bar dataKey="current" fill="hsl(var(--primary))" name="current" />
+                <Bar dataKey="target" fill="hsl(var(--secondary))" name="target" />
+              </BarChart>
+            </ResponsiveContainer>
           
           {/* Pagination Controls */}
           <div className="flex items-center justify-between">
@@ -202,11 +215,20 @@ export default function LearningEngagement() {
           subtitle={`Showing data for ${filteredEngagementTrends.length} periods`}
         >
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={filteredEngagementTrends}>
+            <AreaChart 
+              data={filteredEngagementTrends}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis />
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--popover))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+              />
               <Area type="monotone" dataKey="completions" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" />
               <Area type="monotone" dataKey="activeUsers" stackId="2" stroke="hsl(var(--secondary))" fill="hsl(var(--secondary))" />
             </AreaChart>
@@ -254,7 +276,10 @@ export default function LearningEngagement() {
             subtitle={`${filteredTrendingTopics.length} topics filtered`}
           >
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={filteredTrendingTopics}>
+              <BarChart 
+                data={filteredTrendingTopics}
+                margin={{ top: 5, right: 30, left: 20, bottom: 80 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="topic" 
@@ -263,7 +288,13 @@ export default function LearningEngagement() {
                   height={80}
                 />
                 <YAxis />
-                <Tooltip />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--popover))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                />
                 <Bar dataKey="learners" fill="hsl(var(--primary))" />
               </BarChart>
             </ResponsiveContainer>
