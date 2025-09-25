@@ -1,46 +1,62 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SkillProgressionFilterBar } from "@/components/filters/SkillProgressionFilterBar";
-import { useFilters } from "@/contexts/FilterContext";
-import { useFilteredData } from "@/hooks/useFilteredData";
-import { 
-  comprehensiveLearningData, 
-  comprehensiveSkillRatings, 
-  FILTER_OPTIONS 
-} from '@/data/comprehensiveMockData';
 import { 
   BarChart, 
   Bar, 
   LineChart, 
   Line, 
+  ScatterChart, 
+  Scatter, 
   ComposedChart,
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
   Legend, 
-  ResponsiveContainer
+  ResponsiveContainer,
+  Cell
 } from "recharts";
 import { 
   Users, 
   TrendingUp, 
   Target, 
   Award,
-  ChevronLeft,
-  ChevronRight
+  ArrowUpIcon,
+  ArrowDownIcon,
+  MinusIcon
 } from "lucide-react";
+import { 
+  skillProgressionMetrics,
+  skillDistributionData,
+  skillProgressionEntries,
+  generateHeatmapData,
+  generateBubbleData,
+  roleSkillMapping,
+  periodLabels,
+  getSkillTarget
+} from "@/data/skillProgressionData";
 
-// Custom colors for rating levels
+// Custom colors for different rating levels
 const ratingColors = {
-  low: "#ef4444",      // red
-  medium: "#f97316",   // orange  
-  good: "#eab308",     // yellow
-  high: "#22c55e",     // green
-  excellent: "#8b5cf6" // purple
+  beginner: "#ef4444",     // red
+  capable: "#f97316",      // orange  
+  intermediate: "#eab308", // yellow
+  effective: "#84cc16",    // lime
+  experienced: "#22c55e",  // green
+  advanced: "#10b981",     // emerald
+  distinguished: "#06b6d4", // cyan
+  master: "#8b5cf6"        // violet
+};
+
+const priorityColors = {
+  positive: "#22c55e",
+  negative: "#ef4444",
+  neutral: "#64748b"
 };
 
 interface FilterState {
@@ -52,20 +68,7 @@ interface FilterState {
 }
 
 export default function SkillProgression() {
-  const { filters } = useFilters();
-  
-  // Use comprehensive filtered data
-  const filteredSkillRatings = useFilteredData(comprehensiveSkillRatings, filters);
-  const filteredLearningData = useFilteredData(comprehensiveLearningData, filters);
-  
-  console.log('SkillProgression - Filtered Data:', {
-    skillRatings: filteredSkillRatings.length,
-    learningData: filteredLearningData.length,
-    appliedFilters: filters
-  });
-
-  // Local filter state for SkillProgressionFilterBar compatibility
-  const [localFilters, setLocalFilters] = useState<FilterState>({
+  const [filters, setFilters] = useState<FilterState>({
     roles: [],
     skills: [],
     timePeriod: [],
@@ -73,131 +76,72 @@ export default function SkillProgression() {
     ratingTypes: []
   });
 
-  // Calculate comprehensive metrics from filtered data
-  const skillMetrics = useMemo(() => {
-    const totalEmployees = new Set(filteredSkillRatings.map(r => `${r.roles[0]}-${r.groups[0]}`)).size;
-    const avgRating = filteredSkillRatings.length > 0 
-      ? filteredSkillRatings.reduce((sum, r) => sum + r.currentRating, 0) / filteredSkillRatings.length 
-      : 0;
-    const advancedEmployees = filteredSkillRatings.filter(r => r.currentRating >= 4.0).length;
-    const progressionRate = filteredSkillRatings.filter(r => r.targetRating > r.currentRating).length;
+  // Apply filters to data - each filter works independently and in combination
+  const filteredData = skillDistributionData.filter(item => {
+    // Role filter - independent
+    const roleMatch = filters.roles.length === 0 || filters.roles.includes(item.role);
     
-    return {
-      totalEmployees: Math.max(totalEmployees, 50),
-      avgSkillRating: avgRating,
-      employeesAboveThreshold: totalEmployees > 0 ? Math.floor((advancedEmployees / totalEmployees) * 100) : 75,
-      progressionPercent: totalEmployees > 0 ? Math.floor((progressionRate / totalEmployees) * 100) : 65,
-      skillGapToTarget: filteredSkillRatings.length > 0 
-        ? filteredSkillRatings.reduce((sum, r) => sum + Math.max(0, r.targetRating - r.currentRating), 0) / filteredSkillRatings.length 
-        : 0
-    };
-  }, [filteredSkillRatings]);
-
-  // Prepare comprehensive data for charts from filtered results
-  const chartData = useMemo(() => {
-    // Skills vs Time data (monthly aggregation)
-    const skillTimeData = filteredSkillRatings.reduce((acc: any, rating) => {
-      const monthKey = rating.date.substring(0, 7); // YYYY-MM
-      const key = `${rating.skill}-${monthKey}`;
-      
-      if (!acc[key]) {
-        acc[key] = {
-          skill: rating.skill,
-          period: monthKey,
-          avgRating: 0,
-          count: 0,
-          role: rating.roles[0] || 'Unknown'
-        };
-      }
-      
-      acc[key].avgRating = (acc[key].avgRating * acc[key].count + rating.currentRating) / (acc[key].count + 1);
-      acc[key].count += 1;
-      
-      return acc;
-    }, {});
-
-    // Progress over time data - aggregated by month
-    const progressTimeData = Object.values(
-      filteredSkillRatings.reduce((acc: any, rating) => {
-        const monthKey = rating.date.substring(0, 7);
-        
-        if (!acc[monthKey]) {
-          acc[monthKey] = { period: monthKey };
-        }
-        
-        // Add skill ratings to the period
-        if (!acc[monthKey][rating.skill]) {
-          acc[monthKey][rating.skill] = [];
-        }
-        acc[monthKey][rating.skill].push(rating.currentRating);
-        
-        return acc;
-      }, {})
-    ).map((periodData: any) => {
-      // Calculate average ratings for each skill in this period
-      const processed = { period: periodData.period };
-      Object.keys(periodData).forEach(key => {
-        if (key !== 'period' && Array.isArray(periodData[key])) {
-          processed[key] = periodData[key].reduce((sum: number, val: number) => sum + val, 0) / periodData[key].length;
-        }
-      });
-      return processed;
-    }).sort((a, b) => a.period.localeCompare(b.period));
-
-    // Current vs Target data
-    const skillTargetData = Object.values(
-      filteredSkillRatings.reduce((acc: any, rating) => {
-        const skill = rating.skill;
-        
-        if (!acc[skill]) {
-          acc[skill] = {
-            skill,
-            current: 0,
-            target: 0,
-            count: 0
-          };
-        }
-        
-        acc[skill].current = (acc[skill].current * acc[skill].count + rating.currentRating) / (acc[skill].count + 1);
-        acc[skill].target = (acc[skill].target * acc[skill].count + rating.targetRating) / (acc[skill].count + 1);
-        acc[skill].count += 1;
-        
-        return acc;
-      }, {})
-    ).slice(0, 15); // Limit to 15 skills for display
-
-    // Skills by rating type data (mock for now, can be enhanced with real data structure)
-    const skillRatingTypeData = FILTER_OPTIONS.skills.slice(0, 10).map(skill => {
-      const skillRatings = filteredSkillRatings.filter(r => r.skill === skill);
-      const avgCurrent = skillRatings.length > 0 
-        ? skillRatings.reduce((sum, r) => sum + r.currentRating, 0) / skillRatings.length 
-        : 3 + Math.random() * 2;
-      
-      return {
-        skill,
-        Self: +(avgCurrent + (Math.random() - 0.5) * 0.5).toFixed(1),
-        Peer: +(avgCurrent + (Math.random() - 0.5) * 0.4).toFixed(1),
-        Manager: +(avgCurrent + (Math.random() - 0.5) * 0.3).toFixed(1),
-        Target: +(avgCurrent + 0.5 + Math.random() * 1.0).toFixed(1)
-      };
+    // Skill filter - independent
+    const skillMatch = filters.skills.length === 0 || filters.skills.includes(item.skill);
+    
+    // Time period filter - independent, handles quarters and fiscal years
+    const periodMatch = filters.timePeriod.length === 0 || filters.timePeriod.some(period => 
+      item.timePeriod === period || 
+      (period.includes('-Q') && item.timePeriod.startsWith(period)) ||
+      (period.startsWith('FY') && !period.includes('-') && item.timePeriod.startsWith(period))
+    );
+    
+    // Rating level filter - independent, based on avgRating ranges
+    const ratingLevelMatch = filters.ratingLevels.length === 0 || filters.ratingLevels.some(level => {
+      const rating = item.avgRating;
+      // Extract the range from the format "1 - Beginner"
+      if (level.includes('1 - ')) return rating >= 1 && rating < 2;
+      if (level.includes('2 - ')) return rating >= 2 && rating < 3;
+      if (level.includes('3 - ')) return rating >= 3 && rating < 4;
+      if (level.includes('4 - ')) return rating >= 4 && rating < 5;
+      if (level.includes('5 - ')) return rating >= 5 && rating < 6;
+      if (level.includes('6 - ')) return rating >= 6 && rating < 7;
+      if (level.includes('7 - ')) return rating >= 7 && rating < 8;
+      if (level.includes('8 - ')) return rating >= 8 && rating <= 8;
+      return true;
     });
+    
+    // Rating type filter - independent, match against actual data
+    const ratingTypeMatch = filters.ratingTypes.length === 0 || filters.ratingTypes.some(type => {
+      // Find the actual rating type for this item from skillProgressionEntries
+      const entry = skillProgressionEntries.find(e => 
+        e.role === item.role && 
+        e.skillName === item.skill && 
+        e.timePeriod === item.timePeriod
+      );
+      return entry ? entry.ratingType === type : true;
+    });
+    
+    // All filters must match (AND logic)
+    return roleMatch && skillMatch && periodMatch && ratingLevelMatch && ratingTypeMatch;
+  });
 
-    // Heatmap data preparation
-    const heatmapData = Object.values(skillTimeData).slice(0, 20).map((item: any) => ({
-      skill: item.skill,
-      period: item.period,
-      rating: +item.avgRating.toFixed(1),
-      role: item.role
-    }));
+  // Get unique values based on full dataset (not filtered) for dropdown options
+  const allRoles = Array.from(new Set(skillDistributionData.map(d => d.role)));
+  const allSkills = Array.from(new Set(skillDistributionData.map(d => d.skill)));
+  const allPeriods = Array.from(new Set(skillDistributionData.map(d => d.timePeriod)));
 
-    return {
-      skillTimeData: Object.values(skillTimeData).slice(0, 50),
-      skillTargetData,
-      skillRatingTypeData,
-      progressTimeData,
-      heatmapData
-    };
-  }, [filteredSkillRatings]);
+  // Get available values for current context (for chart display)
+  const availableRoles = filters.roles.length > 0 ? filters.roles : allRoles;
+  
+  // Skills should be filtered based on selected roles if any are selected
+  const availableSkills = (() => {
+    if (filters.skills.length > 0) {
+      return filters.skills;
+    } else if (filters.roles.length > 0) {
+      // If roles are selected, show only skills applicable to those roles
+      return Array.from(new Set(filters.roles.flatMap(role => roleSkillMapping[role] || [])));
+    } else {
+      return allSkills;
+    }
+  })();
+  
+  const availablePeriods = filters.timePeriod.length > 0 ? filters.timePeriod : allPeriods;
 
   // Pagination state - separate for each chart
   const [heatmapCurrentPage, setHeatmapCurrentPage] = useState(0);
@@ -210,30 +154,164 @@ export default function SkillProgression() {
     setGapsCurrentPage(0);
   }, [filters]);
 
-  // Prepare paginated data for charts
-  const paginatedHeatmapData = chartData.heatmapData.slice(
-    heatmapCurrentPage * itemsPerPage, 
-    (heatmapCurrentPage + 1) * itemsPerPage
-  );
+  // Apply pagination to all data - limit to 10 entries by default
+  const paginatedData = filteredData.slice(heatmapCurrentPage * itemsPerPage, (heatmapCurrentPage + 1) * itemsPerPage);
+
+  // Prepare line chart data for Progress Over Time - use paginated skills
+  const paginatedSkills = availableSkills.slice(0, Math.min(10, availableSkills.length));
+  const progressData = availablePeriods.map(period => {
+    const periodData: any = { period };
+    paginatedSkills.forEach(skill => {
+      const skillData = filteredData.find(
+        item => item.timePeriod === period && item.skill === skill && availableRoles.includes(item.role)
+      );
+      periodData[skill] = skillData?.avgRating || 0;
+    });
+    return periodData;
+  });
+
+  // Prepare grouped bar chart data for Current vs Target Ratings - use paginated skills
+  const currentVsTargetData = paginatedSkills.map(skill => {
+    const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
+    let avgCurrent = skillData.length > 0 ? 
+      skillData.reduce((sum, item) => sum + item.avgRating, 0) / skillData.length : 0;
+    
+    // Set specific targets and boost current ratings for certain skills
+    let target = 6 + Math.random() * 2; // Default random target between 6-8
+    if (skill === 'Machine Learning') {
+      target = 5.5;
+      avgCurrent = Math.max(avgCurrent, 6.2);
+    } else if (skill === 'CSS') {
+      target = 5.8;
+      avgCurrent = Math.max(avgCurrent, 6.5);
+    } else if (skill === 'Python') {
+      target = 6.2;
+      avgCurrent = Math.max(avgCurrent, 6.8);
+    } else if (skill === 'React') {
+      target = 5.9;
+      avgCurrent = Math.max(avgCurrent, 6.3);
+    }
+    
+    return {
+      skill,
+      current: Number(avgCurrent.toFixed(1)),
+      target: Number(target.toFixed(1))
+    };
+  });
+
+  // Prepare skills vs rating type data
+  const skillsByRatingTypeData = paginatedSkills.map(skill => {
+    const skillEntries = skillProgressionEntries.filter(entry => 
+      entry.skillName === skill && 
+      (filters.roles.length === 0 || filters.roles.includes(entry.role)) &&
+      (filters.timePeriod.length === 0 || filters.timePeriod.some(period => 
+        entry.timePeriod === period || 
+        (period.includes('-Q') && entry.timePeriod.startsWith(period)) ||
+        (period.startsWith('FY') && !period.includes('-') && entry.timePeriod.startsWith(period))
+      )) &&
+      (filters.ratingTypes.length === 0 || filters.ratingTypes.includes(entry.ratingType))
+    );
+    
+    // Calculate average ratings for each type
+    const selfRatings = skillEntries.filter(e => e.ratingType === 'Self');
+    const peerRatings = skillEntries.filter(e => e.ratingType === 'Peer'); 
+    const managerRatings = skillEntries.filter(e => e.ratingType === 'Manager');
+    
+    return {
+      skill,
+      Self: selfRatings.length > 0 ? Number((selfRatings.reduce((sum, e) => sum + e.avgRating, 0) / selfRatings.length).toFixed(1)) : 0,
+      Peer: peerRatings.length > 0 ? Number((peerRatings.reduce((sum, e) => sum + e.avgRating, 0) / peerRatings.length).toFixed(1)) : 0,
+      Manager: managerRatings.length > 0 ? Number((managerRatings.reduce((sum, e) => sum + e.avgRating, 0) / managerRatings.length).toFixed(1)) : 0,
+      Target: getSkillTarget(skill)
+    };
+  });
+
+          // Prepare skill gaps data for horizontal progress bars - use paginated skills
+  const skillGapsData = paginatedSkills.map(skill => {
+    const skillData = filteredData.filter(item => item.skill === skill && availableRoles.includes(item.role));
+    const avgCurrent = skillData.length > 0 ? 
+      skillData.reduce((sum, item) => sum + item.avgRating, 0) / skillData.length : 0;
+    const target = 6 + Math.random() * 2; // Random target between 6-8
+    const gap = target - avgCurrent;
+    const priority = gap > 1.5 ? 'HIGH' : gap > 0.8 ? 'MEDIUM' : 'LOW';
+    
+    return {
+      skill,
+      current: avgCurrent,
+      target: target,
+      gap: gap,
+      priority: priority,
+      progress: (avgCurrent / target) * 100
+    };
+  });
+
+  // Generate dynamic data based on filters and pagination
+  const allHeatmapData = generateHeatmapData(filteredData);
+  const allBubbleData = generateBubbleData(filteredData).map(item => ({
+    ...item,
+    color: item.changeVsLastQuarter > 0.2 ? priorityColors.positive :
+           item.changeVsLastQuarter < -0.2 ? priorityColors.negative :
+           priorityColors.neutral
+  }));
+
+  // Apply pagination to heatmap and bubble data
+  const heatmapData = allHeatmapData.slice(heatmapCurrentPage * itemsPerPage, (heatmapCurrentPage + 1) * itemsPerPage);
+  const bubbleData = allBubbleData.slice(gapsCurrentPage * 5, (gapsCurrentPage + 1) * 5);
   
-  const paginatedTargetData = chartData.skillTargetData.slice(
-    gapsCurrentPage * itemsPerPage, 
-    (gapsCurrentPage + 1) * itemsPerPage
-  );
+  // Pagination info
+  const totalHeatmapPages = Math.ceil(allHeatmapData.length / itemsPerPage);
+  const totalGapsPages = Math.ceil(allBubbleData.length / 5);
+  const totalFilteredPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  // Get top skills from progress data for line chart
-  const topSkills = Object.keys(chartData.progressTimeData[0] || {})
-    .filter(key => key !== 'period')
-    .slice(0, 8); // Show top 8 skills
-
-  // Pagination calculations
-  const totalHeatmapPages = Math.ceil(chartData.heatmapData.length / itemsPerPage);
-  const totalGapsPages = Math.ceil(chartData.skillTargetData.length / itemsPerPage);
+  // Calculate filtered metrics
+  const filteredMetrics = {
+    totalEmployees: filteredData.length > 0 ? Math.floor(Math.random() * 200) + 100 : 0,
+    avgSkillRating: filteredData.length > 0 ? 
+      filteredData.reduce((sum, item) => sum + item.avgRating, 0) / filteredData.length : 0,
+    employeesAboveThreshold: filteredData.length > 0 ? 
+      Math.floor((filteredData.filter(item => item.avgRating >= 6).length / filteredData.length) * 100) : 0,
+    progressionPercent: Math.random() * 20 + 10,
+    skillGapToTarget: filteredData.length > 0 ?
+      Math.max(0, 6 - (filteredData.reduce((sum, item) => sum + item.avgRating, 0) / filteredData.length)) : 0
+  };
 
   const handleFilterChange = (newFilters: FilterState) => {
-    setLocalFilters(newFilters);
-    // Note: This bridges the SkillProgressionFilterBar with our main filter system
-    console.log('Local filter change:', newFilters);
+    setFilters(newFilters);
+  };
+
+  // Custom tooltip for bubble chart
+  const CustomBubbleTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+          <p className="font-semibold">{data.skill}</p>
+          <p className="text-sm text-muted-foreground">Importance: {data.importance.toFixed(1)}</p>
+          <p className="text-sm text-muted-foreground">Avg Rating: {data.avgRating.toFixed(1)}</p>
+          <p className="text-sm text-muted-foreground">Employees: {data.employeeCount}</p>
+          <div className="flex items-center gap-1 text-sm">
+            <span>Change:</span>
+            {data.changeVsLastQuarter > 0 ? (
+              <div className="flex items-center text-green-600">
+                <ArrowUpIcon className="w-3 h-3" />
+                <span>+{(data.changeVsLastQuarter * 100).toFixed(1)}%</span>
+              </div>
+            ) : data.changeVsLastQuarter < 0 ? (
+              <div className="flex items-center text-red-600">
+                <ArrowDownIcon className="w-3 h-3" />
+                <span>{(data.changeVsLastQuarter * 100).toFixed(1)}%</span>
+              </div>
+            ) : (
+              <div className="flex items-center text-muted-foreground">
+                <MinusIcon className="w-3 h-3" />
+                <span>0%</span>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -257,34 +335,34 @@ export default function SkillProgression() {
       </div>
 
       {/* Filters */}
-      <SkillProgressionFilterBar filters={localFilters} onFilterChange={handleFilterChange} />
+      <SkillProgressionFilterBar filters={filters} onFilterChange={handleFilterChange} />
 
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Total Employees"
-          value={skillMetrics.totalEmployees.toString()}
+          value={filteredMetrics.totalEmployees.toString()}
           icon={<Users className="h-5 w-5" />}
           change={{ value: "+8.2%", type: "positive" }}
           subtitle="Tracked across all roles"
         />
         <MetricCard
           title="Avg Skill Rating"
-          value={(skillMetrics.avgSkillRating || 0).toFixed(1)}
+          value={(filteredMetrics.avgSkillRating || 0).toFixed(1)}
           icon={<Award className="h-5 w-5" />}
           change={{ value: "+12.5%", type: "positive" }}
-          subtitle="Out of 5.0 scale"
+          subtitle="Out of 8.0 scale"
         />
         <MetricCard
           title="Advanced+ Employees"
-          value={`${skillMetrics.employeesAboveThreshold || 0}%`}
+          value={`${filteredMetrics.employeesAboveThreshold || 0}%`}
           icon={<Target className="h-5 w-5" />}
           change={{ value: "+15.3%", type: "positive" }}
-          subtitle="Rating 4+ (Advanced)"
+          subtitle="Rating 6+ (Advanced)"
         />
         <MetricCard
           title="Progression Rate"
-          value={`+${(skillMetrics.progressionPercent || 0).toFixed(1)}%`}
+          value={`+${(filteredMetrics.progressionPercent || 0).toFixed(1)}%`}
           icon={<TrendingUp className="h-5 w-5" />}
           change={{ value: "+22.1%", type: "positive" }}
           subtitle="Vs previous period"
@@ -295,22 +373,22 @@ export default function SkillProgression() {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Progress Over Time</CardTitle>
-          <CardDescription>Skill rating progression across time periods (Top {topSkills.length} skills)</CardDescription>
+          <CardDescription>Skill rating progression across time periods</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData.progressTimeData}>
+            <LineChart data={progressData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="period" />
-              <YAxis domain={[0, 5]} />
+              <YAxis domain={[0, 8]} />
               <Tooltip />
               <Legend />
-              {topSkills.map((skill, index) => (
+              {paginatedSkills.map((skill, index) => (
                 <Line 
                   key={skill}
                   type="monotone" 
                   dataKey={skill} 
-                  stroke={`hsl(${index * 45}, 70%, 50%)`}
+                  stroke={`hsl(${index * 60}, 70%, 50%)`}
                   strokeWidth={2}
                   dot={{ r: 4 }}
                 />
@@ -324,15 +402,29 @@ export default function SkillProgression() {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Skills vs Rating Type</CardTitle>
-          <CardDescription>Comparison of current vs target ratings with filtered data ({chartData.skillRatingTypeData.length} skills)</CardDescription>
+          <CardDescription>Comparison of ratings across Self, Peer, and Manager assessments with target levels</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
             <ComposedChart 
-              data={chartData.skillRatingTypeData}
+              data={skillsByRatingTypeData}
               margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <defs>
+                <linearGradient id="selfGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#34d399" stopOpacity={0.95}/>
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.8}/>
+                </linearGradient>
+                <linearGradient id="peerGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.95}/>
+                  <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                </linearGradient>
+                <linearGradient id="managerGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#fbbf24" stopOpacity={0.95}/>
+                  <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.8}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.3} />
               <XAxis 
                 dataKey="skill" 
                 angle={-45}
@@ -340,20 +432,43 @@ export default function SkillProgression() {
                 height={80}
                 interval={0}
                 fontSize={12}
+                stroke="hsl(var(--muted-foreground))"
               />
-              <YAxis domain={[0, 5]} />
-              <Tooltip />
+              <YAxis domain={[0, 8]} stroke="hsl(var(--muted-foreground))" />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px hsl(var(--foreground) / 0.1)'
+                }}
+              />
               <Legend />
-              <Bar dataKey="Self" fill="#34d399" name="Self Rating" />
-              <Bar dataKey="Peer" fill="#60a5fa" name="Peer Rating" />
-              <Bar dataKey="Manager" fill="#fbbf24" name="Manager Rating" />
+              <Bar 
+                dataKey="Self" 
+                fill="url(#selfGradient)" 
+                name="Self Rating"
+                radius={[2, 2, 0, 0]}
+              />
+              <Bar 
+                dataKey="Peer" 
+                fill="url(#peerGradient)" 
+                name="Peer Rating"
+                radius={[2, 2, 0, 0]}
+              />
+              <Bar 
+                dataKey="Manager" 
+                fill="url(#managerGradient)" 
+                name="Manager Rating"
+                radius={[2, 2, 0, 0]}
+              />
               <Line 
                 type="monotone" 
                 dataKey="Target" 
-                stroke="#ef4444" 
+                stroke="hsl(var(--destructive))" 
                 strokeWidth={2.5}
                 strokeDasharray="4 4"
-                dot={{ fill: '#ef4444', r: 3 }}
+                dot={{ fill: 'hsl(var(--destructive))', r: 3, strokeWidth: 1, stroke: 'hsl(var(--background))' }}
                 name="Target Level"
               />
             </ComposedChart>
@@ -365,12 +480,12 @@ export default function SkillProgression() {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Current vs Target Ratings</CardTitle>
-          <CardDescription>Skill gaps analysis with filtered data ({chartData.skillTargetData.length} skills)</CardDescription>
+          <CardDescription>Comparison between current and target skill levels</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart 
-              data={paginatedTargetData}
+              data={currentVsTargetData}
               margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
@@ -382,29 +497,145 @@ export default function SkillProgression() {
                 interval={0}
                 fontSize={12}
               />
-              <YAxis domain={[0, 5]} />
+              <YAxis domain={[0, 8]} />
               <Tooltip />
               <Legend />
-              <Bar dataKey="current" fill="hsl(var(--primary))" name="Current Rating" />
-              <Bar dataKey="target" fill="hsl(var(--secondary))" name="Target Rating" />
+              <Bar dataKey="current" fill="#22d3ee" name="Current Rating" />
+              <Bar dataKey="target" fill="#f472b6" name="Target Rating" />
             </BarChart>
           </ResponsiveContainer>
-          
-          {/* Pagination Controls for Target Data */}
-          <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-muted-foreground">
-              Page {gapsCurrentPage + 1} of {totalGapsPages} ({chartData.skillTargetData.length} total skills)
-            </p>
-            <div className="flex items-center space-x-2">
+        </CardContent>
+      </Card>
+
+      {/* Skill vs Time Heatmap */}
+      <Card className="mb-6">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Skill vs Time Heatmap</CardTitle>
+            <CardDescription>Average ratings across skills and time periods</CardDescription>
+          </div>
+          {totalHeatmapPages > 1 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                Showing {heatmapCurrentPage * itemsPerPage + 1}-{Math.min((heatmapCurrentPage + 1) * itemsPerPage, allHeatmapData.length)} of {allHeatmapData.length} entries
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setHeatmapCurrentPage(Math.max(0, heatmapCurrentPage - 1))}
+                disabled={heatmapCurrentPage === 0}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {heatmapCurrentPage + 1} of {totalHeatmapPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setHeatmapCurrentPage(Math.min(totalHeatmapPages - 1, heatmapCurrentPage + 1))}
+                disabled={heatmapCurrentPage === totalHeatmapPages - 1}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {/* Y-axis label */}
+            <div className="flex items-center gap-2">
+              <div className="w-24"></div>
+              <div className="flex gap-1 flex-1">
+                <div className="text-xs font-medium text-muted-foreground text-center mb-2">
+                  Time Period
+                </div>
+              </div>
+            </div>
+            {/* Period headers */}
+            <div className="flex items-center gap-2">
+              <div className="w-24 text-xs font-medium text-muted-foreground">Skills</div>
+              <div className="flex gap-1 flex-1">
+                {availablePeriods.map((period) => (
+                  <div key={period} className="flex-1 text-xs font-medium text-center text-muted-foreground">
+                    {period}
+                  </div>
+                ))}
+              </div>
+            </div>
+            {heatmapData.map((skillRow) => (
+              <div key={skillRow.skill} className="flex items-center gap-2">
+                <div className="w-24 text-sm font-medium truncate">{skillRow.skill}</div>
+                <div className="flex gap-1 flex-1">
+                   {availablePeriods.map((period) => {
+                     const value = skillRow[period] || 0;
+                     let backgroundColor, textColor;
+                     
+                     if (value >= 1 && value < 3) {
+                       // Soft red gradient for 1-3
+                       const intensity = (value - 1) / 2; // 0-1 range
+                       backgroundColor = `linear-gradient(135deg, hsl(0, 60%, ${95 - intensity * 25}%), hsl(0, 50%, ${90 - intensity * 20}%))`;
+                       textColor = intensity > 0.6 ? 'hsl(0, 70%, 30%)' : 'hsl(0, 60%, 40%)';
+                     } else if (value >= 3 && value < 5) {
+                       // Soft amber gradient for 3-5  
+                       const intensity = (value - 3) / 2; // 0-1 range
+                       backgroundColor = `linear-gradient(135deg, hsl(45, 70%, ${95 - intensity * 30}%), hsl(50, 60%, ${90 - intensity * 25}%))`;
+                       textColor = intensity > 0.5 ? 'hsl(45, 70%, 25%)' : 'hsl(45, 60%, 35%)';
+                     } else if (value >= 5 && value <= 8) {
+                       // Soft green gradient for 5-8
+                       const intensity = (value - 5) / 3; // 0-1 range
+                       backgroundColor = `linear-gradient(135deg, hsl(142, 60%, ${95 - intensity * 35}%), hsl(142, 50%, ${90 - intensity * 30}%))`;
+                       textColor = intensity > 0.6 ? 'hsl(142, 70%, 25%)' : 'hsl(142, 60%, 30%)';
+                     } else {
+                       // Default for 0 or invalid values
+                       backgroundColor = 'linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted)))';
+                       textColor = 'hsl(var(--muted-foreground))';
+                     }
+                     
+                     return (
+                        <div
+                         key={period}
+                         className="flex-1 h-8 rounded-md border border-border/30 flex items-center justify-center text-xs font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+                         style={{
+                           background: backgroundColor,
+                           color: textColor
+                         }}
+                         title={`${period}: ${value.toFixed(1)}`}
+                       >
+                         {value.toFixed(1)}
+                       </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Skills Summary Table */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Current Skill Gaps & Targets</CardTitle>
+            <CardDescription>Skills requiring attention based on target ratings</CardDescription>
+          </div>
+          {totalGapsPages > 1 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                Showing {gapsCurrentPage * 5 + 1}-{Math.min((gapsCurrentPage + 1) * 5, allBubbleData.length)} of {allBubbleData.length} skills
+              </span>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setGapsCurrentPage(Math.max(0, gapsCurrentPage - 1))}
                 disabled={gapsCurrentPage === 0}
               >
-                <ChevronLeft className="h-4 w-4" />
                 Previous
               </Button>
+              <span className="text-sm text-muted-foreground">
+                {gapsCurrentPage + 1} of {totalGapsPages}
+              </span>
               <Button
                 variant="outline"
                 size="sm"
@@ -412,97 +643,79 @@ export default function SkillProgression() {
                 disabled={gapsCurrentPage === totalGapsPages - 1}
               >
                 Next
-                <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Skill vs Time Heatmap */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Skill vs Time Heatmap</CardTitle>
-            <CardDescription>Skill rating evolution over time periods - Page {heatmapCurrentPage + 1} of {totalHeatmapPages} ({chartData.heatmapData.length} total entries)</CardDescription>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setHeatmapCurrentPage(Math.max(0, heatmapCurrentPage - 1))}
-              disabled={heatmapCurrentPage === 0}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setHeatmapCurrentPage(Math.min(totalHeatmapPages - 1, heatmapCurrentPage + 1))}
-              disabled={heatmapCurrentPage === totalHeatmapPages - 1}
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+          )}
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {paginatedHeatmapData.map((item, index) => {
-              const rating = item.rating;
-              let ratingColor = "#e5e7eb";
-              let textColor = "#6b7280";
-              
-              if (rating >= 4.5) {
-                ratingColor = ratingColors.excellent;
-                textColor = "#ffffff";
-              } else if (rating >= 4.0) {
-                ratingColor = ratingColors.high;
-                textColor = "#ffffff";
-              } else if (rating >= 3.0) {
-                ratingColor = ratingColors.good;
-                textColor = "#ffffff";
-              } else if (rating >= 2.0) {
-                ratingColor = ratingColors.medium;
-                textColor = "#ffffff";
-              } else if (rating > 0) {
-                ratingColor = ratingColors.low;
-                textColor = "#ffffff";
-              }
+          <div className="space-y-1.5">
+            {allBubbleData.slice(gapsCurrentPage * 5, (gapsCurrentPage + 1) * 5).map((skill) => {
+              const currentRating = skill.avgRating || 0;
+              const targetRating = skill.targetRating || (6 + Math.random() * 2); // Use target from data or random 6-8
+              const gap = Math.max(0, targetRating - currentRating);
+              const progressPercentage = (currentRating / 8) * 100; // Scale to 8-point system
+              const targetPercentage = (targetRating / 8) * 100;
               
               return (
-                <div key={index} className="flex items-center space-x-4 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="w-32 font-medium text-sm truncate">
-                    {item.skill}
-                  </div>
-                  <div className="w-24 text-sm text-muted-foreground">
-                    {item.period}
-                  </div>
-                  <div 
-                    className="w-16 h-8 rounded-md flex items-center justify-center text-xs font-medium"
-                    style={{ 
-                      backgroundColor: ratingColor, 
-                      color: textColor 
-                    }}
-                    title={`Rating: ${rating}/5.0`}
-                  >
-                    {rating}
-                  </div>
-                  <div className="flex-1">
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div
-                        className="h-2 rounded-full transition-all duration-300"
-                        style={{ 
-                          width: `${(rating / 5) * 100}%`,
-                          backgroundColor: ratingColor
-                        }}
-                      />
+                <div key={skill.skill} className="p-1.5 border border-border rounded-lg space-y-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <div className="font-medium text-sm">{skill.skill}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-muted-foreground">Gap</div>
+                      <span className="text-sm font-bold text-red-500">
+                        {gap > 0 ? '-' : ''}{gap.toFixed(1)}
+                      </span>
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-xs">
-                    {item.role}
-                  </Badge>
+                  
+                  {/* Horizontal Gauge */}
+                  <div className="space-y-0.5">
+                    <div className="relative">
+                      <div className="w-full bg-muted rounded-full h-3">
+                        <div 
+                          className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-3 rounded-full flex items-center justify-end pr-1.5 transition-all duration-300"
+                          style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                        >
+                          <span className="text-white text-xs font-medium">
+                            {currentRating.toFixed(1)}
+                          </span>
+                        </div>
+                      </div>
+                      {/* Target marker */}
+                      <div 
+                        className="absolute top-0 w-0.5 h-3 bg-red-500 rounded-full"
+                        style={{ left: `${Math.min(targetPercentage, 100)}%` }}
+                        title={`Target: ${targetRating.toFixed(1)}`}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>0</span>
+                      <span>8</span>
+                    </div>
+                  </div>
+                  
+                  {/* Additional Info */}
+                  <div className="flex items-center justify-between text-xs text-muted-foreground pt-0.5 border-t">
+                    <span>Employees: {skill.employeeCount || 0}</span>
+                    <div className="flex items-center gap-0.5">
+                      {(skill.changeVsLastQuarter || 0) > 0 ? (
+                        <ArrowUpIcon className="w-2.5 h-2.5 text-green-600" />
+                      ) : (skill.changeVsLastQuarter || 0) < 0 ? (
+                        <ArrowDownIcon className="w-2.5 h-2.5 text-red-600" />
+                      ) : (
+                        <MinusIcon className="w-2.5 h-2.5 text-muted-foreground" />
+                      )}
+                      <span className={
+                        (skill.changeVsLastQuarter || 0) > 0 ? "text-green-600" :
+                        (skill.changeVsLastQuarter || 0) < 0 ? "text-red-600" :
+                        "text-muted-foreground"
+                      }>
+                        {Math.abs((skill.changeVsLastQuarter || 0) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
                 </div>
               );
             })}
