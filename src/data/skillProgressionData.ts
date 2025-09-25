@@ -17,6 +17,7 @@ export interface SkillProgressionEntry {
 
 export interface SkillDistribution {
   timePeriod: string;
+  date: Date;
   role: string;
   skill: string;
   beginner: number;
@@ -134,11 +135,18 @@ export const ratingTypeOptions = ["Self", "Peer", "Manager"];
 // Generate comprehensive mock data for all roles and skills
 function generateSkillDistributionData(): SkillDistribution[] {
   const data: SkillDistribution[] = [];
-  const periods = ["FY24-Q1", "FY24-Q2", "FY24-Q3", "FY24-Q4", "FY25-Q1", "FY25-Q2"];
+  const periods = [
+    { period: "FY24-Q1", date: new Date(2023, 9, 1) },   // Oct 2023
+    { period: "FY24-Q2", date: new Date(2024, 0, 1) },   // Jan 2024  
+    { period: "FY24-Q3", date: new Date(2024, 3, 1) },   // Apr 2024
+    { period: "FY24-Q4", date: new Date(2024, 6, 1) },   // Jul 2024
+    { period: "FY25-Q1", date: new Date(2024, 9, 1) },   // Oct 2024
+    { period: "FY25-Q2", date: new Date(2025, 0, 1) },   // Jan 2025
+  ];
   
   Object.entries(roleSkillMapping).forEach(([role, skills]) => {
     skills.forEach(skill => {
-      periods.forEach((period, periodIndex) => {
+      periods.forEach(({ period, date }, periodIndex) => {
         // Generate broader range of skill levels including higher ratings
         const baseSkillLevel = Math.random() * 4 + 2; // Base level 2-6
         const progression = periodIndex * 0.3; // Gradual improvement
@@ -150,6 +158,7 @@ function generateSkillDistributionData(): SkillDistribution[] {
         
         data.push({
           timePeriod: period,
+          date,
           role,
           skill,
           ...distribution,
