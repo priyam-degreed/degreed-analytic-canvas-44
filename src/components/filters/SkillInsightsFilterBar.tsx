@@ -11,6 +11,7 @@ interface FilterState {
   skills: string[];
   groups: string[];
   roles: string[];
+  customAttribute: string[];
 }
 
 interface SkillInsightsFilterBarProps {
@@ -94,6 +95,15 @@ const rolesOptions = [
   "CTO"
 ];
 
+const customAttributeOptions = [
+  "Budget",
+  "Completion Status",
+  "Compliance",
+  "Learning Hours",
+  "Onboarding",
+  "Skill Proficiency"
+].sort();
+
 export function SkillInsightsFilterBar({ onFilterChange }: SkillInsightsFilterBarProps) {
   const [filters, setFilters] = useState<FilterState>({
     dateRange: {
@@ -104,7 +114,8 @@ export function SkillInsightsFilterBar({ onFilterChange }: SkillInsightsFilterBa
     provider: [],
     skills: [],
     groups: [],
-    roles: []
+    roles: [],
+    customAttribute: []
   });
 
   const handleFilterChange = (filterType: keyof FilterState, value: any) => {
@@ -174,6 +185,17 @@ export function SkillInsightsFilterBar({ onFilterChange }: SkillInsightsFilterBa
           options={rolesOptions}
           selected={filters.roles}
           onChange={(value) => handleFilterChange('roles', value)}
+          placeholder="All"
+        />
+      </div>
+
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Custom:</span>
+        <MultiSelectFilter
+          label="Custom Attribute"
+          options={customAttributeOptions}
+          selected={filters.customAttribute}
+          onChange={(value) => handleFilterChange('customAttribute', value)}
           placeholder="All"
         />
       </div>

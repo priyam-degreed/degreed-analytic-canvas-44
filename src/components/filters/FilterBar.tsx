@@ -86,9 +86,10 @@ const customAttributeOptions = [
 
 interface FilterBarProps {
   showRoles?: boolean;
+  showCustomAttribute?: boolean;
 }
 
-export function FilterBar({ showRoles = false }: FilterBarProps) {
+export function FilterBar({ showRoles = false, showCustomAttribute = false }: FilterBarProps) {
   const { filters, updateFilter, resetFilters } = useFilters();
 
   return (
@@ -159,16 +160,18 @@ export function FilterBar({ showRoles = false }: FilterBarProps) {
           </div>
         )}
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground min-w-fit">Custom Attribute</span>
-          <MultiSelectFilter
-            label="Custom Attribute"
-            options={customAttributeOptions}
-            selected={filters.customAttribute || []}
-            onChange={(value) => updateFilter('customAttribute', value)}
-            placeholder="All"
-          />
-        </div>
+        {showCustomAttribute && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground min-w-fit">Custom Attribute</span>
+            <MultiSelectFilter
+              label="Custom Attribute"
+              options={customAttributeOptions}
+              selected={filters.customAttribute || []}
+              onChange={(value) => updateFilter('customAttribute', value)}
+              placeholder="All"
+            />
+          </div>
+        )}
       </div>
 
       <Button
