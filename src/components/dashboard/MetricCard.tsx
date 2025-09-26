@@ -12,6 +12,7 @@ interface MetricCardProps {
   subtitle?: string;
   icon?: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
 export function MetricCard({ 
@@ -20,7 +21,8 @@ export function MetricCard({
   change, 
   subtitle, 
   icon, 
-  className 
+  className,
+  onClick 
 }: MetricCardProps) {
   const getTrendIcon = () => {
     if (!change) return null;
@@ -49,7 +51,10 @@ export function MetricCard({
   };
 
   return (
-    <div className={cn("metric-card", className)}>
+    <div 
+      className={cn("metric-card", onClick && "cursor-pointer hover:shadow-md transition-shadow", className)}
+      onClick={onClick}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-muted-foreground mb-2">{title}</p>

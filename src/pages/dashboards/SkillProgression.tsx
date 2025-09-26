@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { SkillProgressionFilterBar } from "@/components/filters/SkillProgressionFilterBar";
 import { DrillDownTooltip, ClickableDrillDown } from "@/components/dashboard/DrillDownTooltip";
 import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
+import { getEmployeesAboveRating, getEmployeesWithProgression, getAllEmployees, Employee } from "@/data/employeeDrillDownData";
 import { 
   BarChart, 
   Bar, 
@@ -319,6 +320,108 @@ export default function SkillProgression() {
     setIsDrillDownOpen(true);
   };
 
+  // Metric card drill-down handlers
+  const handleMetricCardClick = (cardType: string) => {
+    let drillDownData: DrillDownData;
+    let employees: Employee[] = [];
+
+    switch (cardType) {
+      case 'totalEmployees':
+        employees = getAllEmployees(
+          filters.ratingTypes.length > 0 ? filters.ratingTypes : undefined,
+          filters.roles.length > 0 ? filters.roles : undefined,
+          filters.skills.length > 0 ? filters.skills : undefined
+        );
+        drillDownData = {
+          value: filteredMetrics.totalEmployees,
+          employees: employees.length,
+          additionalData: {
+            cardType: 'Total Employees',
+            description: 'All employees tracked across roles',
+            employeeList: employees,
+            breakdown: {
+              roles: [...new Set(employees.map(e => e.role))],
+              ratingTypes: [...new Set(employees.map(e => e.ratingType))]
+            }
+          }
+        };
+        break;
+
+      case 'avgSkillRating':
+        employees = getAllEmployees(
+          filters.ratingTypes.length > 0 ? filters.ratingTypes : undefined,
+          filters.roles.length > 0 ? filters.roles : undefined,
+          filters.skills.length > 0 ? filters.skills : undefined
+        );
+        drillDownData = {
+          value: (filteredMetrics.avgSkillRating || 0).toFixed(1),
+          employees: employees.length,
+          additionalData: {
+            cardType: 'Average Skill Rating',
+            description: 'Average rating across all tracked employees',
+            employeeList: employees,
+            ratingDistribution: {
+              'Advanced (6-8)': employees.filter(e => e.skillRating >= 6).length,
+              'Intermediate (4-6)': employees.filter(e => e.skillRating >= 4 && e.skillRating < 6).length,
+              'Beginner (1-4)': employees.filter(e => e.skillRating < 4).length
+            }
+          }
+        };
+        break;
+
+      case 'advancedEmployees':
+        employees = getEmployeesAboveRating(
+          6,
+          filters.ratingTypes.length > 0 ? filters.ratingTypes : undefined,
+          filters.roles.length > 0 ? filters.roles : undefined,
+          filters.skills.length > 0 ? filters.skills : undefined
+        );
+        drillDownData = {
+          value: `${filteredMetrics.employeesAboveThreshold || 0}%`,
+          employees: employees.length,
+          additionalData: {
+            cardType: 'Advanced+ Employees',
+            description: 'Employees with rating 6+ (Advanced level)',
+            employeeList: employees,
+            skillBreakdown: [...new Set(employees.map(e => e.skill))].reduce((acc, skill) => {
+              acc[skill || 'Unknown'] = employees.filter(e => e.skill === skill).length;
+              return acc;
+            }, {} as Record<string, number>)
+          }
+        };
+        break;
+
+      case 'progressionRate':
+        employees = getEmployeesWithProgression(
+          15,
+          filters.ratingTypes.length > 0 ? filters.ratingTypes : undefined,
+          filters.roles.length > 0 ? filters.roles : undefined,
+          filters.skills.length > 0 ? filters.skills : undefined
+        );
+        drillDownData = {
+          value: `+${(filteredMetrics.progressionPercent || 0).toFixed(1)}%`,
+          employees: employees.length,
+          additionalData: {
+            cardType: 'Progression Rate',
+            description: 'Employees showing positive skill progression',
+            employeeList: employees,
+            progressionTiers: {
+              'High Progression (25%+)': employees.filter(e => (e.progressionRate || 0) >= 25).length,
+              'Moderate Progression (15-25%)': employees.filter(e => (e.progressionRate || 0) >= 15 && (e.progressionRate || 0) < 25).length,
+              'Low Progression (5-15%)': employees.filter(e => (e.progressionRate || 0) >= 5 && (e.progressionRate || 0) < 15).length
+            }
+          }
+        };
+        break;
+
+      default:
+        return;
+    }
+
+    setDrillDownData(drillDownData);
+    setIsDrillDownOpen(true);
+  };
+
   const handleApplyFilter = (filterType: string, filterValue: string) => {
     const newFilters = { ...filters };
     
@@ -514,6 +617,7 @@ export default function SkillProgression() {
           icon={<Users className="h-5 w-5" />}
           change={{ value: "+8.2%", type: "positive" }}
           subtitle="Tracked across all roles"
+          onClick={() => handleMetricCardClick('totalEmployees')}
         />
         <MetricCard
           title="Avg Skill Rating"
@@ -521,6 +625,7 @@ export default function SkillProgression() {
           icon={<Award className="h-5 w-5" />}
           change={{ value: "+12.5%", type: "positive" }}
           subtitle="Out of 8.0 scale"
+          onClick={() => handleMetricCardClick('avgSkillRating')}
         />
         <MetricCard
           title="Advanced+ Employees"
@@ -528,6 +633,7 @@ export default function SkillProgression() {
           icon={<Target className="h-5 w-5" />}
           change={{ value: "+15.3%", type: "positive" }}
           subtitle="Rating 6+ (Advanced)"
+          onClick={() => handleMetricCardClick('advancedEmployees')}
         />
         <MetricCard
           title="Progression Rate"
@@ -535,6 +641,7 @@ export default function SkillProgression() {
           icon={<TrendingUp className="h-5 w-5" />}
           change={{ value: "+22.1%", type: "positive" }}
           subtitle="Vs previous period"
+          onClick={() => handleMetricCardClick('progressionRate')}
         />
       </div>
 

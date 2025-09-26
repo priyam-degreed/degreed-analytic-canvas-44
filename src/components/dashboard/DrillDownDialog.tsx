@@ -104,6 +104,102 @@ export function DrillDownDialog({
             )}
           </div>
 
+          {/* Additional Data Display */}
+          {data.additionalData && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-foreground">
+                  {data.additionalData.cardType || 'Details'}
+                </h4>
+                
+                {data.additionalData.description && (
+                  <p className="text-sm text-muted-foreground">
+                    {data.additionalData.description}
+                  </p>
+                )}
+
+                {/* Employee Count */}
+                {data.employees !== undefined && (
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Total Employees:</span>
+                    <Badge variant="outline">{data.employees}</Badge>
+                  </div>
+                )}
+
+                {/* Data Breakdown */}
+                {data.additionalData.breakdown && (
+                  <div className="space-y-2">
+                    <span className="text-sm font-medium">Breakdown:</span>
+                    {Object.entries(data.additionalData.breakdown).map(([key, values]: [string, any]) => (
+                      <div key={key} className="ml-2">
+                        <span className="text-xs text-muted-foreground capitalize">{key}:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {Array.isArray(values) ? values.map((value: string) => (
+                            <Badge key={value} variant="secondary" className="text-xs">
+                              {value}
+                            </Badge>
+                          )) : (
+                            <Badge variant="secondary" className="text-xs">{values}</Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Rating Distribution */}
+                {data.additionalData.ratingDistribution && (
+                  <div className="space-y-2">
+                    <span className="text-sm font-medium">Rating Distribution:</span>
+                    <div className="space-y-1">
+                      {Object.entries(data.additionalData.ratingDistribution).map(([range, count]) => (
+                        <div key={range} className="flex justify-between items-center text-xs">
+                          <span className="text-muted-foreground">{range}:</span>
+                          <Badge variant="outline">{count as number}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Skill Breakdown */}
+                {data.additionalData.skillBreakdown && (
+                  <div className="space-y-2">
+                    <span className="text-sm font-medium">Top Skills:</span>
+                    <div className="space-y-1">
+                      {Object.entries(data.additionalData.skillBreakdown)
+                        .sort(([,a], [,b]) => (b as number) - (a as number))
+                        .slice(0, 5)
+                        .map(([skill, count]) => (
+                          <div key={skill} className="flex justify-between items-center text-xs">
+                            <span className="text-muted-foreground">{skill}:</span>
+                            <Badge variant="outline">{count as number}</Badge>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Progression Tiers */}
+                {data.additionalData.progressionTiers && (
+                  <div className="space-y-2">
+                    <span className="text-sm font-medium">Progression Tiers:</span>
+                    <div className="space-y-1">
+                      {Object.entries(data.additionalData.progressionTiers).map(([tier, count]) => (
+                        <div key={tier} className="flex justify-between items-center text-xs">
+                          <span className="text-muted-foreground">{tier}:</span>
+                          <Badge variant="outline">{count as number}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
           <Separator />
 
           {/* Filter Options */}
