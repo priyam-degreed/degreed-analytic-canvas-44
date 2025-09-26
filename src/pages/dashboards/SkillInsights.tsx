@@ -374,7 +374,7 @@ export default function SkillInsights() {
       >
         <div className="space-y-4">
           <ResponsiveContainer width="100%" height={500}>
-            <BarChart
+            <LineChart
               data={skillsInRolesData}
               margin={{ top: 20, right: 80, left: 150, bottom: 5 }}
             >
@@ -399,12 +399,14 @@ export default function SkillInsights() {
                   borderRadius: '6px'
                 }}
               />
-              <Bar 
+              <Line 
                 dataKey="roleCount" 
-                fill="hsl(var(--primary))"
-                radius={[0, 4, 4, 0]}
+                stroke="hsl(var(--primary))"
+                strokeWidth={3}
+                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 6 }}
+                activeDot={{ r: 8, fill: 'hsl(var(--primary))' }}
               />
-            </BarChart>
+            </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
