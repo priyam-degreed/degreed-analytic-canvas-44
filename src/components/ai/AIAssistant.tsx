@@ -1326,12 +1326,13 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         onClick={handleClose}
       />
       
-      {/* Modal - Centered on screen */}
+      {/* Modal - Centered when open, bottom-right when minimized */}
       <div 
         className={cn(
-          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl border z-50 transition-all duration-200",
-          "max-w-[90vw] max-h-[90vh] overflow-hidden",
-          isMinimized ? "w-80 h-16" : "w-[600px] h-[650px]"
+          "fixed bg-white rounded-xl shadow-2xl border z-50 transition-all duration-300 overflow-hidden",
+          isMinimized 
+            ? "bottom-6 right-6 w-80 h-16" 
+            : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[650px] max-w-[90vw] max-h-[90vh]"
         )}
       >
         {/* Header */}
