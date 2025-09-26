@@ -349,7 +349,6 @@ export default function SkillProgression() {
       const skillValue = data.activePayload.find((payload: any) => payload.dataKey === skill)?.value;
       
       // Set highlight state
-      console.log('Setting highlighted data point:', { skill, period });
       setHighlightedDataPoint({ skill, period });
       
       // Set drill-down data
@@ -534,8 +533,6 @@ export default function SkillProgression() {
                 const isChartDimmed = highlightedDataPoint !== null;
                 const isHighlightedSkill = highlightedDataPoint?.skill === skill;
                 
-                console.log('Rendering skill:', skill, 'isDimmed:', isChartDimmed, 'isHighlighted:', isHighlightedSkill);
-                
                 return (
                   <Line 
                     key={skill}
@@ -562,7 +559,6 @@ export default function SkillProgression() {
                           strokeWidth={isThisDataPointHighlighted ? 3 : 0}
                           style={{ cursor: 'pointer' }}
                           onClick={() => {
-                            console.log('Dot clicked:', { skill, period: currentPeriod });
                             const clickData = {
                               activeLabel: currentPeriod,
                               activePayload: [{ dataKey: skill, value: props.payload[skill] }]
@@ -572,16 +568,7 @@ export default function SkillProgression() {
                         />
                       );
                     }}
-                    activeDot={{ 
-                      r: 8, 
-                      fill: `hsl(${index * 60}, 70%, 50%)`,
-                      stroke: 'hsl(var(--background))',
-                      strokeWidth: 2,
-                      onClick: (data: any) => {
-                        console.log('Active dot clicked:', data);
-                        handleLineChartClick(data, skill);
-                      }
-                    }}
+                    activeDot={false}
                   />
                 );
               })}
