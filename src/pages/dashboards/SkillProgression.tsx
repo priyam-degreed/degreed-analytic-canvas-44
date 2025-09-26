@@ -369,6 +369,9 @@ export default function SkillProgression() {
 
   const CustomBarTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      // Find the original data point to get the target value
+      const dataPoint = skillsByRatingTypeData.find(item => item.skill === label);
+      
       return (
         <div className="bg-background border border-border rounded-lg p-3 shadow-lg" style={{zIndex: 9999, position: 'relative'}}>
           <p className="font-semibold text-foreground mb-2">{label}</p>
@@ -384,6 +387,18 @@ export default function SkillProgression() {
               </div>
             </div>
           ))}
+          {dataPoint?.Target && (
+            <div className="mb-1">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm" style={{ color: 'hsl(var(--destructive))' }}>
+                  Target Level:
+                </span>
+                <span className="font-medium text-foreground">
+                  {dataPoint.Target.toFixed(1)}
+                </span>
+              </div>
+            </div>
+          )}
           <div className="mt-2 pt-2 border-t border-border">
             <div className="text-xs text-muted-foreground">
               Click bars to drill down
@@ -581,8 +596,27 @@ export default function SkillProgression() {
       {/* Skills vs Rating Type Chart */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Skills vs Rating Type</CardTitle>
-          <CardDescription>Comparison of ratings across Self, Peer, and Manager assessments with target levels</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Skills vs Rating Type</CardTitle>
+              <CardDescription>Comparison of ratings across Self, Peer, and Manager assessments with target levels</CardDescription>
+            </div>
+          </div>
+          {highlightedBarData && (
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-xs">
+                Highlighted: {highlightedBarData.skill} - {highlightedBarData.ratingType} Rating
+              </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setHighlightedBarData(null)}
+                className="text-xs"
+              >
+                Clear
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
