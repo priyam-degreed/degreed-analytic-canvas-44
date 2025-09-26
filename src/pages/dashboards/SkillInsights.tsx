@@ -497,12 +497,12 @@ export default function SkillInsights() {
                     </div>
                     <div>
                       <h4 className="font-medium">{skill.skill}</h4>
-                      <p className="text-sm text-muted-foreground">{skill.learners} learners</p>
+                      <p className="text-sm text-muted-foreground">{formatNumber(skill.learners)} learners</p>
                     </div>
                   </div>
                   <div className="text-right space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">+{skill.averageGrowth}</span>
+                      <span className="text-sm font-medium">+{formatPercentage(skill.averageGrowth)}</span>
                       <ArrowUp className="h-4 w-4 text-green-500" />
                     </div>
                     <div className="flex items-center gap-1">
@@ -535,7 +535,7 @@ export default function SkillInsights() {
                       {alert.urgency}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">{alert.affectedUsers}</p>
+                  <p className="text-xs text-muted-foreground">{formatNumber(alert.affectedUsers)} affected users</p>
                   <p className="text-xs">Last activity: {alert.lastActivity}</p>
                 </div>
               )) : (
@@ -556,7 +556,7 @@ export default function SkillInsights() {
                   <span className="text-sm font-medium">{assessment.period}</span>
                   <div className="text-right">
                     <div className="text-sm font-medium">{assessment.avgScore}%</div>
-                    <div className="text-xs text-muted-foreground">{assessment.totalAssessments} assessments</div>
+                    <div className="text-xs text-muted-foreground">{formatNumber(assessment.totalAssessments)} assessments</div>
                   </div>
                 </div>
               ))}
@@ -629,7 +629,7 @@ export default function SkillInsights() {
                     return (
                       <div className="bg-white p-3 border rounded-lg shadow-lg">
                         <p className="font-medium">{data.name}</p>
-                        <p className="text-sm text-muted-foreground">Users: {data.users}</p>
+                        <p className="text-sm text-muted-foreground">Users: {formatNumber(data.users)}</p>
                         <p className="text-sm text-muted-foreground">Market Demand: {data.marketDemand}%</p>
                         <p className="text-sm text-muted-foreground">Rating: {data.selfRating}/5</p>
                       </div>
