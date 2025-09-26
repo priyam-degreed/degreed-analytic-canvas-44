@@ -407,12 +407,11 @@ export default function LearningEngagement() {
                       previous: role.previousPeriod.completions,
                       change: role.change
                     }))}
-                    layout="horizontal"
-                    margin={{ top: 5, right: 80, left: 80, bottom: 5 }}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 60 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis type="category" dataKey="role" width={120} />
+                    <XAxis dataKey="role" angle={-45} textAnchor="end" height={80} />
+                    <YAxis />
                     <Tooltip 
                       contentStyle={{
                         backgroundColor: 'hsl(var(--popover))',
