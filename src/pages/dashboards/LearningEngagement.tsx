@@ -288,7 +288,7 @@ export default function LearningEngagement() {
       <FilterBar showRoles={true} showCustomAttribute={true} />
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
         <MetricCard
           title="Total Active Learners"
           value={metrics.totalLearners.toLocaleString()}
@@ -297,25 +297,39 @@ export default function LearningEngagement() {
           onClick={() => handleCardClick("Total Active Learners")}
         />
         <MetricCard
-          title="Active This Week"
-          value={metrics.activeUsersThisWeek.toLocaleString()}
-          change={{ value: 8.9, type: "positive" }}
-          icon={<TrendingUp className="h-5 w-5" />}
-          onClick={() => handleCardClick("Active This Week")}
-        />
-        <MetricCard
-          title="Course Completions"
+          title="Learning Completions"
           value={metrics.courseCompletions.toLocaleString()}
           change={{ value: 28.9, type: "positive" }}
           icon={<Award className="h-5 w-5" />}
-          onClick={() => handleCardClick("Course Completions")}
+          onClick={() => handleCardClick("Learning Completions")}
         />
         <MetricCard
           title="Learning Hours"
           value={`${metrics.learningHours.toLocaleString()}h`}
           change={{ value: 12.4, type: "positive" }}
           icon={<Clock className="h-5 w-5" />}
-          onClick={() => handleCardClick("Learning Hours")}
+          onClick={() => handleCardClick("Total Learning Hours")}
+        />
+        <MetricCard
+          title="Learning Satisfaction"
+          value="89%"
+          change={{ value: 4.2, type: "positive" }}
+          icon={<Target className="h-5 w-5" />}
+          onClick={() => handleCardClick("Learning Satisfaction")}
+        />
+        <MetricCard
+          title="Assignments Created"
+          value={(metrics.courseCompletions * 1.3).toLocaleString()}
+          change={{ value: 18.7, type: "positive" }}
+          icon={<BookOpen className="h-5 w-5" />}
+          onClick={() => handleCardClick("Assignments Created")}
+        />
+        <MetricCard
+          title="Most Active Skill"
+          value="JavaScript"
+          change={{ value: 23.4, type: "positive" }}
+          icon={<Play className="h-5 w-5" />}
+          onClick={() => handleCardClick("Most Active Skill")}
         />
       </div>
 
@@ -887,6 +901,161 @@ export default function LearningEngagement() {
               </div>
             );
           })}
+        </div>
+      </ChartCard>
+
+      {/* New Analysis Charts to Answer All Questions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Provider Usage Comparison */}
+        <ChartCard title="Learning Provider Usage Trends" subtitle="Which providers are gaining momentum">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={[
+              { provider: 'Coursera', currentPeriod: 847, previousPeriod: 623, growth: 36 },
+              { provider: 'LinkedIn Learning', currentPeriod: 693, previousPeriod: 578, growth: 20 },
+              { provider: 'Internal Training', currentPeriod: 521, previousPeriod: 445, growth: 17 },
+              { provider: 'Udemy Business', currentPeriod: 432, previousPeriod: 398, growth: 9 },
+              { provider: 'Pluralsight', currentPeriod: 287, previousPeriod: 234, growth: 23 }
+            ]}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="provider" angle={-45} textAnchor="end" height={80} />
+              <YAxis />
+              <Tooltip contentStyle={{
+                backgroundColor: 'hsl(var(--popover))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '6px'
+              }} />
+              <Bar dataKey="currentPeriod" fill="hsl(var(--primary))" name="Current Period" />
+              <Bar dataKey="previousPeriod" fill="hsl(var(--muted))" name="Previous Period" />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        {/* Learning Time by Skill Categories */}
+        <ChartCard title="Learning Time by Skill Categories" subtitle="How participants spend time on different skills">
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={[
+                  { name: 'Technical Skills', value: 445, hours: '445h' },
+                  { name: 'Leadership', value: 287, hours: '287h' },
+                  { name: 'Communication', value: 234, hours: '234h' },
+                  { name: 'Project Management', value: 198, hours: '198h' },
+                  { name: 'Data Analysis', value: 176, hours: '176h' },
+                  { name: 'Other', value: 123, hours: '123h' }
+                ]}
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                fill="hsl(var(--primary))"
+                dataKey="value"
+                label={({ name, hours }) => `${name}: ${hours}`}
+              >
+                {[0,1,2,3,4,5].map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => [`${value}h`, 'Learning Hours']} />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        {/* Learning Satisfaction Trends */}
+        <ChartCard title="Learning Satisfaction Over Time" subtitle="Participant satisfaction ratings">
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={[
+              { month: 'Jan', satisfaction: 86, responses: 234 },
+              { month: 'Feb', satisfaction: 87, responses: 267 },
+              { month: 'Mar', satisfaction: 85, responses: 289 },
+              { month: 'Apr', satisfaction: 88, responses: 312 },
+              { month: 'May', satisfaction: 89, responses: 345 },
+              { month: 'Jun', satisfaction: 91, responses: 378 },
+              { month: 'Jul', satisfaction: 89, responses: 398 },
+              { month: 'Aug', satisfaction: 92, responses: 423 }
+            ]}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis domain={[80, 95]} />
+              <Tooltip 
+                formatter={(value, name) => [
+                  name === 'satisfaction' ? `${value}%` : value,
+                  name === 'satisfaction' ? 'Satisfaction Score' : 'Survey Responses'
+                ]}
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--popover))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+              />
+              <Line type="monotone" dataKey="satisfaction" stroke="hsl(var(--primary))" strokeWidth={3} />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        {/* Assignment vs Completion Tracking */}
+        <ChartCard title="Learning Assignments vs Completions" subtitle="Assignment effectiveness tracking">
+          <ResponsiveContainer width="100%" height={300}>
+            <ComposedChart data={[
+              { month: 'Jan', assigned: 1200, completed: 847, rate: 71 },
+              { month: 'Feb', assigned: 1350, completed: 956, rate: 71 },
+              { month: 'Mar', assigned: 1180, completed: 874, rate: 74 },
+              { month: 'Apr', assigned: 1420, completed: 1087, rate: 77 },
+              { month: 'May', assigned: 1560, completed: 1234, rate: 79 },
+              { month: 'Jun', assigned: 1380, completed: 1156, rate: 84 },
+              { month: 'Jul', assigned: 1650, completed: 1378, rate: 84 },
+              { month: 'Aug', assigned: 1720, completed: 1487, rate: 86 }
+            ]}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis yAxisId="left" />
+              <YAxis yAxisId="right" orientation="right" domain={[60, 100]} />
+              <Tooltip contentStyle={{
+                backgroundColor: 'hsl(var(--popover))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '6px'
+              }} />
+              <Bar yAxisId="left" dataKey="assigned" fill="hsl(var(--muted))" name="Assignments Created" />
+              <Bar yAxisId="left" dataKey="completed" fill="hsl(var(--primary))" name="Completions" />
+              <Line yAxisId="right" type="monotone" dataKey="rate" stroke="hsl(var(--accent))" strokeWidth={3} name="Completion Rate %" />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+      </div>
+
+      {/* Skills Progression & Correlation Analysis */}
+      <ChartCard title="Learning Impact on Skill Progression" subtitle="Correlation between learning activities and skill rating improvements">
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart data={activityRatingTrends}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis yAxisId="left" />
+            <YAxis yAxisId="right" orientation="right" domain={[3, 6]} />
+            <Tooltip 
+              formatter={(value, name) => {
+                if (name === 'learningActivities') return [value, 'Learning Activities'];
+                const nameStr = typeof name === 'string' ? name : String(name);
+                return [value, nameStr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())];
+              }}
+              contentStyle={{
+                backgroundColor: 'hsl(var(--popover))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '6px'
+              }}
+            />
+            <Bar yAxisId="left" dataKey="learningActivities" fill="hsl(var(--muted))" name="Learning Activities" />
+            <Line yAxisId="right" type="monotone" dataKey="peerRating" stroke="hsl(var(--primary))" strokeWidth={2} name="Peer Rating" />
+            <Line yAxisId="right" type="monotone" dataKey="managerRating" stroke="hsl(var(--accent))" strokeWidth={2} name="Manager Rating" />
+            <Line yAxisId="right" type="monotone" dataKey="selfRating" stroke="hsl(var(--secondary))" strokeWidth={2} name="Self Rating" />
+          </LineChart>
+        </ResponsiveContainer>
+        <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+          <h4 className="font-semibold mb-2">Key Insights:</h4>
+          <ul className="text-sm space-y-1 text-muted-foreground">
+            <li>• Strong correlation visible between learning activities spike (Aug 2025: 5,440 activities) and rating improvements</li>
+            <li>• Manager ratings show consistent upward trend, indicating sustained skill development</li>
+            <li>• Self and peer ratings demonstrate positive correlation with increased learning engagement</li>
+          </ul>
         </div>
       </ChartCard>
 
