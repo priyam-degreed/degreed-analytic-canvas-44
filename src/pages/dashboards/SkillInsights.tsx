@@ -13,6 +13,12 @@ import {
   comprehensiveSkillRatings, 
   comprehensiveTrendingTopics
 } from '@/data/comprehensiveMockData';
+import { 
+  skillOpportunitiesData, 
+  getMostNeededSkillsData, 
+  getSkillTrendData, 
+  getTotalOpportunities 
+} from '@/data/skillOpportunitiesData';
 import { useMemo } from 'react';
 import { useSkillMetrics, useTopSkillsGained } from "@/hooks/useSkillMetrics";
 import { 
@@ -25,7 +31,9 @@ import {
   ResponsiveContainer,
   ScatterChart,
   Scatter,
-  Cell
+  Cell,
+  LineChart,
+  Line
 } from "recharts";
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', '#8884d8'];
@@ -40,6 +48,7 @@ export default function SkillInsights() {
   // Use comprehensive filtered data for remaining calculations
   const filteredLearningData = useFilteredData(comprehensiveLearningData, filters);
   const filteredSkillRatings = useFilteredData(comprehensiveSkillRatings, filters);
+  const filteredOpportunitiesData = useFilteredData(skillOpportunitiesData, filters);
   
   // Generate filtered skill gaps
   const filteredSkillGaps = useMemo(() => {
@@ -148,6 +157,22 @@ export default function SkillInsights() {
       .slice(0, 4);
   }, [filteredSkillRatings]);
 
+  // Generate opportunities chart data
+  const mostNeededSkillsData = useMemo(() => 
+    getMostNeededSkillsData(filteredOpportunitiesData), 
+    [filteredOpportunitiesData]
+  );
+
+  const skillTrendData = useMemo(() => 
+    getSkillTrendData(filteredOpportunitiesData), 
+    [filteredOpportunitiesData]
+  );
+
+  const totalOpportunities = useMemo(() => 
+    getTotalOpportunities(filteredOpportunitiesData), 
+    [filteredOpportunitiesData]
+  );
+
   // Generate filtered market alignment data
   const filteredMarketAlignment = useMemo(() => {
     const skillUsage = filteredLearningData.reduce((acc: any, item) => {
@@ -222,6 +247,80 @@ export default function SkillInsights() {
           change={{ value: -12.4, type: "negative" }}
           icon={<AlertTriangle className="h-5 w-5" />}
         />
+      </div>
+
+      {/* Skills Opportunities Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard
+          title="Most Needed Skills in Open Opportunities"
+          subtitle="Sep 2025"
+        >
+          <div className="space-y-4">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={mostNeededSkillsData}
+                margin={{ top: 20, right: 60, left: 100, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis 
+                  dataKey="skill" 
+                  type="category" 
+                  width={100}
+                  fontSize={12}
+                />
+                <Tooltip 
+                  formatter={(value: any) => [value, 'Opportunities']}
+                  labelFormatter={(label: any) => `Skill: ${label}`}
+                />
+                <Bar dataKey="opportunities" fill="hsl(var(--primary))" />
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="flex items-center gap-2 mt-4">
+              <div className="w-3 h-3 rounded-full bg-primary"></div>
+              <span className="text-sm font-medium">Number of Opportunities</span>
+              <span className="text-2xl font-bold text-primary ml-4">{totalOpportunities}</span>
+            </div>
+          </div>
+        </ChartCard>
+
+        <ChartCard
+          title="Trend of Most Needed Skills"
+          subtitle="Sep 2025"
+        >
+          <div className="space-y-4">
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={skillTrendData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="month" 
+                  fontSize={12}
+                />
+                <YAxis 
+                  domain={['dataMin - 0.1', 'dataMax + 0.1']}
+                  fontSize={12}
+                />
+                <Tooltip 
+                  formatter={(value: any) => [`${value}K`, 'Opportunities']}
+                  labelFormatter={(label: any) => `Month: ${label}`}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="opportunities" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={2}
+                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="flex items-center gap-2 mt-4">
+              <div className="w-3 h-3 rounded-full bg-primary"></div>
+              <span className="text-sm font-medium">Overall</span>
+              <span className="text-sm text-muted-foreground ml-4">Number of Opportunities</span>
+              <span className="text-2xl font-bold text-primary ml-4">{totalOpportunities}</span>
+            </div>
+          </div>
+        </ChartCard>
       </div>
 
       {/* Critical Skill Gaps */}
