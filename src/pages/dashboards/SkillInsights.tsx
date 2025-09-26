@@ -158,20 +158,23 @@ export default function SkillInsights() {
   }, [filteredSkillRatings]);
 
   // Generate opportunities chart data
-  const mostNeededSkillsData = useMemo(() => 
-    getMostNeededSkillsData(filteredOpportunitiesData), 
-    [filteredOpportunitiesData]
-  );
+  const mostNeededSkillsData = useMemo(() => {
+    const data = getMostNeededSkillsData(filteredOpportunitiesData);
+    console.log('📊 Most needed skills data:', data);
+    return data;
+  }, [filteredOpportunitiesData]);
 
-  const skillTrendData = useMemo(() => 
-    getSkillTrendData(filteredOpportunitiesData), 
-    [filteredOpportunitiesData]
-  );
+  const skillTrendData = useMemo(() => {
+    const data = getSkillTrendData(filteredOpportunitiesData);
+    console.log('📈 Skill trend data:', data);
+    return data;
+  }, [filteredOpportunitiesData]);
 
-  const totalOpportunities = useMemo(() => 
-    getTotalOpportunities(filteredOpportunitiesData), 
-    [filteredOpportunitiesData]
-  );
+  const totalOpportunities = useMemo(() => {
+    const total = getTotalOpportunities(filteredOpportunitiesData);
+    console.log('🎯 Total opportunities:', total);
+    return total;
+  }, [filteredOpportunitiesData]);
 
   // Generate filtered market alignment data
   const filteredMarketAlignment = useMemo(() => {
@@ -256,30 +259,44 @@ export default function SkillInsights() {
           subtitle="Sep 2025"
         >
           <div className="space-y-4">
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={400}>
               <BarChart
                 data={mostNeededSkillsData}
-                margin={{ top: 20, right: 60, left: 100, bottom: 5 }}
+                margin={{ top: 20, right: 80, left: 120, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
+                <XAxis 
+                  type="number" 
+                  domain={[0, 'dataMax + 100']}
+                />
                 <YAxis 
                   dataKey="skill" 
                   type="category" 
-                  width={100}
-                  fontSize={12}
+                  width={120}
+                  fontSize={11}
                 />
                 <Tooltip 
                   formatter={(value: any) => [value, 'Opportunities']}
-                  labelFormatter={(label: any) => `Skill: ${label}`}
+                  labelFormatter={(label: any) => `${label}`}
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--background))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
                 />
-                <Bar dataKey="opportunities" fill="hsl(var(--primary))" />
+                <Bar 
+                  dataKey="opportunities" 
+                  fill="hsl(var(--primary))"
+                  label={{ position: 'right', fontSize: 12 }}
+                />
               </BarChart>
             </ResponsiveContainer>
-            <div className="flex items-center gap-2 mt-4">
-              <div className="w-3 h-3 rounded-full bg-primary"></div>
-              <span className="text-sm font-medium">Number of Opportunities</span>
-              <span className="text-2xl font-bold text-primary ml-4">{totalOpportunities}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-primary"></div>
+                <span className="text-sm font-medium">Number of Opportunities</span>
+              </div>
+              <span className="text-2xl font-bold text-primary">{totalOpportunities}</span>
             </div>
           </div>
         </ChartCard>
