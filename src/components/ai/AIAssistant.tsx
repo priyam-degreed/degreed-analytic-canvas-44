@@ -1296,15 +1296,6 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   variant="outline" 
                   size="sm" 
                   className="text-xs h-7"
-                  onClick={() => handleChartTypeSwitch(message.id, "line")}
-                >
-                  <LineChart className="h-3 w-3 mr-1" />
-                  Line chart
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs h-7"
                   onClick={() => handleChartTypeSwitch(message.id, "table")}
                 >
                   <Filter className="h-3 w-3 mr-1" />
