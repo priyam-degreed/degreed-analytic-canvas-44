@@ -349,6 +349,7 @@ export default function SkillProgression() {
       const skillValue = data.activePayload.find((payload: any) => payload.dataKey === skill)?.value;
       
       // Set highlight state
+      console.log('Setting highlighted data point:', { skill, period });
       setHighlightedDataPoint({ skill, period });
       
       // Set drill-down data
@@ -515,22 +516,25 @@ export default function SkillProgression() {
               <CartesianGrid 
                 strokeDasharray="3 3" 
                 stroke="hsl(var(--muted-foreground))" 
-                strokeOpacity={highlightedDataPoint ? 0.1 : 0.3} 
+                strokeOpacity={highlightedDataPoint ? 0.05 : 0.3} 
               />
               <XAxis 
                 dataKey="period" 
                 stroke="hsl(var(--muted-foreground))"
-                opacity={highlightedDataPoint ? 0.3 : 1}
+                opacity={highlightedDataPoint ? 0.2 : 1}
               />
               <YAxis 
                 domain={[0, 8]} 
                 stroke="hsl(var(--muted-foreground))"
-                opacity={highlightedDataPoint ? 0.3 : 1}
+                opacity={highlightedDataPoint ? 0.2 : 1}
               />
               <Tooltip content={<CustomLineTooltip />} />
-              <Legend opacity={highlightedDataPoint ? 0.3 : 1} />
+              <Legend opacity={highlightedDataPoint ? 0.2 : 1} />
               {paginatedSkills.map((skill, index) => {
                 const isChartDimmed = highlightedDataPoint !== null;
+                const isHighlightedSkill = highlightedDataPoint?.skill === skill;
+                
+                console.log('Rendering skill:', skill, 'isDimmed:', isChartDimmed, 'isHighlighted:', isHighlightedSkill);
                 
                 return (
                   <Line 
@@ -539,7 +543,7 @@ export default function SkillProgression() {
                     dataKey={skill} 
                     stroke={`hsl(${index * 60}, 70%, 50%)`}
                     strokeWidth={2}
-                    strokeOpacity={isChartDimmed ? 0.15 : 1}
+                    strokeOpacity={isChartDimmed && !isHighlightedSkill ? 0.1 : 1}
                     dot={(props: any) => {
                       const currentPeriod = props.payload?.period;
                       const isThisDataPointHighlighted = highlightedDataPoint && 
@@ -553,7 +557,7 @@ export default function SkillProgression() {
                           cy={props.cy}
                           r={isThisDataPointHighlighted ? 8 : 4}
                           fill={`hsl(${index * 60}, 70%, 50%)`}
-                          fillOpacity={isThisDataPointHighlighted ? 1 : (isChartDimmed ? 0.15 : 1)}
+                          fillOpacity={isThisDataPointHighlighted ? 1 : (isChartDimmed ? 0.1 : 1)}
                           stroke={isThisDataPointHighlighted ? 'hsl(var(--background))' : undefined}
                           strokeWidth={isThisDataPointHighlighted ? 3 : 0}
                           style={{ cursor: 'pointer' }}
