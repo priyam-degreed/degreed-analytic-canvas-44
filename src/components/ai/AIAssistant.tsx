@@ -1287,10 +1287,10 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   variant="outline" 
                   size="sm" 
                   className="text-xs h-7"
-                  onClick={() => handleChartTypeSwitch(message.id, "line")}
+                  onClick={() => handleChartTypeSwitch(message.id, viz.type === "line" ? "pie" : "line")}
                 >
-                  <LineChart className="h-3 w-3 mr-1" />
-                  Line chart
+                  {viz.type === "line" ? <PieChart className="h-3 w-3 mr-1" /> : <LineChart className="h-3 w-3 mr-1" />}
+                  {viz.type === "line" ? "Pie chart" : "Line chart"}
                 </Button>
                 <Button 
                   variant="outline" 
