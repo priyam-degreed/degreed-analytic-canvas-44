@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Play, BookOpen, Star, TrendingUp, Users, Clock, Award, Heart, Share, Edit, Download } from "lucide-react";
 import { contentPerformanceData } from "@/data/mockData";
 import { FilterBar } from "@/components/filters/FilterBar";
+import { SkillInsightsFilterBar } from "@/components/filters/SkillInsightsFilterBar";
 import { 
   BarChart, 
   Bar, 
@@ -39,6 +40,9 @@ export default function ContentPerformance() {
 
       {/* Filter Bar */}
       <FilterBar showRoles={true} />
+
+      {/* Skills Insights Filter Section */}
+      <SkillInsightsFilterBar />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
