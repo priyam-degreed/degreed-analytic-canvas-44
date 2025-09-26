@@ -49,12 +49,8 @@ export function filterData<T extends FilterableDataItem>(
     }
 
     // Skills filter
-    if (filters.skills.length > 0) {
-      const itemSkills = item.skills || [];
-      if (itemSkills.length === 0) {
-        return false;
-      }
-      const hasMatchingSkill = itemSkills.some(skill => 
+    if (filters.skills.length > 0 && item.skills) {
+      const hasMatchingSkill = item.skills.some(skill => 
         filters.skills.includes(skill)
       );
       if (!hasMatchingSkill) {
@@ -63,12 +59,8 @@ export function filterData<T extends FilterableDataItem>(
     }
 
     // Groups filter
-    if (filters.groups.length > 0) {
-      const itemGroups = item.groups || [];
-      if (itemGroups.length === 0) {
-        return false;
-      }
-      const hasMatchingGroup = itemGroups.some(group => 
+    if (filters.groups.length > 0 && item.groups) {
+      const hasMatchingGroup = item.groups.some(group => 
         filters.groups.includes(group)
       );
       if (!hasMatchingGroup) {
@@ -77,12 +69,8 @@ export function filterData<T extends FilterableDataItem>(
     }
 
     // Roles filter
-    if (filters.roles.length > 0) {
-      const itemRoles = item.roles || [];
-      if (itemRoles.length === 0) {
-        return false;
-      }
-      const hasMatchingRole = itemRoles.some(role => 
+    if (filters.roles.length > 0 && item.roles) {
+      const hasMatchingRole = item.roles.some(role => 
         filters.roles.includes(role)
       );
       if (!hasMatchingRole) {
@@ -91,12 +79,8 @@ export function filterData<T extends FilterableDataItem>(
     }
 
     // Custom Attribute filter
-    if (filters.customAttribute.length > 0) {
-      const itemCustomAttributes = item.customAttribute || [];
-      if (itemCustomAttributes.length === 0) {
-        return false;
-      }
-      const hasMatchingCustomAttribute = itemCustomAttributes.some(attr => 
+    if (filters.customAttribute.length > 0 && item.customAttribute) {
+      const hasMatchingCustomAttribute = item.customAttribute.some(attr => 
         filters.customAttribute.includes(attr)
       );
       if (!hasMatchingCustomAttribute) {
@@ -127,14 +111,7 @@ export function useFilteredData<T extends FilterableDataItem>(
   data: T[],
   filters: FilterState
 ): T[] {
-  return useMemo(() => {
-    // Safety check to ensure data is an array
-    if (!Array.isArray(data)) {
-      console.warn('useFilteredData: data is not an array, returning empty array');
-      return [];
-    }
-    return filterData(data, filters);
-  }, [data, filters]);
+  return useMemo(() => filterData(data, filters), [data, filters]);
 }
 
 // Hook for aggregated metrics from filtered data
