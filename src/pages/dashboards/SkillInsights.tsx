@@ -9,6 +9,7 @@ import { skillGrowthData, strategicOverviewData } from "@/data/mockData";
 import { SkillInsightsFilterBar } from "@/components/filters/SkillInsightsFilterBar";
 import { useFilters } from "@/contexts/FilterContext";
 import { useFilteredData } from "@/hooks/useFilteredData";
+import { formatNumber, formatPercentage, formatChartValue } from "@/lib/formatters";
 import { 
   comprehensiveLearningData, 
   comprehensiveSkillRatings, 
@@ -256,29 +257,37 @@ export default function SkillInsights() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Total Skills Tracked"
-          value={skillMetrics.totalSkills.toString()}
+          value={skillMetrics.totalSkills}
+          valueType="number"
           change={{ value: 8.3, type: "positive" }}
+          changeType="percentage"
           icon={<Brain className="h-5 w-5" />}
           onClick={() => handleCardClick('Total Skills Tracked')}
         />
         <MetricCard
           title="Expert-Level Skills"
-          value={skillMetrics.expertSkills.toString()}
+          value={skillMetrics.expertSkills}
+          valueType="number"
           change={{ value: 15.7, type: "positive" }}
+          changeType="percentage"
           icon={<Award className="h-5 w-5" />}
           onClick={() => handleCardClick('Expert-Level Skills')}
         />
         <MetricCard
           title="Active Skill Plans"
-          value={skillMetrics.activeSkillPlans.toString()}
+          value={skillMetrics.activeSkillPlans}
+          valueType="number"
           change={{ value: 23.1, type: "positive" }}
+          changeType="percentage"
           icon={<Target className="h-5 w-5" />}
           onClick={() => handleCardClick('Active Skill Plans')}
         />
         <MetricCard
           title="Skills in Decay"
-          value={skillMetrics.skillsInDecay.toString()}
+          value={skillMetrics.skillsInDecay}
+          valueType="number"
           change={{ value: -12.4, type: "negative" }}
+          changeType="percentage"
           icon={<AlertTriangle className="h-5 w-5" />}
           onClick={() => handleCardClick('Skills in Decay')}
         />
@@ -310,7 +319,7 @@ export default function SkillInsights() {
                   label={{ value: 'Number of Opportunities', angle: -90, position: 'insideLeft' }}
                 />
                 <Tooltip 
-                  formatter={(value: any) => [value, 'Opportunities']}
+                  formatter={(value: any) => [formatNumber(value), 'Opportunities']}
                   labelFormatter={(label: any) => `${label}`}
                   contentStyle={{
                     backgroundColor: 'hsl(var(--background))',
@@ -330,7 +339,7 @@ export default function SkillInsights() {
                 <div className="w-3 h-3 rounded-full bg-primary"></div>
                 <span className="text-sm font-medium">Number of Opportunities</span>
               </div>
-              <span className="text-2xl font-bold text-primary">{totalOpportunities}</span>
+              <span className="text-2xl font-bold text-primary">{formatNumber(totalOpportunities)}</span>
             </div>
           </div>
         </ChartCard>
@@ -350,11 +359,11 @@ export default function SkillInsights() {
                 <YAxis 
                   domain={['dataMin - 0.1', 'dataMax + 0.1']}
                   fontSize={12}
-                  tickFormatter={(value) => `${value}K`}
+                  tickFormatter={(value) => formatNumber(value)}
                 />
                 <Tooltip 
                   formatter={(value: any, name: string, props: any) => [
-                    props.payload.displayValue || `${value}K`, 
+                    formatNumber(props.payload.opportunities || value), 
                     'Opportunities'
                   ]}
                   labelFormatter={(label: any) => `Month: ${label}`}
@@ -378,7 +387,7 @@ export default function SkillInsights() {
               <div className="w-3 h-3 rounded-full bg-primary"></div>
               <span className="text-sm font-medium">Overall</span>
               <span className="text-sm text-muted-foreground ml-4">Number of Opportunities</span>
-              <span className="text-2xl font-bold text-primary ml-4">{totalOpportunities}</span>
+              <span className="text-2xl font-bold text-primary ml-4">{formatNumber(totalOpportunities)}</span>
             </div>
           </div>
         </ChartCard>

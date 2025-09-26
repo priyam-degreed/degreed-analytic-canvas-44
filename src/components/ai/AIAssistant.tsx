@@ -36,6 +36,7 @@ import {
   RotateCcw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatNumber, formatPercentage, formatRating, formatChartValue } from "@/lib/formatters";
 import { generateContextualResponse } from "@/data/aiConversations";
 
 interface ChatMessage {
@@ -1355,7 +1356,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                       className="h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-r-sm flex items-center justify-end pr-2 text-xs text-white chart-value transition-all duration-300 hover:opacity-80"
                       style={{ width: `${width}px` }}
                     >
-                      <span className="text-xs">{Math.round(value)}</span>
+                      <span className="text-xs">{formatNumber(value)}</span>
                     </div>
                   </div>
                 </div>
@@ -1383,35 +1384,35 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                     const tooltip = document.getElementById('tooltip');
                     const tooltipContent = document.getElementById('tooltip-content');
                     
-                    if (tooltip && tooltipContent) {
-                      const title = viz.title.toLowerCase();
-                      let tooltipHtml = `<div class="font-semibold">${item.name}</div>`;
-                      
-                      if (title.includes("completion rate")) {
-                        tooltipHtml += `<div>Completion Rate: ${item.rate || item.value || 0}%</div>`;
-                        tooltipHtml += `<div>Completed: ${item.completed || 'N/A'}</div>`;
-                        tooltipHtml += `<div>Total Assigned: ${item.assigned || item.total || 'N/A'}</div>`;
-                        if (item.avgTime) tooltipHtml += `<div>Avg Time: ${item.avgTime}</div>`;
-                      } else if (title.includes("past due")) {
-                        tooltipHtml += `<div>Past Due Count: ${item.value || 0}</div>`;
-                        tooltipHtml += `<div>Past Due Rate: ${item.rate || item.percentage || 0}%</div>`;
-                        tooltipHtml += `<div>Total Assignments: ${item.total || 'N/A'}</div>`;
-                      } else if (title.includes("satisfaction") || title.includes("provider")) {
-                        tooltipHtml += `<div>Rating: ${item.rate || item.value || 0}/5</div>`;
-                        tooltipHtml += `<div>Reviews: ${item.reviews || 'N/A'}</div>`;
-                        tooltipHtml += `<div>Change: ${item.change > 0 ? '+' : ''}${item.change || 0}</div>`;
-                      } else if (title.includes("endorsed") || title.includes("skills")) {
-                        tooltipHtml += `<div>Endorsement Rate: ${item.rate || item.value || 0}%</div>`;
-                        tooltipHtml += `<div>Development Events: ${item.events || 'N/A'}</div>`;
-                        tooltipHtml += `<div>Endorsed Events: ${item.endorsed || 'N/A'}</div>`;
-                      } else if (title.includes("engagement")) {
-                        tooltipHtml += `<div>Engagement Score: ${item.rate || item.value || 0}%</div>`;
-                        tooltipHtml += `<div>Active Users: ${item.users || item.active || 'N/A'}</div>`;
-                        tooltipHtml += `<div>Sessions: ${item.sessions || 'N/A'}</div>`;
-                      } else {
-                        tooltipHtml += `<div>Value: ${item.rate || item.value || 0}</div>`;
-                        tooltipHtml += `<div>Details: ${item.completed || item.learners || item.count || 'N/A'}</div>`;
-                      }
+                     if (tooltip && tooltipContent) {
+                       const title = viz.title.toLowerCase();
+                       let tooltipHtml = `<div class="font-semibold">${item.name}</div>`;
+                       
+                       if (title.includes("completion rate")) {
+                         tooltipHtml += `<div>Completion Rate: ${formatPercentage(item.rate || item.value || 0)}</div>`;
+                         tooltipHtml += `<div>Completed: ${formatNumber(item.completed || 0)}</div>`;
+                         tooltipHtml += `<div>Total Assigned: ${formatNumber(item.assigned || item.total || 0)}</div>`;
+                         if (item.avgTime) tooltipHtml += `<div>Avg Time: ${item.avgTime}</div>`;
+                       } else if (title.includes("past due")) {
+                         tooltipHtml += `<div>Past Due Count: ${formatNumber(item.value || 0)}</div>`;
+                         tooltipHtml += `<div>Past Due Rate: ${formatPercentage(item.rate || item.percentage || 0)}</div>`;
+                         tooltipHtml += `<div>Total Assignments: ${formatNumber(item.total || 0)}</div>`;
+                       } else if (title.includes("satisfaction") || title.includes("provider")) {
+                         tooltipHtml += `<div>Rating: ${formatRating(item.rate || item.value || 0)}</div>`;
+                         tooltipHtml += `<div>Reviews: ${formatNumber(item.reviews || 0)}</div>`;
+                         tooltipHtml += `<div>Change: ${item.change && item.change > 0 ? '+' : ''}${formatNumber(item.change || 0)}</div>`;
+                       } else if (title.includes("endorsed") || title.includes("skills")) {
+                         tooltipHtml += `<div>Endorsement Rate: ${formatPercentage(item.rate || item.value || 0)}</div>`;
+                         tooltipHtml += `<div>Development Events: ${formatNumber(item.events || 0)}</div>`;
+                         tooltipHtml += `<div>Endorsed Events: ${formatNumber(item.endorsed || 0)}</div>`;
+                       } else if (title.includes("engagement")) {
+                         tooltipHtml += `<div>Engagement Score: ${formatPercentage(item.rate || item.value || 0)}</div>`;
+                         tooltipHtml += `<div>Active Users: ${formatNumber(item.users || item.active || 0)}</div>`;
+                         tooltipHtml += `<div>Sessions: ${formatNumber(item.sessions || 0)}</div>`;
+                       } else {
+                         tooltipHtml += `<div>Value: ${formatNumber(item.rate || item.value || 0)}</div>`;
+                         tooltipHtml += `<div>Details: ${formatNumber(item.completed || item.learners || item.count || 0)}</div>`;
+                       }
                       
                       tooltipContent.innerHTML = tooltipHtml;
                       tooltip.style.opacity = '1';
@@ -1435,7 +1436,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                     className="rounded-t-sm w-full mb-1 flex items-end justify-center text-xs text-white font-semibold transition-all duration-300 hover:opacity-90 hover:scale-105 bg-gradient-to-r from-purple-500 to-purple-600 cursor-pointer"
                     style={{ height: `${height}px` }}
                   >
-                    <span className="text-xs mb-1">{Math.round(value)}</span>
+                    <span className="text-xs mb-1">{formatNumber(value)}</span>
                   </div>
                   <div className="text-xs text-center text-gray-600 leading-tight px-1 w-full">
                     <div className="chart-legend break-words line-clamp-2" title={item.name || item.month || `Item ${idx + 1}`}>

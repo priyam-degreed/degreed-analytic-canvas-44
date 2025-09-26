@@ -8,6 +8,7 @@ import { SkillProgressionFilterBar } from "@/components/filters/SkillProgression
 import { DrillDownTooltip, ClickableDrillDown } from "@/components/dashboard/DrillDownTooltip";
 import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
 import { getEmployeesAboveRating, getEmployeesWithProgression, getAllEmployees, Employee } from "@/data/employeeDrillDownData";
+import { formatNumber, formatPercentage, formatRating } from "@/lib/formatters";
 import { 
   BarChart, 
   Bar, 
@@ -613,33 +614,41 @@ export default function SkillProgression() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Total Employees"
-          value={filteredMetrics.totalEmployees.toString()}
+          value={filteredMetrics.totalEmployees}
+          valueType="number"
           icon={<Users className="h-5 w-5" />}
-          change={{ value: "+8.2%", type: "positive" }}
+          change={{ value: 8.2, type: "positive" }}
+          changeType="percentage"
           subtitle="Tracked across all roles"
           onClick={() => handleMetricCardClick('totalEmployees')}
         />
         <MetricCard
           title="Avg Skill Rating"
-          value={(filteredMetrics.avgSkillRating || 0).toFixed(1)}
+          value={filteredMetrics.avgSkillRating || 0}
+          valueType="rating"
           icon={<Award className="h-5 w-5" />}
-          change={{ value: "+12.5%", type: "positive" }}
+          change={{ value: 12.5, type: "positive" }}
+          changeType="percentage"
           subtitle="Out of 8.0 scale"
           onClick={() => handleMetricCardClick('avgSkillRating')}
         />
         <MetricCard
           title="Advanced+ Employees"
-          value={`${filteredMetrics.employeesAboveThreshold || 0}%`}
+          value={filteredMetrics.employeesAboveThreshold || 0}
+          valueType="percentage"
           icon={<Target className="h-5 w-5" />}
-          change={{ value: "+15.3%", type: "positive" }}
+          change={{ value: 15.3, type: "positive" }}
+          changeType="percentage"
           subtitle="Rating 6+ (Advanced)"
           onClick={() => handleMetricCardClick('advancedEmployees')}
         />
         <MetricCard
           title="Progression Rate"
-          value={`+${(filteredMetrics.progressionPercent || 0).toFixed(1)}%`}
+          value={filteredMetrics.progressionPercent || 0}
+          valueType="percentage"
           icon={<TrendingUp className="h-5 w-5" />}
-          change={{ value: "+22.1%", type: "positive" }}
+          change={{ value: 22.1, type: "positive" }}
+          changeType="percentage"
           subtitle="Vs previous period"
           onClick={() => handleMetricCardClick('progressionRate')}
         />

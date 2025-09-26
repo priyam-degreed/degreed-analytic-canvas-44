@@ -2,6 +2,7 @@ import { MetricCard } from "@/components/dashboard/MetricCard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Button } from "@/components/ui/button";
 import { Calendar, Filter, Download, TrendingUp, Users, Target, BookOpen, Share, Edit } from "lucide-react";
+import { formatNumber, formatPercentage } from "@/lib/formatters";
 import { 
   strategicOverviewData, 
   learningOverviewData, 
