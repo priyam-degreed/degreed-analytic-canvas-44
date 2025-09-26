@@ -96,6 +96,9 @@ export default function SkillProgression() {
   
   // Highlight state for Progress Over Time chart
   const [highlightedDataPoint, setHighlightedDataPoint] = useState<{skill: string, period: string} | null>(null);
+  
+  // Highlight state for Skills vs Rating Type chart
+  const [highlightedBarData, setHighlightedBarData] = useState<{skill: string, ratingType: string} | null>(null);
 
   // Apply filters to data - each filter works independently and in combination
   const filteredData = skillDistributionData.filter(item => {
@@ -352,10 +355,22 @@ export default function SkillProgression() {
     }
   };
 
+  // Handle bar chart clicks
+  const handleBarChartClick = (data: any, skill: string, ratingType: string) => {
+    if (data) {
+      // Toggle highlighting - click same bar to unhighlight
+      if (highlightedBarData?.skill === skill && highlightedBarData?.ratingType === ratingType) {
+        setHighlightedBarData(null);
+      } else {
+        setHighlightedBarData({ skill, ratingType });
+      }
+    }
+  };
+
   const CustomBarTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+        <div className="bg-background border border-border rounded-lg p-3 shadow-lg" style={{zIndex: 9999, position: 'relative'}}>
           <p className="font-semibold text-foreground mb-2">{label}</p>
           {payload.map((entry: any, index: number) => (
             <div key={index} className="mb-1">
@@ -589,7 +604,11 @@ export default function SkillProgression() {
                   <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.8}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.3} />
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="hsl(var(--muted-foreground))" 
+                strokeOpacity={highlightedBarData ? 0.05 : 0.3} 
+              />
               <XAxis 
                 dataKey="skill" 
                 angle={-45}
@@ -598,27 +617,41 @@ export default function SkillProgression() {
                 interval={0}
                 fontSize={12}
                 stroke="hsl(var(--muted-foreground))"
+                opacity={highlightedBarData ? 0.2 : 1}
               />
-              <YAxis domain={[0, 8]} stroke="hsl(var(--muted-foreground))" />
+              <YAxis 
+                domain={[0, 8]} 
+                stroke="hsl(var(--muted-foreground))" 
+                opacity={highlightedBarData ? 0.2 : 1}
+              />
               <Tooltip content={<CustomBarTooltip />} />
-              <Legend />
+              <Legend opacity={highlightedBarData ? 0.2 : 1} />
               <Bar 
                 dataKey="Self" 
                 fill="url(#selfGradient)" 
                 name="Self Rating"
                 radius={[2, 2, 0, 0]}
+                fillOpacity={highlightedBarData && highlightedBarData.ratingType !== 'Self' ? 0.1 : 1}
+                onClick={(data) => handleBarChartClick(data, data.payload.skill, 'Self')}
+                style={{ cursor: 'pointer' }}
               />
               <Bar 
                 dataKey="Peer" 
                 fill="url(#peerGradient)" 
                 name="Peer Rating"
                 radius={[2, 2, 0, 0]}
+                fillOpacity={highlightedBarData && highlightedBarData.ratingType !== 'Peer' ? 0.1 : 1}
+                onClick={(data) => handleBarChartClick(data, data.payload.skill, 'Peer')}
+                style={{ cursor: 'pointer' }}
               />
               <Bar 
                 dataKey="Manager" 
                 fill="url(#managerGradient)" 
                 name="Manager Rating"
                 radius={[2, 2, 0, 0]}
+                fillOpacity={highlightedBarData && highlightedBarData.ratingType !== 'Manager' ? 0.1 : 1}
+                onClick={(data) => handleBarChartClick(data, data.payload.skill, 'Manager')}
+                style={{ cursor: 'pointer' }}
               />
               <Line 
                 type="monotone" 
@@ -626,6 +659,7 @@ export default function SkillProgression() {
                 stroke="hsl(var(--destructive))" 
                 strokeWidth={2.5}
                 strokeDasharray="4 4"
+                strokeOpacity={highlightedBarData ? 0.2 : 1}
                 dot={{ fill: 'hsl(var(--destructive))', r: 3, strokeWidth: 1, stroke: 'hsl(var(--background))' }}
                 name="Target Level"
               />
