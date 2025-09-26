@@ -262,9 +262,8 @@ function getSkillTarget(skill: string): number {
 function generateSkillProgressionEntries(): SkillProgressionEntry[] {
   const entries: SkillProgressionEntry[] = [];
   
-  // Sort time periods for progressive rating calculation
+  // Sort time periods chronologically
   const sortedPeriods = timePeriodOptions.sort((a, b) => {
-    // Extract fiscal year and quarter for proper sorting
     const parseTimePeriod = (period: string) => {
       const [fy, quarter] = period.split('-');
       const year = parseInt(fy.replace('FY', ''));
@@ -273,57 +272,93 @@ function generateSkillProgressionEntries(): SkillProgressionEntry[] {
     };
     return parseTimePeriod(a.value) - parseTimePeriod(b.value);
   });
+
+  // Group data by skill and role to ensure consistent progression
+  const skillRoleGroups = new Map();
   
-  skillDistributionData.forEach((item, index) => {
-    const skillTarget = getSkillTarget(item.skill);
-    const periodIndex = sortedPeriods.findIndex(p => p.value === item.timePeriod);
-    const progressionFactor = periodIndex / (sortedPeriods.length - 1); // 0 to 1
+  skillDistributionData.forEach(item => {
+    const key = `${item.skill}-${item.role}`;
+    if (!skillRoleGroups.has(key)) {
+      skillRoleGroups.set(key, []);
+    }
+    skillRoleGroups.get(key).push(item);
+  });
+
+  // Generate progressive entries for each skill-role combination
+  skillRoleGroups.forEach((items, key) => {
+    const [skill, role] = key.split('-');
+    const skillTarget = getSkillTarget(skill);
     
-    // Create entries for each rating type with realistic variations
-    ['Self', 'Peer', 'Manager'].forEach((ratingType, typeIndex) => {
-      let adjustedRating = item.avgRating;
-      
-      // Apply realistic rating type patterns with progression
+    // Sort items by time period for this skill-role combination  
+    const sortedItems = items.sort((a, b) => {
+      const parseTimePeriod = (period: string) => {
+        const [fy, quarter] = period.split('-');
+        const year = parseInt(fy.replace('FY', ''));
+        const q = quarter ? parseInt(quarter.replace('Q', '')) : 0;
+        return year * 10 + q;
+      };
+      return parseTimePeriod(a.timePeriod) - parseTimePeriod(b.timePeriod);
+    });
+
+    // Generate base ratings for each rating type for this skill-role
+    const ratingTypes = ['Self', 'Peer', 'Manager'];
+    const baseRatings = {};
+    
+    ratingTypes.forEach(ratingType => {
       if (ratingType === 'Self') {
-        // Self-ratings: Progressive and optimistic, trending upward over time
-        const baseRating = Math.min(8, item.avgRating + (Math.random() * 0.5 + 0.2));
-        const progressiveBoost = progressionFactor * 1.2; // Up to 1.2 points improvement
-        adjustedRating = Math.min(8, baseRating + progressiveBoost);
-      } else if (ratingType === 'Peer') { 
-        // Peer ratings: Progressive but more conservative, trending upward
-        const baseRating = item.avgRating + (Math.random() - 0.5) * 0.3;
-        const progressiveBoost = progressionFactor * 0.8; // Up to 0.8 points improvement
-        adjustedRating = Math.min(8, baseRating + progressiveBoost);
-      } else if (ratingType === 'Manager') {
-        // Manager ratings: Variable, some progression but more conservative
-        const isStrategicSkill = ['Leadership', 'Communication', 'Strategic Planning', 'People Management'].includes(item.skill);
+        // Self ratings start higher and are more optimistic
+        baseRatings[ratingType] = Math.min(7, Math.max(3, sortedItems[0].avgRating + 0.5 + Math.random() * 0.5));
+      } else if (ratingType === 'Peer') {
+        // Peer ratings are more moderate but still positive
+        baseRatings[ratingType] = Math.min(6.5, Math.max(2.5, sortedItems[0].avgRating + Math.random() * 0.4));
+      } else {
+        // Manager ratings vary more
+        const isStrategicSkill = ['Leadership', 'Communication', 'Strategic Planning', 'People Management'].includes(skill);
         if (isStrategicSkill) {
-          adjustedRating = Math.max(1, item.avgRating - (Math.random() * 0.4 + 0.1)); // More conservative
-          // Slight progression for strategic skills
-          adjustedRating = Math.min(8, adjustedRating + (progressionFactor * 0.4));
+          baseRatings[ratingType] = Math.max(2, sortedItems[0].avgRating - Math.random() * 0.3);
         } else {
-          adjustedRating = item.avgRating + (Math.random() - 0.5) * 0.4; // More varied
-          // Moderate progression for technical skills
-          adjustedRating = Math.min(8, adjustedRating + (progressionFactor * 0.6));
+          baseRatings[ratingType] = sortedItems[0].avgRating + (Math.random() - 0.5) * 0.4;
         }
       }
-      
-      // Ensure rating stays within bounds
-      adjustedRating = Math.max(1, Math.min(8, adjustedRating));
-      
-      entries.push({
-        id: `sp-${index}-${typeIndex}`,
-        role: item.role,
-        skillName: item.skill,
-        timePeriod: item.timePeriod,
-        ratingLevel: Math.round(adjustedRating),
-        ratingType: ratingType as 'Self' | 'Peer' | 'Manager',
-        employeeCount: Math.floor(Math.random() * 30) + 15, // Smaller groups for each rating type
-        avgRating: Math.round(adjustedRating * 10) / 10,
-        progressionPercent: Math.random() * 25 + 5, // 5-30% progression
-        skillGapToTarget: Math.max(0, skillTarget - adjustedRating),
-        skillImportance: Math.random() * 10 + 1, // 1-10 importance scale
-        targetRating: Number(skillTarget.toFixed(1))
+    });
+
+    // Create progressive entries for each time period
+    sortedItems.forEach((item, periodIndex) => {
+      ratingTypes.forEach((ratingType, typeIndex) => {
+        let adjustedRating = baseRatings[ratingType];
+        
+        // Calculate progressive improvement for Self and Peer ratings
+        if (ratingType === 'Self') {
+          // Self ratings: 0.2-0.4 points increase per quarter
+          const progressiveIncrease = periodIndex * (0.2 + Math.random() * 0.2);
+          adjustedRating = Math.min(8, baseRatings[ratingType] + progressiveIncrease);
+        } else if (ratingType === 'Peer') {
+          // Peer ratings: 0.15-0.3 points increase per quarter  
+          const progressiveIncrease = periodIndex * (0.15 + Math.random() * 0.15);
+          adjustedRating = Math.min(7.5, baseRatings[ratingType] + progressiveIncrease);
+        } else {
+          // Manager ratings: slight progression but more variable
+          const progressiveIncrease = periodIndex * (0.1 + Math.random() * 0.1);
+          adjustedRating = Math.min(8, baseRatings[ratingType] + progressiveIncrease);
+        }
+        
+        // Ensure rating stays within bounds
+        adjustedRating = Math.max(1, Math.min(8, adjustedRating));
+        
+        entries.push({
+          id: `sp-${item.skill}-${item.role}-${item.timePeriod}-${ratingType}`,
+          role: item.role,
+          skillName: item.skill,
+          timePeriod: item.timePeriod,
+          ratingLevel: Math.round(adjustedRating),
+          ratingType: ratingType as 'Self' | 'Peer' | 'Manager',
+          employeeCount: Math.floor(Math.random() * 30) + 15,
+          avgRating: Math.round(adjustedRating * 10) / 10,
+          progressionPercent: periodIndex > 0 ? ((adjustedRating - baseRatings[ratingType]) / baseRatings[ratingType]) * 100 : 0,
+          skillGapToTarget: Math.max(0, skillTarget - adjustedRating),
+          skillImportance: Math.random() * 10 + 1,
+          targetRating: Number(skillTarget.toFixed(1))
+        });
       });
     });
   });
