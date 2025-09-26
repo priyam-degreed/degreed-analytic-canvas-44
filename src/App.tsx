@@ -21,6 +21,7 @@ import ContentPerformance from "./pages/dashboards/ContentPerformance";
 import CareerDevelopment from "./pages/dashboards/CareerDevelopment";
 import DrillDownPaths from "./pages/dashboards/DrillDownPaths";
 import EngagementOverviewDashboard from "./pages/dashboards/EngagementOverviewDashboard";
+import SkillsDashboard from "./pages/dashboards/SkillsDashboard";
 import DashboardBuilder from "./pages/DashboardBuilder";
 import NotFound from "./pages/NotFound";
 import Explore from "./pages/Explore";
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="dashboards/career-development" element={<CareerDevelopment />} />
             <Route path="dashboards/drill-down" element={<DrillDownPaths />} />
             <Route path="dashboards/engagement-overview" element={<EngagementOverviewDashboard />} />
+            <Route path="dashboards/skills-dashboard" element={<SkillsDashboard />} />
             {/* Dashboard Builder Routes */}
             <Route path="dashboard-builder" element={<DashboardBuilder mode="create" />} />
             <Route path="dashboard-builder/:id/edit" element={<DashboardBuilder mode="edit" />} />

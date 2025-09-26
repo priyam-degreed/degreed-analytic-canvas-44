@@ -49,7 +49,8 @@ const adminDashboards: Dashboard[] = [
   { id: "03", name: "Skill Progression", path: "/dashboards/skill-progression" },
   { id: "04", name: "Drill Down Paths", path: "/dashboards/drill-down" },
   { id: "05", name: "Content Performance", path: "/dashboards/content-performance" },
-  { id: "06", name: "Engagement Overview", path: "/dashboards/engagement-overview" }
+  { id: "06", name: "Engagement Overview", path: "/dashboards/engagement-overview" },
+  { id: "07", name: "Skills Dashboard", path: "/dashboards/skills-dashboard" }
 ];
 
 // Manager dashboards (limited scope with realistic data)
@@ -58,7 +59,8 @@ const managerDashboards: Dashboard[] = [
   { id: "M2", name: "Direct Reports Skills", path: "/dashboards/skill-insights" },
   { id: "M3", name: "Individual Development Plans", path: "/dashboards/career-development" },
   { id: "M4", name: "Team Engagement Overview", path: "/dashboards/engagement-overview" },
-  { id: "M5", name: "Content Performance (Team)", path: "/dashboards/content-performance" }
+  { id: "M5", name: "Content Performance (Team)", path: "/dashboards/content-performance" },
+  { id: "M6", name: "Team Skills Dashboard", path: "/dashboards/skills-dashboard" }
 ];
 
 // Admin navigation items (full access) - Removed all sections
