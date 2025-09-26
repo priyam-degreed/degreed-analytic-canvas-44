@@ -3,6 +3,9 @@ import { ChartCard } from "@/components/dashboard/ChartCard";
 import { Button } from "@/components/ui/button";
 import { Calendar, Filter, Download, ThumbsUp, ThumbsDown } from "lucide-react";
 import { engagementData } from "@/data/mockData";
+import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
+import { getLearningDrillDownData } from "@/data/learningDrillDownData";
+import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -21,6 +24,15 @@ import {
 const COLORS = ["#3b82f6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#84cc16", "#f97316"];
 
 export default function EngagementOverview() {
+  const [drillDownData, setDrillDownData] = useState<any>(null);
+  const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
+
+  const handleCardClick = (cardType: string) => {
+    const data = getLearningDrillDownData(cardType);
+    setDrillDownData({ additionalData: data });
+    setIsDrillDownOpen(true);
+  };
+
   const engagementMetrics = [
     {
       title: "Learning Completions",
@@ -84,6 +96,7 @@ export default function EngagementOverview() {
             value={metric.value}
             change={metric.change}
             subtitle={metric.subtitle}
+            onClick={() => handleCardClick(metric.title)}
           />
         ))}
       </div>
@@ -300,6 +313,15 @@ export default function EngagementOverview() {
           </div>
         </div>
       </div>
+
+      {/* Drill Down Dialog */}
+      <DrillDownDialog
+        isOpen={isDrillDownOpen}
+        onClose={() => setIsDrillDownOpen(false)}
+        data={drillDownData}
+        onApplyFilter={() => {}}
+        onViewDetails={() => {}}
+      />
     </div>
   );
 }

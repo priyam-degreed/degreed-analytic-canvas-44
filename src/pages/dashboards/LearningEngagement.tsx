@@ -7,6 +7,8 @@ import { FilterBar } from "@/components/filters/FilterBar";
 import { useFilters } from "@/contexts/FilterContext";
 import { useFilteredData, useFilteredMetrics } from "@/hooks/useFilteredData";
 import { useState, useMemo } from "react";
+import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
+import { getLearningDrillDownData } from "@/data/learningDrillDownData";
 import { 
   comprehensiveLearningData, 
   comprehensiveSkillRatings, 
@@ -32,6 +34,14 @@ const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accen
 
 export default function LearningEngagement() {
   const { filters } = useFilters();
+  const [drillDownData, setDrillDownData] = useState<any>(null);
+  const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
+
+  const handleCardClick = (cardType: string) => {
+    const data = getLearningDrillDownData(cardType);
+    setDrillDownData({ additionalData: data });
+    setIsDrillDownOpen(true);
+  };
   
   // Use comprehensive filtered data
   const filteredLearningData = useFilteredData(comprehensiveLearningData, filters);
@@ -252,24 +262,28 @@ export default function LearningEngagement() {
           value={metrics.totalLearners.toLocaleString()}
           change={{ value: 15.3, type: "positive" }}
           icon={<Users className="h-5 w-5" />}
+          onClick={() => handleCardClick("Total Active Learners")}
         />
         <MetricCard
           title="Active This Week"
           value={metrics.activeUsersThisWeek.toLocaleString()}
           change={{ value: 8.9, type: "positive" }}
           icon={<TrendingUp className="h-5 w-5" />}
+          onClick={() => handleCardClick("Active This Week")}
         />
         <MetricCard
           title="Course Completions"
           value={metrics.courseCompletions.toLocaleString()}
           change={{ value: 28.9, type: "positive" }}
           icon={<Award className="h-5 w-5" />}
+          onClick={() => handleCardClick("Course Completions")}
         />
         <MetricCard
           title="Learning Hours"
           value={`${metrics.learningHours.toLocaleString()}h`}
           change={{ value: 12.4, type: "positive" }}
           icon={<Clock className="h-5 w-5" />}
+          onClick={() => handleCardClick("Learning Hours")}
         />
       </div>
 
@@ -713,6 +727,15 @@ export default function LearningEngagement() {
           })}
         </div>
       </ChartCard>
+
+      {/* Drill Down Dialog */}
+      <DrillDownDialog
+        isOpen={isDrillDownOpen}
+        onClose={() => setIsDrillDownOpen(false)}
+        data={drillDownData}
+        onApplyFilter={() => {}}
+        onViewDetails={() => {}}
+      />
     </div>
   );
 }
