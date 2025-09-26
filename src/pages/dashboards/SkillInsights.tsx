@@ -373,21 +373,21 @@ export default function SkillInsights() {
         subtitle="Sep 2025"
       >
         <div className="space-y-4">
-          <ResponsiveContainer width="100%" height={500}>
+          <ResponsiveContainer width="100%" height={400}>
             <BarChart
               data={skillsInRolesData}
-              margin={{ top: 20, right: 80, left: 150, bottom: 5 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
-                type="number"
-                domain={[0, 'dataMax + 50']}
+                dataKey="skill"
+                angle={-45}
+                textAnchor="end"
+                height={100}
                 fontSize={12}
               />
               <YAxis 
-                dataKey="skill" 
-                type="category" 
-                width={150}
+                label={{ value: 'Role Count', angle: -90, position: 'insideLeft' }}
                 fontSize={12}
               />
               <Tooltip 
@@ -402,7 +402,7 @@ export default function SkillInsights() {
               <Bar 
                 dataKey="roleCount" 
                 fill="hsl(var(--primary))"
-                radius={[0, 4, 4, 0]}
+                radius={[4, 4, 0, 0]}
               />
             </BarChart>
           </ResponsiveContainer>
