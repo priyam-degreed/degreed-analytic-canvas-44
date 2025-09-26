@@ -419,19 +419,19 @@ export default function LearningEngagement() {
                         borderRadius: '6px'
                       }}
                     />
-                    <Bar dataKey="current" fill="hsl(var(--chart-1))" name="Current Period" />
-                    <Bar dataKey="previous" fill="hsl(var(--chart-2))" name="Previous Period" />
+                    <Bar dataKey="current" fill="hsl(var(--primary))" name="Current Period" />
+                    <Bar dataKey="previous" fill="hsl(var(--accent))" name="Previous Period" />
                   </BarChart>
                 </ResponsiveContainer>
                 
                 <div className="flex justify-center gap-8">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{backgroundColor: 'hsl(var(--chart-1))'}}></div>
+                    <div className="w-3 h-3 rounded-full bg-primary"></div>
                     <span className="text-sm">Current Period (Aug 31 2025)</span>
                     <span className="font-semibold">{currentVsPrevComparison.current.completions}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{backgroundColor: 'hsl(var(--chart-2))'}}></div>
+                    <div className="w-3 h-3 rounded-full bg-accent"></div>
                     <span className="text-sm">Previous Period (Jul 31 2025)</span>
                     <span className="font-semibold">{currentVsPrevComparison.previous.completions}</span>
                   </div>
