@@ -1,5 +1,6 @@
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
+import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +22,8 @@ import {
   getSkillsInRolesData,
   getTotalRoleSkillsCount
 } from '@/data/skillOpportunitiesData';
-import { useMemo } from 'react';
+import { getSkillDrillDownData } from '@/data/skillDrillDownData';
+import { useMemo, useState } from 'react';
 import { useSkillMetrics, useTopSkillsGained } from "@/hooks/useSkillMetrics";
 import { 
   BarChart, 
@@ -42,6 +44,17 @@ const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accen
 
 export default function SkillInsights() {
   const { filters } = useFilters();
+  
+  // Drill-down state
+  const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
+  const [drillDownData, setDrillDownData] = useState<any>(null);
+
+  // Handle card click for drill-down
+  const handleCardClick = (cardType: string) => {
+    const data = getSkillDrillDownData(cardType);
+    setDrillDownData(data);
+    setIsDrillDownOpen(true);
+  };
   
   // Use enhanced hooks for better filter responsiveness
   const skillMetrics = useSkillMetrics(comprehensiveLearningData, comprehensiveSkillRatings, filters);
@@ -246,24 +259,28 @@ export default function SkillInsights() {
           value={skillMetrics.totalSkills.toString()}
           change={{ value: 8.3, type: "positive" }}
           icon={<Brain className="h-5 w-5" />}
+          onClick={() => handleCardClick('Total Skills Tracked')}
         />
         <MetricCard
           title="Expert-Level Skills"
           value={skillMetrics.expertSkills.toString()}
           change={{ value: 15.7, type: "positive" }}
           icon={<Award className="h-5 w-5" />}
+          onClick={() => handleCardClick('Expert-Level Skills')}
         />
         <MetricCard
           title="Active Skill Plans"
           value={skillMetrics.activeSkillPlans.toString()}
           change={{ value: 23.1, type: "positive" }}
           icon={<Target className="h-5 w-5" />}
+          onClick={() => handleCardClick('Active Skill Plans')}
         />
         <MetricCard
           title="Skills in Decay"
           value={skillMetrics.skillsInDecay.toString()}
           change={{ value: -12.4, type: "negative" }}
           icon={<AlertTriangle className="h-5 w-5" />}
+          onClick={() => handleCardClick('Skills in Decay')}
         />
       </div>
 
@@ -663,6 +680,21 @@ export default function SkillInsights() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Drill-down Dialog */}
+      <DrillDownDialog
+        isOpen={isDrillDownOpen}
+        onClose={() => setIsDrillDownOpen(false)}
+        data={drillDownData}
+        onApplyFilter={(filterType: string, filterValue: string) => {
+          // Handle filter application if needed
+          console.log('Apply filter:', filterType, filterValue);
+        }}
+        onViewDetails={() => {
+          // Handle view details if needed
+          console.log('View details for:', drillDownData?.cardType);
+        }}
+      />
     </div>
   );
 }
