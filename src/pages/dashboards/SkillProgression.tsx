@@ -346,23 +346,9 @@ export default function SkillProgression() {
   const handleLineChartClick = (data: any, skill: string) => {
     if (data && data.activePayload && data.activePayload.length > 0) {
       const period = data.activeLabel;
-      const skillValue = data.activePayload.find((payload: any) => payload.dataKey === skill)?.value;
       
-      // Set highlight state
+      // Set highlight state only - no popup
       setHighlightedDataPoint({ skill, period });
-      
-      // Set drill-down data
-      setDrillDownData({
-        skill,
-        period,
-        value: skillValue,
-        additionalData: {
-          'Avg Rating': skillValue,
-          'Period': period,
-          'Skill': skill
-        }
-      });
-      setIsDrillDownOpen(true);
     }
   };
 
