@@ -258,31 +258,53 @@ function getSkillTarget(skill: string): number {
   return skillTargets[skill] || (5.5 + Math.random() * 1.5); // Default range 5.5-7.0
 }
 
-// Generate diversified mock skill progression entries with realistic rating type patterns
+// Generate diversified mock skill progression entries with progressive Self and Peer ratings
 function generateSkillProgressionEntries(): SkillProgressionEntry[] {
   const entries: SkillProgressionEntry[] = [];
   
+  // Sort time periods for progressive rating calculation
+  const sortedPeriods = timePeriodOptions.sort((a, b) => {
+    // Extract fiscal year and quarter for proper sorting
+    const parseTimePeriod = (period: string) => {
+      const [fy, quarter] = period.split('-');
+      const year = parseInt(fy.replace('FY', ''));
+      const q = quarter ? parseInt(quarter.replace('Q', '')) : 0;
+      return year * 10 + q;
+    };
+    return parseTimePeriod(a.value) - parseTimePeriod(b.value);
+  });
+  
   skillDistributionData.forEach((item, index) => {
     const skillTarget = getSkillTarget(item.skill);
+    const periodIndex = sortedPeriods.findIndex(p => p.value === item.timePeriod);
+    const progressionFactor = periodIndex / (sortedPeriods.length - 1); // 0 to 1
     
     // Create entries for each rating type with realistic variations
     ['Self', 'Peer', 'Manager'].forEach((ratingType, typeIndex) => {
       let adjustedRating = item.avgRating;
       
-      // Apply realistic rating type patterns
+      // Apply realistic rating type patterns with progression
       if (ratingType === 'Self') {
-        // Self-ratings tend to be slightly higher
-        adjustedRating = Math.min(8, item.avgRating + (Math.random() * 0.5 + 0.2));
+        // Self-ratings: Progressive and optimistic, trending upward over time
+        const baseRating = Math.min(8, item.avgRating + (Math.random() * 0.5 + 0.2));
+        const progressiveBoost = progressionFactor * 1.2; // Up to 1.2 points improvement
+        adjustedRating = Math.min(8, baseRating + progressiveBoost);
       } else if (ratingType === 'Peer') { 
-        // Peer ratings tend to be more moderate/accurate
-        adjustedRating = item.avgRating + (Math.random() - 0.5) * 0.3;
+        // Peer ratings: Progressive but more conservative, trending upward
+        const baseRating = item.avgRating + (Math.random() - 0.5) * 0.3;
+        const progressiveBoost = progressionFactor * 0.8; // Up to 0.8 points improvement
+        adjustedRating = Math.min(8, baseRating + progressiveBoost);
       } else if (ratingType === 'Manager') {
-        // Manager ratings can be more conservative or more generous depending on skill
+        // Manager ratings: Variable, some progression but more conservative
         const isStrategicSkill = ['Leadership', 'Communication', 'Strategic Planning', 'People Management'].includes(item.skill);
         if (isStrategicSkill) {
           adjustedRating = Math.max(1, item.avgRating - (Math.random() * 0.4 + 0.1)); // More conservative
+          // Slight progression for strategic skills
+          adjustedRating = Math.min(8, adjustedRating + (progressionFactor * 0.4));
         } else {
           adjustedRating = item.avgRating + (Math.random() - 0.5) * 0.4; // More varied
+          // Moderate progression for technical skills
+          adjustedRating = Math.min(8, adjustedRating + (progressionFactor * 0.6));
         }
       }
       
@@ -332,75 +354,124 @@ export const skillProgressionMetrics: SkillProgressionMetrics = {
   skillGapToTarget: 2.6
 };
 
-// Generate heatmap data based on actual skill distribution data
-export function generateHeatmapData(filteredData: SkillDistribution[]) {
+// Generate heatmap data based on actual skill distribution data and rating type filters
+export function generateHeatmapData(filteredData: SkillDistribution[], ratingTypeFilter: string[] = []) {
   const skills = Array.from(new Set(filteredData.map(d => d.skill)));
   const periods = Array.from(new Set(filteredData.map(d => d.timePeriod)));
   
   return skills.map(skill => {
     const skillData: any = { skill };
     periods.forEach(period => {
-      const data = filteredData.find(d => d.skill === skill && d.timePeriod === period);
-      skillData[period] = data?.avgRating || 0;
+      if (ratingTypeFilter.length > 0) {
+        // When rating type filter is applied, get average from progression entries
+        const relevantEntries = skillProgressionEntries.filter(entry =>
+          entry.skillName === skill &&
+          entry.timePeriod === period &&
+          ratingTypeFilter.includes(entry.ratingType)
+        );
+        
+        if (relevantEntries.length > 0) {
+          const avgRating = relevantEntries.reduce((sum, entry) => sum + entry.avgRating, 0) / relevantEntries.length;
+          skillData[period] = Math.round(avgRating * 10) / 10;
+        } else {
+          skillData[period] = 0;
+        }
+      } else {
+        // Use original distribution data when no rating type filter
+        const data = filteredData.find(d => d.skill === skill && d.timePeriod === period);
+        skillData[period] = data?.avgRating || 0;
+      }
     });
     return skillData;
   });
 }
 
-// Generate bubble chart data based on filtered data
-export function generateBubbleData(filteredData: SkillDistribution[]) {
+// Generate bubble chart data based on filtered data and rating type filters
+export function generateBubbleData(filteredData: SkillDistribution[], ratingTypeFilter: string[] = []) {
   const skillStats = new Map();
   
-  filteredData.forEach(entry => {
-    if (!skillStats.has(entry.skill)) {
-      // Set specific lower targets for certain skills to allow exceeding
-      let targetRating = 6 + Math.random() * 2; // Default random target between 6-8
-      if (entry.skill === 'Machine Learning') {
-        targetRating = 5.5; // Lower target to allow exceeding
-      } else if (entry.skill === 'CSS') {
-        targetRating = 5.8; // Lower target to allow exceeding
-      } else if (entry.skill === 'Python') {
-        targetRating = 6.2; // Slightly lower target
-      } else if (entry.skill === 'React') {
-        targetRating = 5.9; // Lower target
+  if (ratingTypeFilter.length > 0) {
+    // When rating type filter is applied, use progression entries
+    const filteredSkills = Array.from(new Set(filteredData.map(d => d.skill)));
+    
+    filteredSkills.forEach(skill => {
+      const relevantEntries = skillProgressionEntries.filter(entry =>
+        entry.skillName === skill &&
+        ratingTypeFilter.includes(entry.ratingType)
+      );
+      
+      if (relevantEntries.length > 0) {
+        const avgRating = relevantEntries.reduce((sum, entry) => sum + entry.avgRating, 0) / relevantEntries.length;
+        const totalEmployees = relevantEntries.reduce((sum, entry) => sum + entry.employeeCount, 0);
+        
+        skillStats.set(skill, {
+          skill: skill,
+          avgRating: avgRating,
+          employeeCount: totalEmployees,
+          importance: Math.random() * 10 + 1,
+          targetRating: getSkillTarget(skill),
+          changeVsLastQuarter: (Math.random() - 0.5) * 2
+        });
+      }
+    });
+  } else {
+    // Use original distribution data when no rating type filter
+    filteredData.forEach(entry => {
+      if (!skillStats.has(entry.skill)) {
+        // Set specific lower targets for certain skills to allow exceeding
+        let targetRating = 6 + Math.random() * 2; // Default random target between 6-8
+        if (entry.skill === 'Machine Learning') {
+          targetRating = 5.5; // Lower target to allow exceeding
+        } else if (entry.skill === 'CSS') {
+          targetRating = 5.8; // Lower target to allow exceeding
+        } else if (entry.skill === 'Python') {
+          targetRating = 6.2; // Slightly lower target
+        } else if (entry.skill === 'React') {
+          targetRating = 5.9; // Lower target
+        }
+        
+        skillStats.set(entry.skill, {
+          skill: entry.skill,
+          totalRating: 0,
+          count: 0,
+          employeeCount: 0,
+          importance: Math.random() * 10 + 1,
+          targetRating: targetRating
+        });
       }
       
-      skillStats.set(entry.skill, {
-        skill: entry.skill,
-        totalRating: 0,
-        count: 0,
-        employeeCount: 0,
-        importance: Math.random() * 10 + 1,
-        targetRating: targetRating
-      });
-    }
-    
-    const stats = skillStats.get(entry.skill);
-    stats.totalRating += entry.avgRating;
-    stats.count++;
-    stats.employeeCount += Math.floor(Math.random() * 50) + 20;
-  });
+      const stats = skillStats.get(entry.skill);
+      stats.totalRating += entry.avgRating;
+      stats.count++;
+      stats.employeeCount += Math.floor(Math.random() * 50) + 20;
+    });
+  }
   
   return Array.from(skillStats.values()).map(stats => {
-    let avgRating = stats.count > 0 ? stats.totalRating / stats.count : 0;
+    let avgRating = stats.avgRating;
     
-    // Boost ratings for specific skills to exceed their targets
-    if (stats.skill === 'Machine Learning') {
-      avgRating = Math.max(avgRating, 6.2); // Ensure it exceeds target of 5.5
-    } else if (stats.skill === 'CSS') {
-      avgRating = Math.max(avgRating, 6.5); // Ensure it exceeds target of 5.8
-    } else if (stats.skill === 'Python') {
-      avgRating = Math.max(avgRating, 6.8); // Ensure it exceeds target of 6.2
-    } else if (stats.skill === 'React') {
-      avgRating = Math.max(avgRating, 6.3); // Ensure it exceeds target of 5.9
+    // If using distribution data, calculate average
+    if (stats.totalRating !== undefined) {
+      avgRating = stats.count > 0 ? stats.totalRating / stats.count : 0;
+      
+      // Boost ratings for specific skills to exceed their targets
+      if (stats.skill === 'Machine Learning') {
+        avgRating = Math.max(avgRating, 6.2); // Ensure it exceeds target of 5.5
+      } else if (stats.skill === 'CSS') {
+        avgRating = Math.max(avgRating, 6.5); // Ensure it exceeds target of 5.8
+      } else if (stats.skill === 'Python') {
+        avgRating = Math.max(avgRating, 6.8); // Ensure it exceeds target of 6.2
+      } else if (stats.skill === 'React') {
+        avgRating = Math.max(avgRating, 6.3); // Ensure it exceeds target of 5.9
+      }
     }
     
     return {
       skill: stats.skill,
       importance: stats.importance,
       avgRating: avgRating,
-      employeeCount: stats.count > 0 ? Math.floor(stats.employeeCount / stats.count) : 0,
-      changeVsLastQuarter: (Math.random() - 0.5) * 2,
+      employeeCount: stats.employeeCount || (stats.count > 0 ? Math.floor(stats.employeeCount / stats.count) : 0),
+      changeVsLastQuarter: stats.changeVsLastQuarter || (Math.random() - 0.5) * 2,
       targetRating: stats.targetRating
     };
   });

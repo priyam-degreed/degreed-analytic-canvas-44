@@ -181,15 +181,33 @@ export default function SkillProgression() {
   // Apply pagination to all data - limit to 10 entries by default
   const paginatedData = filteredData.slice(heatmapCurrentPage * itemsPerPage, (heatmapCurrentPage + 1) * itemsPerPage);
 
-  // Prepare line chart data for Progress Over Time - use paginated skills
+  // Prepare line chart data for Progress Over Time - use paginated skills with rating type filtering
   const paginatedSkills = availableSkills.slice(0, Math.min(10, availableSkills.length));
   const progressData = availablePeriods.map(period => {
     const periodData: any = { period };
     paginatedSkills.forEach(skill => {
-      const skillData = filteredData.find(
-        item => item.timePeriod === period && item.skill === skill && availableRoles.includes(item.role)
-      );
-      periodData[skill] = skillData?.avgRating || 0;
+      if (filters.ratingTypes.length > 0) {
+        // When rating type filter is applied, use progression entries
+        const relevantEntries = skillProgressionEntries.filter(entry =>
+          entry.skillName === skill &&
+          entry.timePeriod === period &&
+          filters.ratingTypes.includes(entry.ratingType) &&
+          (filters.roles.length === 0 || filters.roles.includes(entry.role))
+        );
+        
+        if (relevantEntries.length > 0) {
+          const avgRating = relevantEntries.reduce((sum, entry) => sum + entry.avgRating, 0) / relevantEntries.length;
+          periodData[skill] = Math.round(avgRating * 10) / 10;
+        } else {
+          periodData[skill] = 0;
+        }
+      } else {
+        // Use original distribution data when no rating type filter
+        const skillData = filteredData.find(
+          item => item.timePeriod === period && item.skill === skill && availableRoles.includes(item.role)
+        );
+        periodData[skill] = skillData?.avgRating || 0;
+      }
     });
     return periodData;
   });
@@ -242,8 +260,8 @@ export default function SkillProgression() {
   });
 
   // Generate dynamic data based on filters and pagination
-  const allHeatmapData = generateHeatmapData(filteredData);
-  const allBubbleData = generateBubbleData(filteredData).map(item => ({
+  const allHeatmapData = generateHeatmapData(filteredData, filters.ratingTypes);
+  const allBubbleData = generateBubbleData(filteredData, filters.ratingTypes).map(item => ({
     ...item,
     color: item.changeVsLastQuarter > 0.2 ? priorityColors.positive :
            item.changeVsLastQuarter < -0.2 ? priorityColors.negative :
