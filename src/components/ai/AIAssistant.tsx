@@ -1322,14 +1322,14 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" 
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" 
         onClick={handleClose}
       />
       
-      {/* Modal */}
+      {/* Modal - Centered on screen */}
       <div 
         className={cn(
-          "fixed w-[480px] bg-white rounded-xl shadow-2xl border z-40 transition-all duration-200",
+          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] bg-white rounded-xl shadow-2xl border z-50 transition-all duration-200",
           isMinimized ? "h-16" : "h-[700px]"
         )}
         style={{ 
