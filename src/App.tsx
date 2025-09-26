@@ -29,6 +29,7 @@ import Analyses from "./pages/Analyses";
 import SearchPage from "./pages/SearchPage";
 import Metrics from "./pages/Metrics";
 import Data from "./pages/Data";
+import AICreator from "./pages/AICreator";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,7 @@ const App = () => (
             <Route path="captures" element={<Captures />} />
             <Route path="analyses" element={<Analyses />} />
             <Route path="search" element={<SearchPage />} />
+            <Route path="ai/creator" element={<AICreator />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

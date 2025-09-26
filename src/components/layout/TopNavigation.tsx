@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, Search, Bell, User, Settings, HelpCircle, LogOut, BarChart3, Database, TrendingUp, Activity, Shield, Users } from "lucide-react";
+import { ChevronDown, Search, Bell, User, Settings, HelpCircle, LogOut, BarChart3, Database, TrendingUp, Activity, Shield, Users, Sparkles } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { SearchDropdown } from "@/components/ai/SearchDropdown";
@@ -102,6 +102,15 @@ export function TopNavigation() {
 
         {/* Right Section - View Mode Switch, Search and User Actions */}
         <div className="flex items-center space-x-4">
+          {/* Create with AI Button */}
+          <Button 
+            onClick={() => navigate('/ai/creator')}
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Create with AI
+          </Button>
+
           {/* View Mode Switch */}
           <div className="flex items-center space-x-3 border-r border-border pr-4">
             <div className="flex items-center space-x-2">
