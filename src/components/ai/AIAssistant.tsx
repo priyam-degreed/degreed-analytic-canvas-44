@@ -1080,27 +1080,31 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               const intensity = Math.min(impact / 100, 1);
               
               return (
-                <div key={idx} className="flex items-center gap-3">
-                  <div className="w-48 text-xs text-gray-600 text-left truncate">
-                    {item.name || `Item ${idx + 1}`}
+                <div key={idx} className="flex items-center gap-2">
+                  <div className="w-36 text-xs text-gray-600 text-left">
+                    <div className="truncate font-medium" title={item.name || `Item ${idx + 1}`}>
+                      {item.name || `Item ${idx + 1}`}
+                    </div>
                   </div>
                   <div className="flex-1 flex items-center">
                     <div 
-                      className={`h-6 flex items-center justify-center text-xs font-medium transition-all duration-300 hover:opacity-80 ${
+                      className={`h-6 flex items-center justify-center text-xs font-medium transition-all duration-300 hover:opacity-80 rounded-sm ${
                         isPositive 
                           ? 'bg-gradient-to-r from-green-400 to-green-600 text-white' 
                           : 'bg-gradient-to-r from-red-400 to-red-600 text-white'
                       }`}
                       style={{ 
-                        width: `${Math.max(intensity * 200, 20)}px`,
+                        width: `${Math.max(intensity * 180, 20)}px`,
                         opacity: Math.max(intensity, 0.3)
                       }}
                     >
-                      {isPositive ? '+' : ''}{Math.round(item.impact || item.rate || 0)}
+                      <span className="text-xs font-semibold">
+                        {isPositive ? '+' : ''}{Math.round(item.impact || item.rate || 0)}
+                      </span>
                     </div>
                   </div>
-                  <div className="w-16 text-xs text-gray-500 text-right">
-                    {item.frequency || item.count || Math.round(Math.random() * 1000 + 100)}
+                  <div className="w-12 text-xs text-gray-500 text-right font-mono">
+                    {Math.floor((item.frequency || item.count || Math.random() * 1000 + 100)/100)}k
                   </div>
                 </div>
               );
@@ -1126,21 +1130,31 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               const value = item.value || item.rate || item.growth || 50;
               const percentage = (value / total) * 100;
               const colors = ["bg-purple-500", "bg-blue-500", "bg-cyan-500", "bg-green-500", "bg-yellow-500", "bg-red-500"];
+              const name = item.name || `Item ${idx + 1}`;
+              const isLarge = idx < 2;
               
               return (
                 <div 
                   key={idx}
-                  className={`${colors[idx % colors.length]} rounded text-white p-2 flex flex-col justify-between transition-all hover:opacity-80`}
+                  className={`${colors[idx % colors.length]} rounded text-white p-1.5 flex flex-col justify-between transition-all hover:opacity-80 min-h-0`}
                   style={{ 
-                    gridRow: idx < 2 ? 'span 2' : 'span 1',
-                    gridColumn: idx < 2 ? 'span 2' : 'span 1'
+                    gridRow: isLarge ? 'span 2' : 'span 1',
+                    gridColumn: isLarge ? 'span 2' : 'span 1'
                   }}
                 >
-                  <div className="text-xs font-medium leading-tight">
-                    {(item.name || `Item ${idx + 1}`).substring(0, 12)}
+                  <div className={`font-medium leading-tight break-words ${isLarge ? 'text-xs' : 'text-[10px]'}`}>
+                    <div className="line-clamp-2" title={name}>
+                      {name}
+                    </div>
                   </div>
-                  <div className="text-lg font-bold">{Math.round(value)}</div>
-                  <div className="text-xs opacity-90">{Math.round(percentage)}%</div>
+                  <div className="mt-auto">
+                    <div className={`font-bold ${isLarge ? 'text-lg' : 'text-sm'}`}>
+                      {Math.round(value)}
+                    </div>
+                    <div className={`opacity-90 ${isLarge ? 'text-xs' : 'text-[10px]'}`}>
+                      {Math.round(percentage)}%
+                    </div>
+                  </div>
                 </div>
               );
             })}
@@ -1217,17 +1231,20 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
             {viz.data.map((item, idx) => {
               const colors = ["#8b5cf6", "#3b82f6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"];
               const percentage = item.percentage || ((item.value || item.rate || item.growth || item.engagement || 50) / total * 100);
+              const name = item.name || item.month || `Item ${idx + 1}`;
               return (
-                <div key={idx} className="flex items-center gap-2">
+                <div key={idx} className="flex items-center gap-2 min-w-0">
                   <div 
-                    className="w-3 h-3 rounded-sm"
+                    className="w-3 h-3 rounded-sm shrink-0"
                     style={{ backgroundColor: colors[idx % colors.length] }}
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="text-gray-600 truncate text-xs">
-                      {(item.name || item.month || `Item ${idx + 1}`)}
+                    <div className="text-gray-600 text-xs leading-tight">
+                      <div className="truncate font-medium" title={name}>
+                        {name}
+                      </div>
                     </div>
-                    <div className="text-gray-500 text-xs">
+                    <div className="text-gray-500 text-xs font-mono">
                       {typeof percentage === 'number' ? percentage.toFixed(1) : percentage}%
                     </div>
                   </div>
@@ -1315,15 +1332,18 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               {/* Labels */}
               {viz.data.map((item, idx) => {
                 const x = 60 + idx * (280 / (viz.data.length - 1));
+                const label = (item.name || item.month || `${idx + 1}`);
+                const shortLabel = label.length > 4 ? label.substring(0, 4) + '...' : label;
                 return (
                   <text
                     key={idx}
                     x={x}
                     y="155"
                     textAnchor="middle"
-                    className="text-xs fill-gray-600"
+                    className="text-xs fill-gray-600 font-medium"
                   >
-                    {(item.name || item.month || `${idx + 1}`).substring(0, 3)}
+                    <title>{label}</title>
+                    {shortLabel}
                   </text>
                 );
               })}
@@ -1343,13 +1363,15 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               const width = Math.max((value / maxValue) * 260, 12);
               
               return (
-                <div key={idx} className="flex items-center gap-3">
-                  <div className="w-20 text-xs text-gray-600 text-right truncate">
-                    {(item.name || item.month || `Item ${idx + 1}`).substring(0, 10)}
+                <div key={idx} className="flex items-center gap-2">
+                  <div className="w-24 text-xs text-gray-600 text-right shrink-0">
+                    <div className="truncate font-medium" title={item.name || item.month || `Item ${idx + 1}`}>
+                      {(item.name || item.month || `Item ${idx + 1}`)}
+                    </div>
                   </div>
-                  <div className="flex-1 flex items-center">
+                  <div className="flex-1 flex items-center min-w-0">
                     <div 
-                      className="h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-r-sm flex items-center justify-end pr-2 text-xs text-white font-medium transition-all duration-300 hover:opacity-80"
+                      className="h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-r-sm flex items-center justify-end pr-2 text-xs text-white font-semibold transition-all duration-300 hover:opacity-80"
                       style={{ width: `${width}px` }}
                     >
                       <span className="text-xs">{Math.round(value)}</span>
@@ -1371,73 +1393,78 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
             let value = item.rate || item.gap || item.growth || item.engagement || item.learners/10 || item.value || 50;
             const height = Math.max((value / maxValue) * 160, 12);
             
-            return (
-              <div 
-                key={idx} 
-                className="flex flex-col items-center flex-1 max-w-16 relative group"
-                onMouseEnter={(e) => {
-                  const tooltip = document.getElementById('tooltip');
-                  const tooltipContent = document.getElementById('tooltip-content');
-                  
-                  if (tooltip && tooltipContent) {
-                    const title = viz.title.toLowerCase();
-                    let tooltipHtml = `<div class="font-semibold">${item.name}</div>`;
-                    
-                    if (title.includes("completion rate")) {
-                      tooltipHtml += `<div>Completion Rate: ${item.rate || item.value || 0}%</div>`;
-                      tooltipHtml += `<div>Completed: ${item.completed || 'N/A'}</div>`;
-                      tooltipHtml += `<div>Total Assigned: ${item.assigned || item.total || 'N/A'}</div>`;
-                      if (item.avgTime) tooltipHtml += `<div>Avg Time: ${item.avgTime}</div>`;
-                    } else if (title.includes("past due")) {
-                      tooltipHtml += `<div>Past Due Count: ${item.value || 0}</div>`;
-                      tooltipHtml += `<div>Past Due Rate: ${item.rate || item.percentage || 0}%</div>`;
-                      tooltipHtml += `<div>Total Assignments: ${item.total || 'N/A'}</div>`;
-                    } else if (title.includes("satisfaction") || title.includes("provider")) {
-                      tooltipHtml += `<div>Rating: ${item.rate || item.value || 0}/5</div>`;
-                      tooltipHtml += `<div>Reviews: ${item.reviews || 'N/A'}</div>`;
-                      tooltipHtml += `<div>Change: ${item.change > 0 ? '+' : ''}${item.change || 0}</div>`;
-                    } else if (title.includes("endorsed") || title.includes("skills")) {
-                      tooltipHtml += `<div>Endorsement Rate: ${item.rate || item.value || 0}%</div>`;
-                      tooltipHtml += `<div>Development Events: ${item.events || 'N/A'}</div>`;
-                      tooltipHtml += `<div>Endorsed Events: ${item.endorsed || 'N/A'}</div>`;
-                    } else if (title.includes("engagement")) {
-                      tooltipHtml += `<div>Engagement Score: ${item.rate || item.value || 0}%</div>`;
-                      tooltipHtml += `<div>Active Users: ${item.users || item.active || 'N/A'}</div>`;
-                      tooltipHtml += `<div>Sessions: ${item.sessions || 'N/A'}</div>`;
-                    } else {
-                      tooltipHtml += `<div>Value: ${item.rate || item.value || 0}</div>`;
-                      tooltipHtml += `<div>Details: ${item.completed || item.learners || item.count || 'N/A'}</div>`;
-                    }
-                    
-                    tooltipContent.innerHTML = tooltipHtml;
-                    tooltip.style.opacity = '1';
-                    
-                    // Position tooltip
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const container = document.getElementById('chart-container')?.getBoundingClientRect();
-                    if (container) {
-                      tooltip.style.left = `${rect.left - container.left + rect.width/2 - 96}px`;
-                      tooltip.style.top = `${rect.top - container.top - 10}px`;
-                      tooltip.style.transform = 'translateY(-100%)';
-                    }
-                  }
-                }}
-                onMouseLeave={() => {
-                  const tooltip = document.getElementById('tooltip');
-                  if (tooltip) tooltip.style.opacity = '0';
-                }}
-              >
+              return (
                 <div 
-                  className="rounded-t-sm w-full mb-1 flex items-end justify-center text-xs text-white font-medium transition-all duration-300 hover:opacity-90 hover:scale-105 bg-gradient-to-r from-purple-500 to-purple-600 cursor-pointer"
-                  style={{ height: `${height}px` }}
+                  key={idx} 
+                  className="flex flex-col items-center flex-1 relative group"
+                  style={{ minWidth: '48px', maxWidth: '72px' }}
+                  onMouseEnter={(e) => {
+                    const tooltip = document.getElementById('tooltip');
+                    const tooltipContent = document.getElementById('tooltip-content');
+                    
+                    if (tooltip && tooltipContent) {
+                      const title = viz.title.toLowerCase();
+                      let tooltipHtml = `<div class="font-semibold">${item.name}</div>`;
+                      
+                      if (title.includes("completion rate")) {
+                        tooltipHtml += `<div>Completion Rate: ${item.rate || item.value || 0}%</div>`;
+                        tooltipHtml += `<div>Completed: ${item.completed || 'N/A'}</div>`;
+                        tooltipHtml += `<div>Total Assigned: ${item.assigned || item.total || 'N/A'}</div>`;
+                        if (item.avgTime) tooltipHtml += `<div>Avg Time: ${item.avgTime}</div>`;
+                      } else if (title.includes("past due")) {
+                        tooltipHtml += `<div>Past Due Count: ${item.value || 0}</div>`;
+                        tooltipHtml += `<div>Past Due Rate: ${item.rate || item.percentage || 0}%</div>`;
+                        tooltipHtml += `<div>Total Assignments: ${item.total || 'N/A'}</div>`;
+                      } else if (title.includes("satisfaction") || title.includes("provider")) {
+                        tooltipHtml += `<div>Rating: ${item.rate || item.value || 0}/5</div>`;
+                        tooltipHtml += `<div>Reviews: ${item.reviews || 'N/A'}</div>`;
+                        tooltipHtml += `<div>Change: ${item.change > 0 ? '+' : ''}${item.change || 0}</div>`;
+                      } else if (title.includes("endorsed") || title.includes("skills")) {
+                        tooltipHtml += `<div>Endorsement Rate: ${item.rate || item.value || 0}%</div>`;
+                        tooltipHtml += `<div>Development Events: ${item.events || 'N/A'}</div>`;
+                        tooltipHtml += `<div>Endorsed Events: ${item.endorsed || 'N/A'}</div>`;
+                      } else if (title.includes("engagement")) {
+                        tooltipHtml += `<div>Engagement Score: ${item.rate || item.value || 0}%</div>`;
+                        tooltipHtml += `<div>Active Users: ${item.users || item.active || 'N/A'}</div>`;
+                        tooltipHtml += `<div>Sessions: ${item.sessions || 'N/A'}</div>`;
+                      } else {
+                        tooltipHtml += `<div>Value: ${item.rate || item.value || 0}</div>`;
+                        tooltipHtml += `<div>Details: ${item.completed || item.learners || item.count || 'N/A'}</div>`;
+                      }
+                      
+                      tooltipContent.innerHTML = tooltipHtml;
+                      tooltip.style.opacity = '1';
+                      
+                      // Position tooltip
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const container = document.getElementById('chart-container')?.getBoundingClientRect();
+                      if (container) {
+                        tooltip.style.left = `${rect.left - container.left + rect.width/2 - 96}px`;
+                        tooltip.style.top = `${rect.top - container.top - 10}px`;
+                        tooltip.style.transform = 'translateY(-100%)';
+                      }
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    const tooltip = document.getElementById('tooltip');
+                    if (tooltip) tooltip.style.opacity = '0';
+                  }}
                 >
-                  <span className="text-xs mb-1">{Math.round(value)}</span>
+                  <div 
+                    className="rounded-t-sm w-full mb-1 flex items-end justify-center text-xs text-white font-semibold transition-all duration-300 hover:opacity-90 hover:scale-105 bg-gradient-to-r from-purple-500 to-purple-600 cursor-pointer"
+                    style={{ height: `${height}px` }}
+                  >
+                    <span className="text-xs mb-1">{Math.round(value)}</span>
+                  </div>
+                  <div className="text-xs text-center text-gray-600 leading-tight px-1 w-full">
+                    <div className="break-words" style={{ fontSize: '10px', lineHeight: '1.2' }}>
+                      {(item.name || item.month || `Item ${idx + 1}`).split(' ').map((word, i) => (
+                        <div key={i} className="truncate" title={word}>{word}</div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xs text-center text-gray-600 leading-tight px-1">
-                  {(item.name || item.month || `Item ${idx + 1}`).substring(0, 8)}
-                </div>
-              </div>
-            );
+              );
           })}
         </div>
         
