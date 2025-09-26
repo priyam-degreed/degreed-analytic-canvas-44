@@ -734,20 +734,84 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const handleChartTypeSwitch = (messageId: string, newType: "column" | "bar" | "line" | "pie" | "heatmap" | "treemap") => {
     setChatMessages(prev => prev.map(message => {
       if (message.id === messageId && message.visualization) {
+        let updatedData = message.visualization.data;
+        const title = message.visualization.title.toLowerCase();
+        
+        // Generate contextual data for pie charts based on query type
+        if (newType === "pie") {
+          if (title.includes("completion rate") && title.includes("organization")) {
+            // Pie chart for completion rate by org segments
+            updatedData = [
+              { name: "High Performers", value: 35.2, percentage: 35.2, orgs: 8, avgRate: 89.4 },
+              { name: "Good Performers", value: 28.7, percentage: 28.7, orgs: 12, avgRate: 76.8 },
+              { name: "Average Performers", value: 22.1, percentage: 22.1, orgs: 15, avgRate: 63.2 },
+              { name: "Need Improvement", value: 14.0, percentage: 14.0, orgs: 9, avgRate: 48.6 }
+            ];
+          } else if (title.includes("past due")) {
+            // Pie chart for past due by status
+            updatedData = [
+              { name: "1-7 days overdue", value: 45.2, percentage: 45.2, count: 89, total: 198 },
+              { name: "8-30 days overdue", value: 32.8, percentage: 32.8, count: 65, total: 198 },
+              { name: "31-60 days overdue", value: 15.7, percentage: 15.7, count: 31, total: 198 },
+              { name: "60+ days overdue", value: 6.3, percentage: 6.3, count: 13, total: 198 }
+            ];
+          } else if (title.includes("satisfaction") || title.includes("provider")) {
+            // Pie chart for satisfaction distribution
+            updatedData = [
+              { name: "Highly Satisfied (4.5-5.0)", value: 42.3, percentage: 42.3, count: 2847, providers: 4 },
+              { name: "Satisfied (4.0-4.4)", value: 31.7, percentage: 31.7, count: 2134, providers: 3 },
+              { name: "Neutral (3.5-3.9)", value: 18.4, percentage: 18.4, count: 1238, providers: 2 },
+              { name: "Dissatisfied (3.0-3.4)", value: 7.6, percentage: 7.6, count: 512, providers: 1 }
+            ];
+          } else if (title.includes("endorsed") || title.includes("skills")) {
+            // Pie chart for skill endorsement categories
+            updatedData = [
+              { name: "Technical Skills", value: 38.4, percentage: 38.4, events: 1547, endorsed: 1228 },
+              { name: "Soft Skills", value: 26.2, percentage: 26.2, events: 1056, endorsed: 894 },
+              { name: "Leadership Skills", value: 19.7, percentage: 19.7, events: 794, endorsed: 659 },
+              { name: "Domain Expertise", value: 15.7, percentage: 15.7, events: 632, endorsed: 521 }
+            ];
+          } else {
+            // Default pie chart data
+            updatedData = message.visualization.data.slice(0, 6);
+          }
+        } else if (newType === "heatmap") {
+          // Generate heatmap data for any chart type
+          if (title.includes("completion rate")) {
+            updatedData = [
+              { name: "Manager Support", impact: 92.4, type: "positive", correlation: 0.78, frequency: 2847 },
+              { name: "Clear Deadlines", impact: 84.7, type: "positive", correlation: 0.71, frequency: 1934 },
+              { name: "Video Content", impact: 79.3, type: "positive", correlation: 0.65, frequency: 2341 },
+              { name: "Mobile Access", impact: 73.2, type: "positive", correlation: 0.58, frequency: 1567 },
+              { name: "Text-Heavy Content", impact: -67.4, type: "negative", correlation: -0.54, frequency: 892 },
+              { name: "Long Sessions", impact: -59.8, type: "negative", correlation: -0.48, frequency: 567 }
+            ];
+          } else {
+            updatedData = message.visualization.data.map((item, idx) => ({
+              ...item,
+              impact: (item.value || item.rate || 50) + (Math.random() * 20 - 10),
+              type: idx < 3 ? "positive" : "negative",
+              correlation: (Math.random() * 0.6) + 0.2,
+              frequency: Math.floor(Math.random() * 2000) + 500
+            }));
+          }
+        }
+        
         return {
           ...message,
           visualization: {
             ...message.visualization,
             type: newType,
             title: newType === "pie" ? 
-              message.visualization.title.replace(/Column Chart|Line Chart|Bar Chart|Analysis|Trend/gi, "Pie Chart") :
+              message.visualization.title.replace(/Column Chart|Line Chart|Bar Chart|Analysis|Trend/gi, "Distribution") :
               newType === "line" ? 
-              message.visualization.title.replace(/Bar Chart|Column Chart|Pie Chart|Analysis/gi, "Line Chart") :
+              message.visualization.title.replace(/Bar Chart|Column Chart|Pie Chart|Analysis/gi, "Trend Analysis") :
               newType === "heatmap" ?
-              message.visualization.title.replace(/Chart|Analysis/gi, "Heatmap") :
+              message.visualization.title.replace(/Chart|Analysis|Distribution/gi, "Impact Analysis") :
               newType === "treemap" ?
-              message.visualization.title.replace(/Chart|Analysis/gi, "Treemap") :
-              message.visualization.title
+              message.visualization.title.replace(/Chart|Analysis/gi, "Hierarchy View") :
+              message.visualization.title,
+            data: updatedData
           }
         };
       }
@@ -758,14 +822,71 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const handleShowTrend = (messageId: string) => {
     setChatMessages(prev => prev.map(message => {
       if (message.id === messageId && message.visualization) {
-        const trendData = [
-          { month: "Apr", value: 65, trend: "up" },
-          { month: "May", value: 72, trend: "up" },
-          { month: "Jun", value: 68, trend: "down" },
-          { month: "Jul", value: 78, trend: "up" },
-          { month: "Aug", value: 82, trend: "up" },
-          { month: "Sep", value: 85, trend: "up" }
-        ];
+        // Generate contextual trend data based on the original query/title
+        const title = message.visualization.title.toLowerCase();
+        let trendData;
+        
+        if (title.includes("completion rate") && title.includes("organization")) {
+          // Org completion rate trend
+          trendData = [
+            { month: "Apr", name: "Apr", value: 67.2, total: 3456, completed: 2322 },
+            { month: "May", name: "May", value: 71.8, total: 3678, completed: 2641 },
+            { month: "Jun", name: "Jun", value: 69.4, total: 3523, completed: 2445 },
+            { month: "Jul", name: "Jul", value: 74.1, total: 3789, completed: 2808 },
+            { month: "Aug", name: "Aug", value: 76.8, total: 3912, completed: 3005 },
+            { month: "Sep", name: "Sep", value: 79.2, total: 4021, completed: 3185 }
+          ];
+        } else if (title.includes("past due") || title.includes("due")) {
+          // Past due assignments trend  
+          trendData = [
+            { month: "Apr", name: "Apr", value: 234, rate: 6.8, total: 3456 },
+            { month: "May", name: "May", value: 298, rate: 8.1, total: 3678 },
+            { month: "Jun", name: "Jun", value: 267, rate: 7.6, total: 3523 },
+            { month: "Jul", name: "Jul", value: 189, rate: 5.0, total: 3789 },
+            { month: "Aug", name: "Aug", value: 156, rate: 4.0, total: 3912 },
+            { month: "Sep", name: "Sep", value: 198, rate: 4.9, total: 4021 }
+          ];
+        } else if (title.includes("satisfaction") || title.includes("provider")) {
+          // Provider satisfaction trend
+          trendData = [
+            { month: "Apr", name: "Apr", value: 4.12, reviews: 1234, providers: 8 },
+            { month: "May", name: "May", value: 4.18, reviews: 1356, providers: 8 },
+            { month: "Jun", name: "Jun", value: 4.23, reviews: 1445, providers: 9 },
+            { month: "Jul", name: "Jul", value: 4.31, reviews: 1523, providers: 9 },
+            { month: "Aug", name: "Aug", value: 4.38, reviews: 1634, providers: 10 },
+            { month: "Sep", name: "Sep", value: 4.45, reviews: 1756, providers: 10 }
+          ];
+        } else if (title.includes("endorsed") || title.includes("skills")) {
+          // Skills endorsement trend
+          trendData = [
+            { month: "Apr", name: "Apr", value: 68.4, events: 934, endorsed: 639 },
+            { month: "May", name: "May", value: 70.2, events: 1067, endorsed: 749 },
+            { month: "Jun", name: "Jun", value: 72.8, events: 1189, endorsed: 865 },
+            { month: "Jul", name: "Jul", value: 75.1, events: 1278, endorsed: 960 },
+            { month: "Aug", name: "Aug", value: 77.3, events: 1345, endorsed: 1040 },
+            { month: "Sep", name: "Sep", value: 79.6, events: 1423, endorsed: 1133 }
+          ];
+        } else if (title.includes("engagement")) {
+          // Learning engagement trend
+          trendData = [
+            { month: "Apr", name: "Apr", value: 76.2, active: 2847, sessions: 15680 },
+            { month: "May", name: "May", value: 79.4, active: 2934, sessions: 16234 },
+            { month: "Jun", name: "Jun", value: 82.1, active: 3021, sessions: 17456 },
+            { month: "Jul", name: "Jul", value: 85.3, active: 3189, sessions: 18672 },
+            { month: "Aug", name: "Aug", value: 88.7, active: 3267, sessions: 19834 },
+            { month: "Sep", name: "Sep", value: 91.2, active: 3345, sessions: 21045 }
+          ];
+        } else {
+          // Default generic trend
+          trendData = [
+            { month: "Apr", name: "Apr", value: 65.0, metric: 1234 },
+            { month: "May", name: "May", value: 68.4, metric: 1345 },
+            { month: "Jun", name: "Jun", value: 71.2, metric: 1456 },
+            { month: "Jul", name: "Jul", value: 74.8, metric: 1567 },
+            { month: "Aug", name: "Aug", value: 78.1, metric: 1678 },
+            { month: "Sep", name: "Sep", value: 82.3, metric: 1789 }
+          ];
+        }
         
         return {
           ...message,
@@ -774,7 +895,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
             type: "line",
             title: message.visualization.title + " - 6 Month Trend",
             data: trendData,
-            metrics: ["Trend Value", "Growth Direction"]
+            metrics: ["Trend Value", "Growth Direction", "Period Analysis"]
           }
         };
       }
@@ -785,23 +906,92 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const handleJobRoleBreakdown = (messageId: string) => {
     setChatMessages(prev => prev.map(message => {
       if (message.id === messageId && message.visualization) {
-        const deptData = [
-          { name: "Engineering", value: 85, learners: 234 },
-          { name: "Marketing", value: 78, learners: 156 },
-          { name: "Sales", value: 72, learners: 189 },
-          { name: "HR", value: 68, learners: 98 },
-          { name: "Finance", value: 75, learners: 87 },
-          { name: "Operations", value: 71, learners: 143 }
-        ];
+        // Generate contextual job role data based on the original query/title
+        const title = message.visualization.title.toLowerCase();
+        let roleData;
+        
+        if (title.includes("completion rate") && title.includes("organization")) {
+          // Job role completion rates for learning assignments
+          roleData = [
+            { name: "Senior Engineers", rate: 92.4, value: 92.4, completed: 165, assigned: 178, avgTime: "2.1 weeks" },
+            { name: "Product Managers", rate: 88.7, value: 88.7, completed: 134, assigned: 151, avgTime: "2.8 weeks" },
+            { name: "Data Scientists", rate: 85.3, value: 85.3, completed: 97, assigned: 113, avgTime: "3.2 weeks" },
+            { name: "UX Designers", rate: 82.1, value: 82.1, completed: 89, assigned: 108, avgTime: "2.4 weeks" },
+            { name: "Marketing Specialists", rate: 78.9, value: 78.9, completed: 126, assigned: 160, avgTime: "3.6 weeks" },
+            { name: "Sales Representatives", rate: 74.2, value: 74.2, completed: 98, assigned: 132, avgTime: "4.1 weeks" },
+            { name: "HR Coordinators", rate: 69.8, value: 69.8, completed: 67, assigned: 96, avgTime: "4.8 weeks" },
+            { name: "Finance Analysts", rate: 65.4, value: 65.4, completed: 78, assigned: 119, avgTime: "5.2 weeks" }
+          ];
+        } else if (title.includes("past due") || title.includes("due")) {
+          // Job role past due assignments breakdown
+          roleData = [
+            { name: "Finance Analysts", value: 47, rate: 47, pastDue: 47, total: 119, percentage: 39.5 },
+            { name: "HR Coordinators", value: 34, rate: 34, pastDue: 34, total: 96, percentage: 35.4 },
+            { name: "Sales Representatives", value: 28, rate: 28, pastDue: 28, total: 132, percentage: 21.2 },
+            { name: "Marketing Specialists", value: 23, rate: 23, pastDue: 23, total: 160, percentage: 14.4 },
+            { name: "UX Designers", value: 19, rate: 19, pastDue: 19, total: 108, percentage: 17.6 },
+            { name: "Data Scientists", value: 16, rate: 16, pastDue: 16, total: 113, percentage: 14.2 },
+            { name: "Product Managers", value: 12, rate: 12, pastDue: 12, total: 151, percentage: 7.9 },
+            { name: "Senior Engineers", value: 8, rate: 8, pastDue: 8, total: 178, percentage: 4.5 }
+          ];
+        } else if (title.includes("satisfaction") || title.includes("provider")) {
+          // Job role satisfaction with learning providers
+          roleData = [
+            { name: "Data Scientists", value: 4.67, rate: 4.67, rating: 4.67, reviews: 234, providers: 8 },
+            { name: "Senior Engineers", value: 4.52, rate: 4.52, rating: 4.52, reviews: 298, providers: 6 },
+            { name: "Product Managers", value: 4.41, rate: 4.41, rating: 4.41, reviews: 189, providers: 7 },
+            { name: "UX Designers", value: 4.33, rate: 4.33, rating: 4.33, reviews: 156, providers: 5 },
+            { name: "Marketing Specialists", value: 4.18, rate: 4.18, rating: 4.18, reviews: 167, providers: 6 },
+            { name: "Sales Representatives", value: 3.94, rate: 3.94, rating: 3.94, reviews: 134, providers: 4 },
+            { name: "HR Coordinators", value: 3.87, rate: 3.87, rating: 3.87, reviews: 98, providers: 4 },
+            { name: "Finance Analysts", value: 3.72, rate: 3.72, rating: 3.72, reviews: 89, providers: 3 }
+          ];
+        } else if (title.includes("endorsed") || title.includes("skills")) {
+          // Job role skill endorsement rates
+          roleData = [
+            { name: "Senior Engineers", value: 89.4, rate: 89.4, events: 456, endorsed: 408, topSkill: "System Design" },
+            { name: "Data Scientists", value: 86.7, rate: 86.7, events: 398, endorsed: 345, topSkill: "Machine Learning" },
+            { name: "Product Managers", value: 82.3, rate: 82.3, events: 278, endorsed: 229, topSkill: "Strategy" },
+            { name: "UX Designers", value: 78.9, rate: 78.9, events: 189, endorsed: 149, topSkill: "Design Systems" },
+            { name: "Marketing Specialists", value: 74.2, rate: 74.2, events: 234, endorsed: 174, topSkill: "Digital Marketing" },
+            { name: "Sales Representatives", value: 69.8, rate: 69.8, events: 167, endorsed: 117, topSkill: "Negotiation" },
+            { name: "Finance Analysts", value: 65.4, rate: 65.4, events: 145, endorsed: 95, topSkill: "Financial Modeling" },
+            { name: "HR Coordinators", value: 61.2, rate: 61.2, events: 123, endorsed: 75, topSkill: "People Management" }
+          ];
+        } else if (title.includes("engagement")) {
+          // Job role learning engagement levels
+          roleData = [
+            { name: "Data Scientists", value: 94.2, rate: 94.2, sessions: 1845, hours: 234, courses: 12 },
+            { name: "Senior Engineers", value: 91.8, rate: 91.8, sessions: 2134, hours: 298, courses: 15 },
+            { name: "Product Managers", value: 88.4, rate: 88.4, sessions: 1567, hours: 189, courses: 11 },
+            { name: "UX Designers", value: 85.7, rate: 85.7, sessions: 1234, hours: 156, courses: 9 },
+            { name: "Marketing Specialists", value: 82.1, rate: 82.1, sessions: 1398, hours: 167, courses: 10 },
+            { name: "Sales Representatives", value: 78.3, rate: 78.3, sessions: 1087, hours: 134, courses: 8 },
+            { name: "Finance Analysts", value: 74.6, rate: 74.6, sessions: 934, hours: 89, courses: 6 },
+            { name: "HR Coordinators", value: 71.2, rate: 71.2, sessions: 798, hours: 98, courses: 7 }
+          ];
+        } else {
+          // Default job role breakdown
+          roleData = [
+            { name: "Engineering", value: 85.2, rate: 85.2, learners: 234, performance: "High" },
+            { name: "Product", value: 82.4, rate: 82.4, learners: 156, performance: "High" },
+            { name: "Data Science", value: 79.1, rate: 79.1, learners: 189, performance: "Good" },
+            { name: "Design", value: 76.8, rate: 76.8, learners: 98, performance: "Good" },
+            { name: "Marketing", value: 73.5, rate: 73.5, learners: 167, performance: "Average" },
+            { name: "Sales", value: 69.2, rate: 69.2, learners: 143, performance: "Average" },
+            { name: "Finance", value: 65.9, rate: 65.9, learners: 87, performance: "Needs Attention" },
+            { name: "Operations", value: 62.6, rate: 62.6, learners: 123, performance: "Needs Attention" }
+          ];
+        }
         
         return {
           ...message,
           visualization: {
             ...message.visualization,
             type: "bar", // Horizontal bar chart for job role breakdown
-            title: message.visualization.title.replace(/by Pathway|by Engineering|by Skills/gi, "by Job Role"),
-            data: deptData,
-            attributes: ["Job Role", "Learning Progress"],
+            title: message.visualization.title.replace(/by Pathway|by Engineering|by Skills|by Organization|by Category/gi, "by Job Role"),
+            data: roleData,
+            attributes: ["Job Role", "Performance Metric", "Details"],
             filters: [...message.visualization.filters, "Job Role Breakdown"]
           }
         };
@@ -1161,10 +1351,46 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   const tooltipContent = document.getElementById('tooltip-content');
                   
                   if (tooltip && tooltipContent) {
-                    tooltipContent.innerHTML = `<div class="font-semibold">${item.name}</div>
-                      <div>Completion Rate: ${item.rate || item.value || 0}%</div>
-                      <div>Details: ${item.completed || item.value || 'N/A'}</div>`;
+                    const title = viz.title.toLowerCase();
+                    let tooltipHtml = `<div class="font-semibold">${item.name}</div>`;
+                    
+                    if (title.includes("completion rate")) {
+                      tooltipHtml += `<div>Completion Rate: ${item.rate || item.value || 0}%</div>`;
+                      tooltipHtml += `<div>Completed: ${item.completed || 'N/A'}</div>`;
+                      tooltipHtml += `<div>Total Assigned: ${item.assigned || item.total || 'N/A'}</div>`;
+                      if (item.avgTime) tooltipHtml += `<div>Avg Time: ${item.avgTime}</div>`;
+                    } else if (title.includes("past due")) {
+                      tooltipHtml += `<div>Past Due Count: ${item.value || 0}</div>`;
+                      tooltipHtml += `<div>Past Due Rate: ${item.rate || item.percentage || 0}%</div>`;
+                      tooltipHtml += `<div>Total Assignments: ${item.total || 'N/A'}</div>`;
+                    } else if (title.includes("satisfaction") || title.includes("provider")) {
+                      tooltipHtml += `<div>Rating: ${item.rate || item.value || 0}/5</div>`;
+                      tooltipHtml += `<div>Reviews: ${item.reviews || 'N/A'}</div>`;
+                      tooltipHtml += `<div>Change: ${item.change > 0 ? '+' : ''}${item.change || 0}</div>`;
+                    } else if (title.includes("endorsed") || title.includes("skills")) {
+                      tooltipHtml += `<div>Endorsement Rate: ${item.rate || item.value || 0}%</div>`;
+                      tooltipHtml += `<div>Development Events: ${item.events || 'N/A'}</div>`;
+                      tooltipHtml += `<div>Endorsed Events: ${item.endorsed || 'N/A'}</div>`;
+                    } else if (title.includes("engagement")) {
+                      tooltipHtml += `<div>Engagement Score: ${item.rate || item.value || 0}%</div>`;
+                      tooltipHtml += `<div>Active Users: ${item.users || item.active || 'N/A'}</div>`;
+                      tooltipHtml += `<div>Sessions: ${item.sessions || 'N/A'}</div>`;
+                    } else {
+                      tooltipHtml += `<div>Value: ${item.rate || item.value || 0}</div>`;
+                      tooltipHtml += `<div>Details: ${item.completed || item.learners || item.count || 'N/A'}</div>`;
+                    }
+                    
+                    tooltipContent.innerHTML = tooltipHtml;
                     tooltip.style.opacity = '1';
+                    
+                    // Position tooltip
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const container = document.getElementById('chart-container')?.getBoundingClientRect();
+                    if (container) {
+                      tooltip.style.left = `${rect.left - container.left + rect.width/2 - 96}px`;
+                      tooltip.style.top = `${rect.top - container.top - 10}px`;
+                      tooltip.style.transform = 'translateY(-100%)';
+                    }
                   }
                 }}
                 onMouseLeave={() => {
