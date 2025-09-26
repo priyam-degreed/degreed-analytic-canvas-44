@@ -1082,8 +1082,16 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               
               return (
                 <div key={idx} className="flex items-center gap-2">
-                  <div className="w-40 text-xs text-gray-600 text-left">
-                    <div className="chart-legend break-words line-clamp-2" title={item.name || `Item ${idx + 1}`}>
+                  <div className="w-32 sm:w-40 text-xs text-gray-600 text-left flex-shrink-0">
+                    <div className="chart-legend break-words overflow-hidden" 
+                         style={{ 
+                           display: '-webkit-box',
+                           WebkitLineClamp: 2,
+                           WebkitBoxOrient: 'vertical',
+                           lineHeight: '1.2em',
+                           maxHeight: '2.4em'
+                         }}
+                         title={item.name || `Item ${idx + 1}`}>
                       {item.name || `Item ${idx + 1}`}
                     </div>
                   </div>
@@ -1144,7 +1152,15 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   }}
                 >
                   <div className={`font-medium leading-tight break-words ${isLarge ? 'text-xs' : 'text-[10px]'}`}>
-                    <div className="line-clamp-2" title={name}>
+                    <div className="overflow-hidden" 
+                         style={{ 
+                           display: '-webkit-box',
+                           WebkitLineClamp: isLarge ? 3 : 2,
+                           WebkitBoxOrient: 'vertical',
+                           lineHeight: '1.1em',
+                           maxHeight: isLarge ? '3.3em' : '2.2em'
+                         }}
+                         title={name}>
                       {name}
                     </div>
                   </div>
@@ -1225,7 +1241,15 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   />
                   <div className="flex-1 min-w-0">
                     <div className="text-gray-600 text-xs leading-tight">
-                      <div className="chart-legend break-words line-clamp-2" title={name}>
+                      <div className="chart-legend break-words overflow-hidden" 
+                           style={{ 
+                             display: '-webkit-box',
+                             WebkitLineClamp: 2,
+                             WebkitBoxOrient: 'vertical',
+                             lineHeight: '1.2em',
+                             maxHeight: '2.4em'
+                           }}
+                           title={name}>
                         {name}
                       </div>
                     </div>
@@ -1322,8 +1346,16 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               {viz.data.map((item, idx) => {
                 const label = (item.name || item.month || `${idx + 1}`);
                 return (
-                  <div key={idx} className="text-center min-w-0 flex-1">
-                    <div className="text-xs text-gray-600 font-medium chart-legend break-words" title={label}>
+                  <div key={idx} className="text-center min-w-0 flex-1 px-1">
+                    <div className="text-xs text-gray-600 font-medium chart-legend break-words overflow-hidden"
+                         style={{ 
+                           display: '-webkit-box',
+                           WebkitLineClamp: 2,
+                           WebkitBoxOrient: 'vertical',
+                           lineHeight: '1.1em',
+                           maxHeight: '2.2em'
+                         }}
+                         title={label}>
                       {label}
                     </div>
                   </div>
@@ -1346,8 +1378,16 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               
               return (
                 <div key={idx} className="flex items-center gap-2">
-                  <div className="w-28 text-xs text-gray-600 text-right shrink-0">
-                    <div className="chart-legend break-words line-clamp-2 text-right" title={item.name || item.month || `Item ${idx + 1}`}>
+                  <div className="w-24 sm:w-32 text-xs text-gray-600 text-right shrink-0">
+                    <div className="chart-legend break-words overflow-hidden text-right" 
+                         style={{ 
+                           display: '-webkit-box',
+                           WebkitLineClamp: 2,
+                           WebkitBoxOrient: 'vertical',
+                           lineHeight: '1.2em',
+                           maxHeight: '2.4em'
+                         }}
+                         title={item.name || item.month || `Item ${idx + 1}`}>
                       {(item.name || item.month || `Item ${idx + 1}`)}
                     </div>
                   </div>
@@ -1438,8 +1478,17 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   >
                     <span className="text-xs mb-1">{formatNumber(value)}</span>
                   </div>
-                  <div className="text-xs text-center text-gray-600 leading-tight px-1 w-full">
-                    <div className="chart-legend break-words line-clamp-2" title={item.name || item.month || `Item ${idx + 1}`}>
+                  <div className="text-xs text-center text-gray-600 leading-tight px-1 w-full mt-1">
+                    <div className="chart-legend break-words overflow-hidden" 
+                         style={{ 
+                           display: '-webkit-box',
+                           WebkitLineClamp: 2,
+                           WebkitBoxOrient: 'vertical',
+                           lineHeight: '1.1em',
+                           maxHeight: '2.2em',
+                           wordBreak: 'break-word'
+                         }}
+                         title={item.name || item.month || `Item ${idx + 1}`}>
                       {(item.name || item.month || `Item ${idx + 1}`)}
                     </div>
                   </div>
