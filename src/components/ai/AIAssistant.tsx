@@ -1330,16 +1330,9 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       <div 
         className={cn(
           "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl border z-50 transition-all duration-200",
-          "max-w-[90vw] max-h-[90vh]",
+          "max-w-[90vw] max-h-[90vh] overflow-hidden",
           isMinimized ? "w-80 h-16" : "w-[600px] h-[650px]"
         )}
-        style={{ 
-          bottom: '24px', 
-          right: '88px', // Positioned to the left of sticky icon
-          transform: isOpen ? 'scale(1)' : 'scale(0.95)',
-          opacity: isOpen ? 1 : 0,
-          pointerEvents: isOpen ? 'auto' : 'none'
-        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-xl">
