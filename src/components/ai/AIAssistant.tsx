@@ -1073,7 +1073,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     if (viz.type === "heatmap") {
       return (
         <div className="bg-white border rounded-lg p-4">
-          <div className="space-y-2">
+          <div className="space-y-3">
             {viz.data.map((item, idx) => {
               const impact = Math.abs(item.impact || item.rate || 50);
               const isPositive = (item.type === "positive") || (item.impact || item.rate || 0) > 0;
@@ -1081,36 +1081,36 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               
               return (
                 <div key={idx} className="flex items-center gap-2">
-                  <div className="w-36 text-xs text-gray-600 text-left">
-                    <div className="truncate font-medium" title={item.name || `Item ${idx + 1}`}>
+                  <div className="w-40 text-xs text-gray-600 text-left">
+                    <div className="chart-legend break-words line-clamp-2" title={item.name || `Item ${idx + 1}`}>
                       {item.name || `Item ${idx + 1}`}
                     </div>
                   </div>
-                  <div className="flex-1 flex items-center">
+                  <div className="flex-1 flex items-center min-w-0">
                     <div 
-                      className={`h-6 flex items-center justify-center text-xs font-medium transition-all duration-300 hover:opacity-80 rounded-sm ${
+                      className={`h-6 flex items-center justify-center text-xs font-semibold transition-all duration-300 hover:opacity-80 rounded-sm ${
                         isPositive 
                           ? 'bg-gradient-to-r from-green-400 to-green-600 text-white' 
                           : 'bg-gradient-to-r from-red-400 to-red-600 text-white'
                       }`}
                       style={{ 
-                        width: `${Math.max(intensity * 180, 20)}px`,
+                        width: `${Math.max(intensity * 160, 20)}px`,
                         opacity: Math.max(intensity, 0.3)
                       }}
                     >
-                      <span className="text-xs font-semibold">
+                      <span className="text-xs chart-value">
                         {isPositive ? '+' : ''}{Math.round(item.impact || item.rate || 0)}
                       </span>
                     </div>
                   </div>
-                  <div className="w-12 text-xs text-gray-500 text-right font-mono">
+                  <div className="w-12 text-xs text-gray-500 text-right chart-value">
                     {Math.floor((item.frequency || item.count || Math.random() * 1000 + 100)/100)}k
                   </div>
                 </div>
               );
             })}
           </div>
-          <div className="mt-3 text-xs text-gray-500 flex justify-between">
+          <div className="mt-4 text-xs text-gray-500 flex justify-between chart-legend">
             <span>📈 Positive Impact</span>
             <span>📉 Negative Impact</span>
           </div>
@@ -1211,24 +1211,24 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               </svg>
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+          <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
             {viz.data.map((item, idx) => {
               const colors = ["#8b5cf6", "#3b82f6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"];
               const percentage = item.percentage || ((item.value || item.rate || item.growth || item.engagement || 50) / total * 100);
               const name = item.name || item.month || `Item ${idx + 1}`;
               return (
-                <div key={idx} className="flex items-center gap-2 min-w-0">
+                <div key={idx} className="flex items-start gap-2 min-w-0">
                   <div 
-                    className="w-3 h-3 rounded-sm shrink-0"
+                    className="w-3 h-3 rounded-sm shrink-0 mt-0.5"
                     style={{ backgroundColor: colors[idx % colors.length] }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="text-gray-600 text-xs leading-tight">
-                      <div className="truncate font-medium" title={name}>
+                      <div className="chart-legend break-words line-clamp-2" title={name}>
                         {name}
                       </div>
                     </div>
-                    <div className="text-gray-500 text-xs font-mono">
+                    <div className="text-gray-500 text-xs chart-value mt-1">
                       {typeof percentage === 'number' ? percentage.toFixed(1) : percentage}%
                     </div>
                   </div>
@@ -1243,95 +1243,92 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     if (viz.type === "line") {
       return (
         <div className="bg-white border rounded-lg p-4">
-          <div className="h-48 relative">
-            <svg viewBox="0 0 400 160" className="w-full h-full">
-              <defs>
-                <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style={{stopColor: '#10b981', stopOpacity: 0.3}} />
-                  <stop offset="100%" style={{stopColor: '#10b981', stopOpacity: 0}} />
-                </linearGradient>
-              </defs>
-              
-              {/* Grid lines */}
-              {[0, 1, 2, 3, 4].map(i => (
-                <line 
-                  key={i}
-                  x1="40" 
-                  y1={20 + i * 30} 
-                  x2="380" 
-                  y2={20 + i * 30}
-                  stroke="#f3f4f6" 
-                  strokeWidth="1"
-                />
-              ))}
-              
-              {/* Line path */}
-              <path
-                d={viz.data.map((item, idx) => {
-                  const x = 60 + idx * (280 / (viz.data.length - 1));
-                  const value = item.value || item.trend || item.engagement || item.rate || 50;
-                  const y = 140 - ((value / maxValue) * 100);
-                  return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
-                }).join(' ')}
-                fill="none"
-                stroke="#10b981"
-                strokeWidth="3"
-                className="drop-shadow-sm"
-              />
-              
-              {/* Area fill */}
-              <path
-                d={[
-                  `M 60 140`,
-                  ...viz.data.map((item, idx) => {
+          <div className="h-56 relative">
+            <div className="h-48 relative">
+              <svg viewBox="0 0 400 160" className="w-full h-full">
+                <defs>
+                  <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style={{stopColor: '#10b981', stopOpacity: 0.3}} />
+                    <stop offset="100%" style={{stopColor: '#10b981', stopOpacity: 0}} />
+                  </linearGradient>
+                </defs>
+                
+                {/* Grid lines */}
+                {[0, 1, 2, 3, 4].map(i => (
+                  <line 
+                    key={i}
+                    x1="40" 
+                    y1={20 + i * 30} 
+                    x2="380" 
+                    y2={20 + i * 30}
+                    stroke="#f3f4f6" 
+                    strokeWidth="1"
+                  />
+                ))}
+                
+                {/* Line path */}
+                <path
+                  d={viz.data.map((item, idx) => {
                     const x = 60 + idx * (280 / (viz.data.length - 1));
                     const value = item.value || item.trend || item.engagement || item.rate || 50;
                     const y = 140 - ((value / maxValue) * 100);
-                    return `L ${x} ${y}`;
-                  }),
-                  `L ${60 + (viz.data.length - 1) * (280 / (viz.data.length - 1))} 140 Z`
-                ].join(' ')}
-                fill="url(#lineGradient)"
-              />
-              
-              {/* Data points */}
+                    return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
+                  }).join(' ')}
+                  fill="none"
+                  stroke="#10b981"
+                  strokeWidth="3"
+                  className="drop-shadow-sm"
+                />
+                
+                {/* Area fill */}
+                <path
+                  d={[
+                    `M 60 140`,
+                    ...viz.data.map((item, idx) => {
+                      const x = 60 + idx * (280 / (viz.data.length - 1));
+                      const value = item.value || item.trend || item.engagement || item.rate || 50;
+                      const y = 140 - ((value / maxValue) * 100);
+                      return `L ${x} ${y}`;
+                    }),
+                    `L ${60 + (viz.data.length - 1) * (280 / (viz.data.length - 1))} 140 Z`
+                  ].join(' ')}
+                  fill="url(#lineGradient)"
+                />
+                
+                {/* Data points */}
+                {viz.data.map((item, idx) => {
+                  const x = 60 + idx * (280 / (viz.data.length - 1));
+                  const value = item.value || item.trend || item.engagement || item.rate || 50;
+                  const y = 140 - ((value / maxValue) * 100);
+                  return (
+                    <circle
+                      key={idx}
+                      cx={x}
+                      cy={y}
+                      r="4"
+                      fill="#10b981"
+                      stroke="white"
+                      strokeWidth="2"
+                      className="hover:r-6 transition-all"
+                    />
+                  );
+                })}
+              </svg>
+            </div>
+            
+            {/* X-axis labels with proper spacing */}
+            <div className="flex justify-between items-center px-8 pt-2">
               {viz.data.map((item, idx) => {
-                const x = 60 + idx * (280 / (viz.data.length - 1));
-                const value = item.value || item.trend || item.engagement || item.rate || 50;
-                const y = 140 - ((value / maxValue) * 100);
-                return (
-                  <circle
-                    key={idx}
-                    cx={x}
-                    cy={y}
-                    r="4"
-                    fill="#10b981"
-                    stroke="white"
-                    strokeWidth="2"
-                    className="hover:r-6 transition-all"
-                  />
-                );
-              })}
-              
-              {/* Labels */}
-              {viz.data.map((item, idx) => {
-                const x = 60 + idx * (280 / (viz.data.length - 1));
                 const label = (item.name || item.month || `${idx + 1}`);
-                const shortLabel = label.length > 4 ? label.substring(0, 4) + '...' : label;
                 return (
-                  <text
-                    key={idx}
-                    x={x}
-                    y="155"
-                    textAnchor="middle"
-                    className="text-xs fill-gray-600 font-medium"
-                  >
-                    <title>{label}</title>
-                    {shortLabel}
-                  </text>
+                  <div key={idx} className="text-center min-w-0 flex-1">
+                    <div className="text-xs text-gray-600 font-medium chart-legend break-words" title={label}>
+                      {label}
+                    </div>
+                  </div>
                 );
               })}
-            </svg>
+            </div>
           </div>
         </div>
       );
@@ -1348,14 +1345,14 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               
               return (
                 <div key={idx} className="flex items-center gap-2">
-                  <div className="w-24 text-xs text-gray-600 text-right shrink-0">
-                    <div className="truncate font-medium" title={item.name || item.month || `Item ${idx + 1}`}>
+                  <div className="w-28 text-xs text-gray-600 text-right shrink-0">
+                    <div className="chart-legend break-words line-clamp-2 text-right" title={item.name || item.month || `Item ${idx + 1}`}>
                       {(item.name || item.month || `Item ${idx + 1}`)}
                     </div>
                   </div>
                   <div className="flex-1 flex items-center min-w-0">
                     <div 
-                      className="h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-r-sm flex items-center justify-end pr-2 text-xs text-white font-semibold transition-all duration-300 hover:opacity-80"
+                      className="h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-r-sm flex items-center justify-end pr-2 text-xs text-white chart-value transition-all duration-300 hover:opacity-80"
                       style={{ width: `${width}px` }}
                     >
                       <span className="text-xs">{Math.round(value)}</span>
@@ -1441,10 +1438,8 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                     <span className="text-xs mb-1">{Math.round(value)}</span>
                   </div>
                   <div className="text-xs text-center text-gray-600 leading-tight px-1 w-full">
-                    <div className="break-words" style={{ fontSize: '10px', lineHeight: '1.2' }}>
-                      {(item.name || item.month || `Item ${idx + 1}`).split(' ').map((word, i) => (
-                        <div key={i} className="truncate" title={word}>{word}</div>
-                      ))}
+                    <div className="chart-legend break-words line-clamp-2" title={item.name || item.month || `Item ${idx + 1}`}>
+                      {(item.name || item.month || `Item ${idx + 1}`)}
                     </div>
                   </div>
                 </div>
