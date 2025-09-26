@@ -27,7 +27,10 @@ import {
   Bar,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  LineChart,
+  Line,
+  ComposedChart
 } from "recharts";
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', '#8884d8'];
@@ -241,6 +244,35 @@ export default function LearningEngagement() {
     // Return test data if no real data is available
     return result.length > 0 ? result : testData;
   }, [filteredLearningData, filters.roles]);
+
+  // Generate multi-line trend data for activities vs ratings
+  const activityRatingTrends = useMemo(() => {
+    const monthlyData = [];
+    const months = [
+      'SEP 2023', 'OCT', 'NOV', 'DEC', 'JAN 2024', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC', 'JAN 2025', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG'
+    ];
+    
+    months.forEach((month, index) => {
+      const baseActivity = 200 + Math.random() * 100;
+      // Create spike at the end (Aug 2025)
+      const learningActivities = index === months.length - 1 ? 5440 : baseActivity;
+      
+      const peerRating = 3.3 + (Math.random() * 1.5) + (index < 6 ? 0.5 : 0);
+      const managerRating = 5.04 + (Math.random() * 0.08);
+      const selfRating = 3.9 + (Math.random() * 0.25);
+      
+      monthlyData.push({
+        month: month,
+        learningActivities: Math.round(learningActivities),
+        peerRating: Number(peerRating.toFixed(2)),
+        managerRating: Number(managerRating.toFixed(3)),
+        selfRating: Number(selfRating.toFixed(2))
+      });
+    });
+    
+    return monthlyData;
+  }, []);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -501,6 +533,137 @@ export default function LearningEngagement() {
                   <span className="text-sm text-muted-foreground">{completions}</span>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      </ChartCard>
+
+      {/* Trend of Learning Activities vs Average Ratings */}
+      <ChartCard
+        title="Trend of Learning Activities (In Period) vs. Average Peer Rating vs. Average Manager Rating vs. Average Self Rating"
+        subtitle="Aug 2025"
+      >
+        <div className="space-y-4">
+          <ResponsiveContainer width="100%" height={500}>
+            <ComposedChart
+              data={activityRatingTrends}
+              margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="month" 
+                angle={-45}
+                textAnchor="end"
+                height={100}
+                fontSize={12}
+                interval={0}
+              />
+              <YAxis 
+                yAxisId="left" 
+                orientation="left"
+                domain={[0, 6000]}
+                label={{ value: 'Learning Activities', angle: -90, position: 'insideLeft' }}
+              />
+              <YAxis 
+                yAxisId="right" 
+                orientation="right"
+                domain={[3, 5.5]}
+                label={{ value: 'Rating (1-5)', angle: 90, position: 'insideRight' }}
+              />
+              <Tooltip 
+                formatter={(value: any, name: string) => {
+                  if (name === 'learningActivities') {
+                    return [value?.toLocaleString(), 'Learning Activities (In Period)'];
+                  }
+                  return [value, name];
+                }}
+                labelFormatter={(label) => `Month: ${label}`}
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+              />
+              
+              {/* Learning Activities Line */}
+              <Line 
+                yAxisId="left"
+                type="monotone" 
+                dataKey="learningActivities" 
+                stroke="#3B82F6" 
+                strokeWidth={3}
+                dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+                name="Learning Activities (In Period)"
+              />
+              
+              {/* Rating Areas */}
+              <Area 
+                yAxisId="right"
+                type="monotone" 
+                dataKey="peerRating" 
+                stroke="#84CC16" 
+                fill="#84CC16" 
+                fillOpacity={0.3}
+                strokeWidth={2}
+                name="Average Peer Rating"
+              />
+              
+              <Area 
+                yAxisId="right"
+                type="monotone" 
+                dataKey="managerRating" 
+                stroke="#8B5CF6" 
+                fill="#8B5CF6" 
+                fillOpacity={0.3}
+                strokeWidth={2}
+                name="Average Manager Rating"
+              />
+              
+              <Area 
+                yAxisId="right"
+                type="monotone" 
+                dataKey="selfRating" 
+                stroke="#EC4899" 
+                fill="#EC4899" 
+                fillOpacity={0.3}
+                strokeWidth={2}
+                name="Average Self Rating"
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+          
+          {/* Legend and Key Metrics */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="w-3 h-3 rounded-full bg-[#3B82F6]"></div>
+                <span className="text-sm font-medium">Learning Activities (In Period)</span>
+              </div>
+              <div className="text-3xl font-bold text-[#3B82F6]">5.44k</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="w-3 h-3 rounded-full bg-[#84CC16]"></div>
+                <span className="text-sm font-medium">Average Peer Rating</span>
+              </div>
+              <div className="text-3xl font-bold text-[#84CC16]">3.83</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="w-3 h-3 rounded-full bg-[#8B5CF6]"></div>
+                <span className="text-sm font-medium">Average Manager Rating</span>
+              </div>
+              <div className="text-3xl font-bold text-[#8B5CF6]">5.06</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="w-3 h-3 rounded-full bg-[#EC4899]"></div>
+                <span className="text-sm font-medium">Average Self Rating</span>
+              </div>
+              <div className="text-3xl font-bold text-[#EC4899]">3.93</div>
             </div>
           </div>
         </div>
