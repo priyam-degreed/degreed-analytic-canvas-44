@@ -375,7 +375,7 @@ export default function SkillProgression() {
       return (
         <div className="bg-background border border-border rounded-lg p-3 shadow-lg" style={{zIndex: 9999, position: 'relative'}}>
           <p className="font-semibold text-foreground mb-2">{label}</p>
-          {payload.filter((entry: any) => entry.name !== 'Target').map((entry: any, index: number) => (
+          {payload.filter((entry: any) => entry.name !== 'Target Level').map((entry: any, index: number) => (
             <div key={index} className="mb-1">
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm" style={{ color: entry.fill }}>
