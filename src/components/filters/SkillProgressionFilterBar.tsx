@@ -100,7 +100,7 @@ export function SkillProgressionFilterBar({ filters, onFilterChange, onReset }: 
       </div>
 
       <div className="flex items-center gap-1.5">
-        <span className="text-xs text-muted-foreground whitespace-nowrap">Rating:</span>
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Rating Level:</span>
         <MultiSelectFilter
           label="Rating Level"
           options={ratingLevelOptions}
@@ -111,7 +111,7 @@ export function SkillProgressionFilterBar({ filters, onFilterChange, onReset }: 
       </div>
 
       <div className="flex items-center gap-1.5">
-        <span className="text-xs text-muted-foreground whitespace-nowrap">Type:</span>
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Rating Type:</span>
         <MultiSelectFilter
           label="Rating Type"
           options={ratingTypeOptions}
