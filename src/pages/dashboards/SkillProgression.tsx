@@ -317,7 +317,7 @@ export default function SkillProgression() {
   const CustomLineTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+        <div className="bg-background border border-border rounded-lg p-3 shadow-lg z-50 relative">
           <p className="font-semibold text-foreground mb-2">{label}</p>
           {payload.map((entry: any, index: number) => (
             <div key={index} className="mb-1">
