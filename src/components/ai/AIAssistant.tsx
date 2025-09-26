@@ -50,7 +50,7 @@ interface ChatMessage {
 
 interface VisualizationData {
   id: string;
-  type: "column" | "bar" | "line" | "pie" | "heatmap";
+  type: "column" | "bar" | "line" | "pie" | "heatmap" | "table" | "treemap";
   title: string;
   metrics: string[];
   attributes: string[];
@@ -65,13 +65,18 @@ interface AIAssistantProps {
   onClose: () => void;
 }
 
+// Enhanced NLP sample queries based on the business questions
 const sampleQueries = [
+  "Which part of the organization has the highest and lowest completion rate on assigned learning?",
+  "What's driving the completion rate on assigned learning?",
+  "How many learning assignments are past due?",
+  "Are users developing skills that are endorsed?",
+  "How are users developing their skills?",
+  "Which category of learning has the highest completion rate?",
+  "Which learning provider has gained the most user satisfaction?",
+  "Show completion rate by Org Unit for last 90 days",
   "What are the top 5 skills trending for 6 months period?",
-  "Which content pathways have the highest completion rates?", 
-  "Show me the skill gaps for our engineering team vs market demand",
-  "How many learners are preparing for leadership roles?",
-  "Show learning engagement by job role over time",
-  "What content has the highest satisfaction scores?"
+  "Show learning engagement by job role over time"
 ];
 
 const quickActions = [
@@ -137,8 +142,212 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
-  const generateVisualization = (queryText: string): VisualizationData | null => {
+  // Enhanced NLP parsing and data model mapping
+  const parseNLQuery = (queryText: string) => {
     const lowerQuery = queryText.toLowerCase();
+    
+    // Data model mapping from NLP objectives
+    const dataModel = {
+      facts: {
+        'assignments completed': 'assignmentsCompleted',
+        'assignments assigned': 'assignmentsAssigned', 
+        'assignments past due': 'assignmentsPastDue',
+        'completion rate': 'completionRate',
+        'endorsed skill events': 'endorsedSkillEvents',
+        'skill development events': 'skillDevelopmentEvents',
+        'endorsed skill %': 'endorsedSkillPercent',
+        'satisfaction score': 'satisfactionScore',
+        'avg satisfaction': 'avgSatisfaction'
+      },
+      attributes: {
+        'org unit': 'orgUnit',
+        'organization': 'orgUnit',
+        'role': 'role',
+        'job role': 'role',
+        'region': 'region',
+        'provider': 'provider',
+        'category': 'category',
+        'skill': 'skill',
+        'development method': 'developmentMethod',
+        'assignment status': 'assignmentStatus',
+        'time': 'time'
+      }
+    };
+    
+    return { lowerQuery, dataModel };
+  };
+
+  const generateVisualization = (queryText: string): VisualizationData | null => {
+    const { lowerQuery, dataModel } = parseNLQuery(queryText);
+    
+    // Primary NLP questions from business requirements
+    
+    // 1. "Which part of the organization has the highest and lowest completion rate on assigned learning?"
+    if ((lowerQuery.includes("organization") || lowerQuery.includes("org")) && 
+        lowerQuery.includes("completion rate") && 
+        (lowerQuery.includes("highest") || lowerQuery.includes("lowest"))) {
+      return {
+        id: `viz-${Date.now()}`,
+        type: "bar",
+        title: "Completion Rate for Assigned Learning by Org Unit",
+        metrics: ["Completion Rate %", "Assignments Completed", "Assignments Assigned"],
+        attributes: ["Org Unit", "Job Role"],
+        filters: ["Assigned Learning", "All Org Units", "Current Period"],
+        data: [
+          { name: "Associate UI Engineer", rate: 100.0, completed: 45, assigned: 45, orgUnit: "Product Design" },
+          { name: "Web Designer", rate: 60.7, completed: 17, assigned: 28, orgUnit: "Product Design" },
+          { name: "Civil Engineer", rate: 57.9, completed: 22, assigned: 38, orgUnit: "Infrastructure" },
+          { name: "Mobile Developer", rate: 55.4, completed: 31, assigned: 56, orgUnit: "Engineering" },
+          { name: "Software Engineer", rate: 50.0, completed: 89, assigned: 178, orgUnit: "Engineering" },
+          { name: "Content Creator", rate: 47.8, completed: 11, assigned: 23, orgUnit: "Marketing" },
+          { name: "Data Analyst", rate: 41.9, completed: 18, assigned: 43, orgUnit: "Analytics" },
+          { name: "Database Administrator", rate: 33.3, completed: 12, assigned: 36, orgUnit: "IT Operations" }
+        ],
+        canModify: true,
+        saveOptions: true
+      };
+    }
+    
+    // 2. "What's driving the completion rate on assigned learning?"
+    if (lowerQuery.includes("driving") && lowerQuery.includes("completion rate")) {
+      return {
+        id: `viz-${Date.now()}`,
+        type: "heatmap",
+        title: "Drivers of Learning Completion Rate",
+        metrics: ["Impact on Completion Rate", "Frequency", "Correlation"],
+        attributes: ["Driver Category", "Impact Type"],
+        filters: ["All Learning Items", "Assignment Status", "Recommendation Type"],
+        data: [
+          { name: "Assignment Status: Completed", impact: 85, frequency: 1247, type: "positive" },
+          { name: "Learning Type: Video", impact: 72, frequency: 892, type: "positive" },
+          { name: "Provider: SuccessFactors", impact: 68, frequency: 743, type: "positive" },
+          { name: "Recommendation: Assigned", impact: 65, frequency: 1543, type: "positive" },
+          { name: "Assignment Status: Pending", impact: -43, frequency: 2341, type: "negative" },
+          { name: "Learning Type: Course", impact: -38, frequency: 1876, type: "negative" },
+          { name: "Assignment Status: Dismissed", impact: -52, frequency: 234, type: "negative" },
+          { name: "Learning Type: Pathway", impact: -29, frequency: 567, type: "negative" }
+        ],
+        canModify: true,
+        saveOptions: true
+      };
+    }
+    
+    // 3. "How many learning assignments are past due?"
+    if (lowerQuery.includes("past due") || (lowerQuery.includes("assignments") && lowerQuery.includes("due"))) {
+      return {
+        id: `viz-${Date.now()}`,
+        type: "line",
+        title: "Past Due Learning Assignments Trend",
+        metrics: ["Past Due Count", "Total Assignments", "Past Due %"],
+        attributes: ["Time Period", "Assignment Status"],
+        filters: ["Past Due Status", "12 Month Period"],
+        data: [
+          { name: "Jan", month: "Jan 2024", value: 234, total: 3421, percentage: 6.8 },
+          { name: "Feb", month: "Feb 2024", value: 189, total: 3156, percentage: 6.0 },  
+          { name: "Mar", month: "Mar 2024", value: 267, total: 3634, percentage: 7.3 },
+          { name: "Apr", month: "Apr 2024", value: 198, total: 3298, percentage: 6.0 },
+          { name: "May", month: "May 2024", value: 312, total: 3876, percentage: 8.1 },
+          { name: "Jun", month: "Jun 2024", value: 278, total: 3567, percentage: 7.8 },
+          { name: "Jul", month: "Jul 2024", value: 245, total: 3421, percentage: 7.2 },
+          { name: "Aug", month: "Aug 2024", value: 289, total: 3698, percentage: 7.8 },
+          { name: "Sep", month: "Sep 2024", value: 198, total: 3234, percentage: 6.1 }
+        ],
+        canModify: true,
+        saveOptions: true
+      };
+    }
+    
+    // 4. "Are users developing skills that are endorsed?"
+    if ((lowerQuery.includes("skills") && lowerQuery.includes("endorsed")) || 
+        lowerQuery.includes("endorsed skill")) {
+      return {
+        id: `viz-${Date.now()}`,
+        type: "column",
+        title: "Endorsed Skills Development Analysis",
+        metrics: ["Endorsed Skill %", "Skill Development Events", "Endorsed Events"],
+        attributes: ["Skill Category", "Development Method"],
+        filters: ["Active Skills", "All Users", "Current Quarter"],
+        data: [
+          { name: "AI/ML", rate: 78.4, events: 1247, endorsed: 978, category: "Technical" },
+          { name: "Leadership", rate: 65.2, events: 892, endorsed: 582, category: "Soft Skills" },
+          { name: "Data Analytics", rate: 71.8, events: 1134, endorsed: 814, category: "Technical" },
+          { name: "Project Management", rate: 58.9, events: 567, endorsed: 334, category: "Management" },
+          { name: "Communication", rate: 82.1, events: 743, endorsed: 610, category: "Soft Skills" },
+          { name: "Cloud Computing", rate: 69.3, events: 1021, endorsed: 708, category: "Technical" }
+        ],
+        canModify: true,
+        saveOptions: true
+      };
+    }
+    
+    // 5. "How are users developing their skills?"  
+    if (lowerQuery.includes("how") && lowerQuery.includes("developing") && lowerQuery.includes("skills")) {
+      return {
+        id: `viz-${Date.now()}`,
+        type: "pie",
+        title: "Skill Development Methods Distribution", 
+        metrics: ["Usage Count", "% of Total", "Completion Rate"],
+        attributes: ["Development Method", "Skill Category"],
+        filters: ["Active Development", "All Skills"],
+        data: [
+          { name: "Online Courses", value: 2847, percentage: 42.1, completion: 78.4 },
+          { name: "Learning Paths", value: 1934, percentage: 28.6, completion: 82.1 },
+          { name: "Projects", value: 892, percentage: 13.2, completion: 65.7 },
+          { name: "Coaching", value: 567, percentage: 8.4, completion: 91.2 },
+          { name: "Workshops", value: 312, percentage: 4.6, completion: 87.3 },  
+          { name: "Mentoring", value: 213, percentage: 3.1, completion: 94.1 }
+        ],
+        canModify: true,
+        saveOptions: true
+      };
+    }
+    
+    // 6. "Which category of learning has the highest completion rate?"
+    if (lowerQuery.includes("category") && lowerQuery.includes("completion rate") && lowerQuery.includes("highest")) {
+      return {
+        id: `viz-${Date.now()}`,
+        type: "column",
+        title: "Learning Completion Rate by Category",
+        metrics: ["Completion Rate %", "Total Enrollments", "Completions"],
+        attributes: ["Learning Category", "Provider"],
+        filters: ["All Categories", "Active Learning"],
+        data: [
+          { name: "Leadership Skills", rate: 89.4, enrollments: 1247, completions: 1115 },
+          { name: "Technical Skills", rate: 84.7, enrollments: 2341, completions: 1983 },
+          { name: "Communication", rate: 82.1, enrollments: 892, completions: 732 },
+          { name: "Project Management", rate: 78.9, enrollments: 1134, completions: 895 },
+          { name: "Data & Analytics", rate: 76.3, enrollments: 1876, completions: 1431 },
+          { name: "Sales & Marketing", rate: 71.2, enrollments: 743, completions: 529 },
+          { name: "Compliance", rate: 68.5, enrollments: 567, completions: 388 }
+        ],
+        canModify: true,
+        saveOptions: true
+      };
+    }
+    
+    // 7. "Which learning provider has gained the most user satisfaction?"
+    if (lowerQuery.includes("provider") && lowerQuery.includes("satisfaction")) {
+      return {
+        id: `viz-${Date.now()}`,
+        type: "bar",
+        title: "Learning Provider Satisfaction Scores",
+        metrics: ["Avg Satisfaction", "Review Count", "Satisfaction Change"],
+        attributes: ["Learning Provider", "Content Type"],
+        filters: ["Active Providers", "Min 50 reviews"],
+        data: [
+          { name: "LinkedIn Learning", rate: 4.7, reviews: 1247, change: 0.3, trend: "up" },
+          { name: "Coursera", rate: 4.5, reviews: 2341, change: 0.2, trend: "up" },
+          { name: "Udemy", rate: 4.3, reviews: 1876, change: 0.1, trend: "up" },
+          { name: "SuccessFactors", rate: 4.2, reviews: 892, change: -0.1, trend: "down" },
+          { name: "Pluralsight", rate: 4.4, reviews: 743, change: 0.4, trend: "up" },
+          { name: "Internal Training", rate: 3.9, reviews: 567, change: 0.0, trend: "stable" }
+        ],
+        canModify: true,
+        saveOptions: true
+      };
+    }
+    
+    // Enhanced existing queries with better data and structure
     
     // Search dashboards / learning engagement dashboards
     if (lowerQuery.includes("dashboard") && lowerQuery.includes("engagement")) {
@@ -324,7 +533,47 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   };
 
   const generateResponse = (queryText: string): string => {
-    const lowerQuery = queryText.toLowerCase();
+    const { lowerQuery } = parseNLQuery(queryText);
+    
+    // Enhanced NLP responses for business questions
+    
+    // 1. Organization completion rate analysis
+    if ((lowerQuery.includes("organization") || lowerQuery.includes("org")) && 
+        lowerQuery.includes("completion rate")) {
+      return "Analyzing completion rates across organizational units...\n\nHere's a bar chart showing Completion Rate for Assigned Learning by Org Unit.\n\nKey findings:\n• **Highest**: Associate UI Engineers (100% completion rate)\n• **Strong performers**: Web Designers (60.7%), Civil Engineers (57.9%)\n• **Needs attention**: Database Administrators (33.3% completion rate)\n• **Recommendation**: Focus improvement efforts on IT Operations and Analytics units\n\nThe data shows significant variation across roles, suggesting targeted interventions may be needed.";
+    }
+    
+    // 2. Completion rate drivers analysis  
+    if (lowerQuery.includes("driving") && lowerQuery.includes("completion rate")) {
+      return "Analyzing key drivers of learning completion rates...\n\nHere's a breakdown showing what impacts completion rates most.\n\n**Positive drivers:**\n• Assignment status 'Completed' (+85% impact)\n• Video-based learning content (+72% impact) \n• SuccessFactors as provider (+68% impact)\n• Assigned recommendations (+65% impact)\n\n**Negative drivers:**\n• Pending assignment status (-43% impact)\n• Course-type content (-38% impact)\n• Dismissed assignments (-52% impact)\n\n**Recommendation**: Prioritize video content and ensure clear assignment workflows to maximize completion rates.";
+    }
+    
+    // 3. Past due assignments tracking
+    if (lowerQuery.includes("past due") || (lowerQuery.includes("assignments") && lowerQuery.includes("due"))) {
+      return "Tracking past due learning assignments over time...\n\nHere's a line chart showing Past Due Learning Assignments Trend.\n\n**Current status:**\n• **198 assignments** currently past due (September 2024)\n• **6.1%** of total assignments are past due\n• **Improvement**: Down from 8.1% peak in May 2024\n\n**Trends:**\n• Peak overdue period was May 2024 (312 assignments, 8.1%)\n• Recent improvement shows better assignment management\n• Average past due rate: 7.0% over 12 months\n\n**Recommendation**: Continue current intervention strategies that reduced past due rates since May.";
+    }
+    
+    // 4. Endorsed skills development
+    if (lowerQuery.includes("endorsed skill")) {
+      return "Analyzing endorsed skills development patterns...\n\nHere's a column chart showing Endorsed Skills Development Analysis.\n\n**Performance by category:**\n• **Communication** leads with 82.1% endorsement rate\n• **AI/ML skills** show strong endorsement at 78.4%\n• **Data Analytics** maintains solid 71.8% rate\n• **Project Management** needs attention at 58.9%\n\n**Total activity**: 5,604 skill development events with 4,026 endorsed\n**Overall endorsement rate**: 71.8%\n\n**Recommendation**: Focus improvement efforts on Project Management skill development to increase endorsement rates.";
+    }
+    
+    // 5. Skill development methods
+    if (lowerQuery.includes("how") && lowerQuery.includes("developing") && lowerQuery.includes("skills")) {
+      return "Analyzing how users are developing their skills...\n\nHere's a pie chart showing Skill Development Methods Distribution.\n\n**Most popular methods:**\n• **Online Courses** (42.1% of activity, 2,847 users)\n• **Learning Paths** (28.6% of activity, 1,934 users)\n• **Projects** (13.2% of activity, 892 users)\n\n**Highest completion rates:**\n• Mentoring: 94.1% completion\n• Coaching: 91.2% completion  \n• Workshops: 87.3% completion\n\n**Insight**: While online courses are most popular, personalized methods like mentoring and coaching show highest completion rates.\n\n**Recommendation**: Balance scale (online courses) with high-impact personal development methods.";
+    }
+    
+    // 6. Learning category completion rates
+    if (lowerQuery.includes("category") && lowerQuery.includes("completion rate") && lowerQuery.includes("highest")) {
+      return "Comparing completion rates across learning categories...\n\nHere's a column chart showing Learning Completion Rate by Category.\n\n**Top performing categories:**\n• **Leadership Skills**: 89.4% completion (1,115/1,247 enrollments)\n• **Technical Skills**: 84.7% completion (1,983/2,341 enrollments) \n• **Communication**: 82.1% completion (732/892 enrollments)\n\n**Categories needing attention:**\n• **Compliance**: 68.5% completion (388/567 enrollments)\n• **Sales & Marketing**: 71.2% completion (529/743 enrollments)\n\n**Recommendation**: Apply successful strategies from Leadership and Technical categories to improve Compliance and Sales training completion rates.";
+    }
+    
+    // 7. Provider satisfaction analysis
+    if (lowerQuery.includes("provider") && lowerQuery.includes("satisfaction")) {
+      return "Analyzing learning provider satisfaction trends...\n\nHere's a bar chart showing Learning Provider Satisfaction Scores.\n\n**Top performing providers:**\n• **LinkedIn Learning**: 4.7/5 rating (+0.3 improvement, 1,247 reviews)\n• **Pluralsight**: 4.4/5 rating (+0.4 improvement, 743 reviews)\n• **Coursera**: 4.5/5 rating (+0.2 improvement, 2,341 reviews)\n\n**Declining satisfaction:**\n• **SuccessFactors**: 4.2/5 rating (-0.1 decline, 892 reviews)\n• **Internal Training**: 3.9/5 rating (stable, 567 reviews)\n\n**Recommendation**: LinkedIn Learning and Pluralsight show strongest satisfaction gains. Consider expanding partnerships with top-performing providers.";
+    }
+    
+    // Enhanced existing responses
     
     // Search dashboards / learning engagement dashboards
     if (lowerQuery.includes("dashboard") && lowerQuery.includes("engagement")) {
@@ -358,22 +607,71 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     return "I can help you analyze learning data, create visualizations, and provide insights about skills, content performance, and learner engagement. What specific aspect would you like to explore?";
   };
 
+  // Enhanced suggestions based on chart type and context
   const getSuggestions = (queryText: string): string[] => {
-    const lowerQuery = queryText.toLowerCase();
-    const allSuggestions = [
-      "Switch to a bar chart",
-      "Break down by job role",
-      "Add time filter for last quarter", 
-      "Show by learning pathway",
-      "Compare with previous period",
-      "Export to dashboard",
-      "Save this visualization",
-      "Drill down by role",
-      "Add completion rate metric",
-      "Filter by skill category"
+    const { lowerQuery } = parseNLQuery(queryText);
+    
+    // Context-aware suggestions based on query type
+    if (lowerQuery.includes("completion rate")) {
+      return [
+        "Break down by region",
+        "Filter to last 90 days", 
+        "Add time comparison vs previous quarter",
+        "Switch to heatmap view",
+        "Show by provider",
+        "Save as 'Completion Rate Analysis'"
+      ];
+    }
+    
+    if (lowerQuery.includes("past due")) {
+      return [
+        "Filter to Region = APAC",
+        "Add assignment status breakdown",
+        "Switch to table view",
+        "Compare with previous year",
+        "Show by learning category",
+        "Save as 'Past Due Tracking'"
+      ];
+    }
+    
+    if (lowerQuery.includes("endorsed skill")) {
+      return [
+        "Break down by org unit",
+        "Filter to technical skills only",
+        "Switch to treemap",
+        "Add development method filter", 
+        "Show skill progression timeline",
+        "Save as 'Skills Endorsement Analysis'"
+      ];
+    }
+    
+    if (lowerQuery.includes("satisfaction")) {
+      return [
+        "Filter to Providers = Coursera, Udemy",
+        "Add 95% confidence intervals",
+        "Switch to scatter plot",
+        "Compare satisfaction vs completion rate",
+        "Show by content category",
+        "Save as 'Provider Satisfaction Review'"
+      ];
+    }
+    
+    // Default context-aware suggestions
+    const contextSuggestions = [
+      "Switch to treemap",
+      "Break down by org unit", 
+      "Add time comparison",
+      "Filter by region",
+      "Show by category",
+      "Switch to heatmap",
+      "Add previous period comparison",
+      "Filter to top performers only",
+      "Save this insight",
+      "Analyse this data further"
     ];
     
-    return allSuggestions.slice(0, 3);
+    // Return 3-4 most relevant suggestions
+    return contextSuggestions.slice(0, Math.floor(Math.random() * 2) + 3);
   };
 
   const handleSendQuery = async () => {
@@ -425,7 +723,8 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     }
   };
 
-  const handleChartTypeSwitch = (messageId: string, newType: "column" | "bar" | "line" | "pie") => {
+  // Enhanced chart type switching with more options
+  const handleChartTypeSwitch = (messageId: string, newType: "column" | "bar" | "line" | "pie" | "heatmap" | "table" | "treemap") => {
     setChatMessages(prev => prev.map(message => {
       if (message.id === messageId && message.visualization) {
         return {
@@ -434,9 +733,15 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
             ...message.visualization,
             type: newType,
             title: newType === "pie" ? 
-              message.visualization.title.replace("Column Chart", "Pie Chart").replace("Line Chart", "Pie Chart").replace("Bar Chart", "Pie Chart") :
+              message.visualization.title.replace(/Column Chart|Line Chart|Bar Chart|Analysis|Trend/gi, "Pie Chart") :
               newType === "line" ? 
-              message.visualization.title.replace("Bar Chart", "Line Chart").replace("Column Chart", "Line Chart").replace("Pie Chart", "Line Chart") :
+              message.visualization.title.replace(/Bar Chart|Column Chart|Pie Chart|Analysis/gi, "Line Chart") :
+              newType === "heatmap" ?
+              message.visualization.title.replace(/Chart|Analysis/gi, "Heatmap") :
+              newType === "table" ?
+              message.visualization.title.replace(/Chart|Analysis/gi, "Table") :
+              newType === "treemap" ?
+              message.visualization.title.replace(/Chart|Analysis/gi, "Treemap") :
               message.visualization.title
           }
         };
@@ -565,8 +870,124 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     });
   };
 
+  // Enhanced chart rendering with more chart types and GoodData-like styling
   const renderChart = (viz: VisualizationData) => {
-    const maxValue = Math.max(...viz.data.map(d => Math.max(d.rate || 0, d.gap || 0, d.growth || 0, d.engagement || 0, d.learners/10 || 0, d.value || 0)));
+    const maxValue = Math.max(...viz.data.map(d => Math.max(d.rate || 0, d.gap || 0, d.growth || 0, d.engagement || 0, d.learners/10 || 0, d.value || 0, d.impact || 0)));
+    
+    // Heatmap for driver analysis
+    if (viz.type === "heatmap") {
+      return (
+        <div className="bg-white border rounded-lg p-4">
+          <div className="space-y-2">
+            {viz.data.map((item, idx) => {
+              const impact = Math.abs(item.impact || item.rate || 50);
+              const isPositive = (item.type === "positive") || (item.impact || item.rate || 0) > 0;
+              const intensity = Math.min(impact / 100, 1);
+              
+              return (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="w-48 text-xs text-gray-600 text-left truncate">
+                    {item.name || `Item ${idx + 1}`}
+                  </div>
+                  <div className="flex-1 flex items-center">
+                    <div 
+                      className={`h-6 flex items-center justify-center text-xs font-medium transition-all duration-300 hover:opacity-80 ${
+                        isPositive 
+                          ? 'bg-gradient-to-r from-green-400 to-green-600 text-white' 
+                          : 'bg-gradient-to-r from-red-400 to-red-600 text-white'
+                      }`}
+                      style={{ 
+                        width: `${Math.max(intensity * 200, 20)}px`,
+                        opacity: Math.max(intensity, 0.3)
+                      }}
+                    >
+                      {isPositive ? '+' : ''}{Math.round(item.impact || item.rate || 0)}
+                    </div>
+                  </div>
+                  <div className="w-16 text-xs text-gray-500 text-right">
+                    {item.frequency || item.count || Math.round(Math.random() * 1000 + 100)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-3 text-xs text-gray-500 flex justify-between">
+            <span>📈 Positive Impact</span>
+            <span>📉 Negative Impact</span>
+          </div>
+        </div>
+      );
+    }
+    
+    // Table view for detailed analysis
+    if (viz.type === "table") {
+      return (
+        <div className="bg-white border rounded-lg p-4 overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b bg-gray-50">
+                <th className="text-left p-2 font-medium">Name</th>
+                <th className="text-right p-2 font-medium">Value</th>
+                <th className="text-right p-2 font-medium">%</th>
+                <th className="text-right p-2 font-medium">Trend</th>
+              </tr>
+            </thead>
+            <tbody>
+              {viz.data.map((item, idx) => {
+                const value = item.rate || item.growth || item.engagement || item.value || 50;
+                const trend = item.trend || (value > 50 ? "up" : "down");
+                return (
+                  <tr key={idx} className="border-b hover:bg-gray-50">
+                    <td className="p-2 text-gray-700">{item.name}</td>
+                    <td className="p-2 text-right font-medium">{Math.round(value)}</td>
+                    <td className="p-2 text-right text-gray-600">{Math.round(value)}%</td>
+                    <td className="p-2 text-right">
+                      <span className={`text-xs ${trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-600'}`}>
+                        {trend === 'up' ? '↗️' : trend === 'down' ? '↘️' : '➡️'}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    
+    // Treemap for hierarchical data
+    if (viz.type === "treemap") {
+      const total = viz.data.reduce((sum, item) => sum + (item.value || item.rate || item.growth || 50), 0);
+      
+      return (
+        <div className="bg-white border rounded-lg p-4">
+          <div className="h-48 grid grid-cols-4 grid-rows-3 gap-1">
+            {viz.data.slice(0, 12).map((item, idx) => {
+              const value = item.value || item.rate || item.growth || 50;
+              const percentage = (value / total) * 100;
+              const colors = ["bg-purple-500", "bg-blue-500", "bg-cyan-500", "bg-green-500", "bg-yellow-500", "bg-red-500"];
+              
+              return (
+                <div 
+                  key={idx}
+                  className={`${colors[idx % colors.length]} rounded text-white p-2 flex flex-col justify-between transition-all hover:opacity-80`}
+                  style={{ 
+                    gridRow: idx < 2 ? 'span 2' : 'span 1',
+                    gridColumn: idx < 2 ? 'span 2' : 'span 1'
+                  }}
+                >
+                  <div className="text-xs font-medium leading-tight">
+                    {(item.name || `Item ${idx + 1}`).substring(0, 12)}
+                  </div>
+                  <div className="text-lg font-bold">{Math.round(value)}</div>
+                  <div className="text-xs opacity-90">{Math.round(percentage)}%</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
     
     if (viz.type === "pie") {
       const total = viz.data.reduce((sum, item) => sum + (item.value || item.rate || item.growth || item.engagement || 50), 0);
@@ -848,45 +1269,94 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           {/* Chart Rendering */}
           {renderChart(viz)}
 
-          {/* Chart Controls */}
+          {/* Enhanced Chart Controls - GoodData-like interactions */}
           {viz.canModify && (
-            <div className="flex flex-wrap gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-xs h-7"
-                onClick={() => handleChartTypeSwitch(message.id, viz.type === "pie" ? "column" : "pie")}
-              >
-                {viz.type === "pie" ? (
-                  <>
-                    <BarChart3 className="h-3 w-3 mr-1" />
-                    Switch to bar chart
-                  </>
-                ) : (
-                  <>
-                    <PieChart className="h-3 w-3 mr-1" />
-                    Switch to pie chart
-                  </>
-                )}
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-xs h-7"
-                onClick={() => handleShowTrend(message.id)}
-              >
-                <LineChart className="h-3 w-3 mr-1" />
-                Show trend
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-xs h-7"
-                onClick={() => handleJobRoleBreakdown(message.id)}
-              >
-                <Users className="h-3 w-3 mr-1" />
-                Break down by job role
-              </Button>
+            <div className="space-y-3">
+              {/* Chart Type Switcher */}
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => handleChartTypeSwitch(message.id, viz.type === "column" ? "bar" : "column")}
+                >
+                  <BarChart3 className="h-3 w-3 mr-1" />
+                  {viz.type === "column" ? "Switch to bar" : "Switch to column"}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => handleChartTypeSwitch(message.id, "pie")}
+                >
+                  <PieChart className="h-3 w-3 mr-1" />
+                  Pie chart
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => handleChartTypeSwitch(message.id, "line")}
+                >
+                  <LineChart className="h-3 w-3 mr-1" />
+                  Line chart
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => handleChartTypeSwitch(message.id, "heatmap")}
+                >
+                  <Activity className="h-3 w-3 mr-1" />
+                  Heatmap
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => handleChartTypeSwitch(message.id, "table")}
+                >
+                  <Filter className="h-3 w-3 mr-1" />
+                  Table
+                </Button>
+              </div>
+              
+              {/* Slice & Breakdown Actions */}
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => handleJobRoleBreakdown(message.id)}
+                >
+                  <Users className="h-3 w-3 mr-1" />
+                  Break down by job role
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => handleShowTrend(message.id)}
+                >
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  Show trend
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs h-7"
+                  onClick={() => {
+                    toast({
+                      title: "Filter Applied", 
+                      description: "Filtering to Region = APAC, Provider = Top 3",
+                      duration: 3000
+                    });
+                  }}
+                >
+                  <Filter className="h-3 w-3 mr-1" />
+                  Add filters
+                </Button>
+              </div>
             </div>
           )}
 
