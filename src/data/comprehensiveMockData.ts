@@ -1,6 +1,8 @@
-import { addDays, format, endOfMonth } from 'date-fns';
+// Comprehensive Mock Data Generator with Full Filter Coverage - Updated with realistic role baselines
+import { FilterableDataItem } from '@/hooks/useFilteredData';
+import { addDays, subDays, format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter } from 'date-fns';
 
-// Comprehensive filter options - matches FilterBar exactly
+// Enhanced filter options (matching FilterBar components exactly)
 export const FILTER_OPTIONS = {
   contentTypes: [
     "Academy", "Article", "Assessment", "Book", "Course", "Event", "Podcast", "Task"
@@ -20,63 +22,53 @@ export const FILTER_OPTIONS = {
     "Finance Team", "Executive Team", "Customer Success Team", "Quality Assurance Team"
   ],
   roles: [
-    "Developer", "SDET", "Product Manager", "Data Scientist", "Designer",
-    "Marketing Specialist", "Sales Representative", "DevOps Engineer", 
-    "Business Analyst", "Project Manager", "Technical Lead", "Engineering Manager"
+    "Software Engineer", "Senior Software Engineer", "Tech Lead", "Engineering Manager",
+    "Product Manager", "Senior Product Manager", "Data Scientist", "Senior Data Scientist",
+    "Data Analyst", "UX Designer", "Senior UX Designer", "Marketing Manager",
+    "Sales Manager", "DevOps Engineer", "QA Engineer", "Business Analyst",
+    "Project Manager", "Scrum Master", "Director", "VP Engineering", "CTO"
   ],
   customAttributes: [
     "Budget", "Completion Status", "Compliance", "Learning Hours", "Onboarding", "Skill Proficiency"
-  ],
-  regions: [
-    "North America", "Europe", "Asia Pacific", "Latin America", "Middle East & Africa"
-  ],
-  ratings: [1, 2, 3, 4, 5]
+  ]
 };
 
-// FY25 date hierarchy for systematic data generation
+// Date hierarchy for FY25 (April 2024 - March 2025)
 export const DATE_HIERARCHY = {
   FY25: {
     Q1: {
-      name: "Q1 FY25",
-      dateRange: { start: "2024-04-01", end: "2024-06-30" },
-      months: {
-        "2024-04": { start: "2024-04-01", end: "2024-04-30" },
-        "2024-05": { start: "2024-05-01", end: "2024-05-31" },
-        "2024-06": { start: "2024-06-01", end: "2024-06-30" }
-      }
+      months: ["2024-04", "2024-05", "2024-06"],
+      dates: generateDateRange("2024-04-01", "2024-06-30")
     },
     Q2: {
-      name: "Q2 FY25",
-      dateRange: { start: "2024-07-01", end: "2024-09-30" },
-      months: {
-        "2024-07": { start: "2024-07-01", end: "2024-07-31" },
-        "2024-08": { start: "2024-08-01", end: "2024-08-31" },
-        "2024-09": { start: "2024-09-01", end: "2024-09-30" }
-      }
+      months: ["2024-07", "2024-08", "2024-09"],
+      dates: generateDateRange("2024-07-01", "2024-09-30")
     },
     Q3: {
-      name: "Q3 FY25",
-      dateRange: { start: "2024-10-01", end: "2024-12-31" },
-      months: {
-        "2024-10": { start: "2024-10-01", end: "2024-10-31" },
-        "2024-11": { start: "2024-11-01", end: "2024-11-30" },
-        "2024-12": { start: "2024-12-01", end: "2024-12-31" }
-      }
+      months: ["2024-10", "2024-11", "2024-12"],
+      dates: generateDateRange("2024-10-01", "2024-12-31")
     },
     Q4: {
-      name: "Q4 FY25",
-      dateRange: { start: "2025-01-01", end: "2025-03-31" },
-      months: {
-        "2025-01": { start: "2025-01-01", end: "2025-01-31" },
-        "2025-02": { start: "2025-02-01", end: "2025-02-28" },
-        "2025-03": { start: "2025-03-01", end: "2025-03-31" }
-      }
+      months: ["2025-01", "2025-02", "2025-03"],
+      dates: generateDateRange("2025-01-01", "2025-03-31")
     }
   }
 };
 
-// Data structures
-export interface ComprehensiveLearningItem {
+function generateDateRange(startDate: string, endDate: string): string[] {
+  const dates: string[] = [];
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    dates.push(format(d, 'yyyy-MM-dd'));
+  }
+  
+  return dates;
+}
+
+// Enhanced data interfaces
+export interface ComprehensiveLearningItem extends FilterableDataItem {
   id: string;
   date: string;
   contentType: string;
@@ -85,19 +77,21 @@ export interface ComprehensiveLearningItem {
   groups: string[];
   roles: string[];
   customAttribute: string[];
-  learners: number;
-  completions: number;
-  hours: number;
-  engagementRate: number;
-  avgRating: number;
-  activeUsers: number;
+  
+  // Metrics with realistic ranges
+  learners: number;          // 10-500/month/team
+  completions: number;       // 10-500/month/team
+  hours: number;            // 50-2,000/month/team
+  engagementRate: number;   // 35-90%
+  avgRating: number;        // 1-5
+  activeUsers: number;      // Based on learners
 }
 
-export interface SkillRatingItem {
+export interface SkillRatingItem extends FilterableDataItem {
   id: string;
   skill: string;
-  currentRating: number;
-  targetRating: number;
+  currentRating: number;    // 1-5
+  targetRating: number;     // 1-5
   date: string;
   contentType: string;
   provider: string;
@@ -107,7 +101,7 @@ export interface SkillRatingItem {
   customAttribute: string[];
 }
 
-// Helper functions
+// Utility functions for realistic data generation
 function getRandomInRange(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -122,132 +116,104 @@ function getRandomElements<T>(array: T[], min: number = 1, max?: number): T[] {
   return shuffled.slice(0, count);
 }
 
-function getProviderMultiplier(provider: string): number {
-  const multipliers: Record<string, number> = {
-    "LinkedIn Learning": 1.3,
-    "Coursera": 1.2,
-    "Pluralsight": 1.1,
-    "Udemy": 1.0,
-    "edX": 0.9,
-    "Skillsoft": 0.8,
-    "Cloud Academy": 0.7,
-    "Codecademy": 0.6
-  };
-  return multipliers[provider] || 1.0;
-}
-
-function getContentTypeMultiplier(contentType: string): number {
-  const multipliers: Record<string, number> = {
-    "Course": 1.3,
-    "Academy": 1.2,
-    "Article": 1.1,
-    "Assessment": 1.0,
-    "Event": 0.9,
-    "Book": 0.8,
-    "Podcast": 0.7,
-    "Task": 0.6
-  };
-  return multipliers[contentType] || 1.0;
-}
-
-// COMPREHENSIVE DATA GENERATION - Ensures every filter combination has results
+// Generate comprehensive learning data covering all filter combinations
 export function generateComprehensiveLearningData(): ComprehensiveLearningItem[] {
   const data: ComprehensiveLearningItem[] = [];
   let idCounter = 1;
 
-  // Generate systematic data for every filter combination
-  Object.values(DATE_HIERARCHY.FY25).forEach(quarter => {
-    Object.keys(quarter.months).forEach(monthKey => {
+  // Generate data for each quarter
+  Object.entries(DATE_HIERARCHY.FY25).forEach(([quarter, qData]) => {
+    // Generate data for each month in the quarter
+    qData.months.forEach(monthKey => {
       const monthStart = new Date(`${monthKey}-01`);
+      const monthEnd = endOfMonth(monthStart);
       
-      // Generate 4 weekly data points per month
+      // Generate weekly data points for the month (4 weeks)
       for (let week = 0; week < 4; week++) {
         const weekDate = format(addDays(monthStart, week * 7), 'yyyy-MM-dd');
         
-        // MATRIX APPROACH: Ensure every combination has data
-        // Primary combinations: Each role x contentType x provider
-        FILTER_OPTIONS.roles.forEach(role => {
-          FILTER_OPTIONS.contentTypes.forEach(contentType => {
-            FILTER_OPTIONS.providers.forEach(provider => {
-              // Generate 1-2 skill combinations per primary combination
-              const skillSets = [
-                getRandomElements(FILTER_OPTIONS.skills, 1, 2),
-                getRandomElements(FILTER_OPTIONS.skills, 2, 3)
-              ];
-              
-              skillSets.forEach(skills => {
-                const groups = getRandomElements(FILTER_OPTIONS.groups, 1, 2);
-                const customAttribute = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
-                
-                // Calculate metrics with proper distribution
-                const baseMultiplier = getProviderMultiplier(provider) * getContentTypeMultiplier(contentType);
-                const learners = Math.max(1, Math.round(getRandomInRange(2, 15) * baseMultiplier));
-                const completions = Math.max(1, Math.round(learners * getRandomFloat(0.6, 0.9)));
-                const hours = Math.max(1, Math.round(learners * getRandomFloat(2, 12)));
-                const activeUsers = Math.max(1, Math.round(learners * getRandomFloat(0.7, 1.0)));
-
-                data.push({
-                  id: `learning-${idCounter++}`,
-                  date: weekDate,
-                  contentType,
-                  provider,
-                  skills,
-                  groups,
-                  roles: [role],
-                  customAttribute,
-                  learners,
-                  completions,
-                  hours,
-                  engagementRate: getRandomFloat(65, 95, 1),
-                  avgRating: getRandomFloat(3.0, 5.0, 1),
-                  activeUsers
-                });
-              });
-            });
-          });
-        });
-
-        // Secondary combinations: Multiple roles for popular combinations
-        const multiRoleCombinations = [
-          ["Product Manager", "Data Scientist"],
-          ["Developer", "DevOps Engineer"],
-          ["Business Analyst", "Project Manager"],
-          ["Designer", "Technical Lead"]
+        // Generate data for each popular role to ensure role coverage
+        const popularRoles = [
+          "Software Engineer", "Senior Software Engineer", "Data Scientist", "Data Analyst",
+          "Product Manager", "UX Designer", "Engineering Manager", "DevOps Engineer",
+          "QA Engineer", "Business Analyst", "Tech Lead", "Project Manager"
         ];
+        
+        popularRoles.forEach(role => {
+          // Generate 2-3 entries per role per week
+          const entriesCount = getRandomInRange(2, 3);
+          
+          for (let i = 0; i < entriesCount; i++) {
+            const contentType = FILTER_OPTIONS.contentTypes[Math.floor(Math.random() * FILTER_OPTIONS.contentTypes.length)];
+            const provider = FILTER_OPTIONS.providers[Math.floor(Math.random() * FILTER_OPTIONS.providers.length)];
+            const skills = getRandomElements(FILTER_OPTIONS.skills, 1, 3);
+            const groups = getRandomElements(FILTER_OPTIONS.groups, 1, 2);
+            const customAttribute = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
+            
+            // Generate realistic metrics with good distribution
+            const roleMultiplier = popularRoles.includes(role) ? 1.5 : 1.0;
+            const baseLearners = getProviderMultiplier(provider) * getContentTypeMultiplier(contentType) * roleMultiplier;
+            const learners = Math.max(20, getRandomInRange(baseLearners * 0.8, baseLearners * 1.3));
+            const completions = Math.floor(learners * getRandomFloat(0.65, 0.95));
+            const hours = Math.max(80, Math.floor(learners * getRandomFloat(5, 18)));
+            const engagementRate = getRandomFloat(45, 95);
+            const avgRating = getRandomFloat(3.5, 4.8);
+            const activeUsers = Math.floor(learners * getRandomFloat(0.75, 0.95));
 
-        multiRoleCombinations.forEach(roles => {
-          // Limit to top content types and providers for multi-role to prevent explosion
-          FILTER_OPTIONS.contentTypes.slice(0, 4).forEach(contentType => {
-            FILTER_OPTIONS.providers.slice(0, 4).forEach(provider => {
-              const skills = getRandomElements(FILTER_OPTIONS.skills, 2, 4);
-              const groups = getRandomElements(FILTER_OPTIONS.groups, 1, 3);
-              const customAttribute = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 3);
-              
-              const baseMultiplier = getProviderMultiplier(provider) * getContentTypeMultiplier(contentType) * 1.5; // Boost for multi-role
-              const learners = Math.max(5, Math.round(getRandomInRange(8, 25) * baseMultiplier));
-              const completions = Math.max(3, Math.round(learners * getRandomFloat(0.7, 0.95)));
-              const hours = Math.max(10, Math.round(learners * getRandomFloat(4, 20)));
-              const activeUsers = Math.max(4, Math.round(learners * getRandomFloat(0.8, 1.1)));
-
-              data.push({
-                id: `learning-multi-${idCounter++}`,
-                date: weekDate,
-                contentType,
-                provider,
-                skills,
-                groups,
-                roles,
-                customAttribute,
-                learners,
-                completions,
-                hours,
-                engagementRate: getRandomFloat(70, 95, 1),
-                avgRating: getRandomFloat(3.5, 5.0, 1),
-                activeUsers
-              });
+            data.push({
+              id: `comprehensive-${idCounter++}`,
+              date: weekDate,
+              contentType,
+              provider,
+              skills,
+              groups,
+              roles: [role], // Single role per entry for clearer aggregation
+              customAttribute,
+              learners,
+              completions,
+              hours,
+              engagementRate,
+              avgRating,
+              activeUsers
             });
-          });
+          }
         });
+        
+        // Also generate some entries with multiple roles for variety
+        const multiRoleEntriesCount = getRandomInRange(10, 15);
+        for (let i = 0; i < multiRoleEntriesCount; i++) {
+          const contentType = FILTER_OPTIONS.contentTypes[Math.floor(Math.random() * FILTER_OPTIONS.contentTypes.length)];
+          const provider = FILTER_OPTIONS.providers[Math.floor(Math.random() * FILTER_OPTIONS.providers.length)];
+          const skills = getRandomElements(FILTER_OPTIONS.skills, 1, 3);
+          const groups = getRandomElements(FILTER_OPTIONS.groups, 1, 2);
+          const roles = getRandomElements(FILTER_OPTIONS.roles, 1, 2);
+          const customAttribute = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
+          
+          const baseLearners = getProviderMultiplier(provider) * getContentTypeMultiplier(contentType);
+          const learners = Math.max(15, getRandomInRange(baseLearners * 0.8, baseLearners * 1.3));
+          const completions = Math.floor(learners * getRandomFloat(0.65, 0.95));
+          const hours = Math.max(60, Math.floor(learners * getRandomFloat(4, 15)));
+          const engagementRate = getRandomFloat(40, 95);
+          const avgRating = getRandomFloat(3.5, 4.8);
+          const activeUsers = Math.floor(learners * getRandomFloat(0.75, 0.95));
+
+          data.push({
+            id: `comprehensive-${idCounter++}`,
+            date: weekDate,
+            contentType,
+            provider,
+            skills,
+            groups,
+            roles,
+            customAttribute,
+            learners,
+            completions,
+            hours,
+            engagementRate,
+            avgRating,
+            activeUsers
+          });
+        }
       }
     });
   });
@@ -255,75 +221,116 @@ export function generateComprehensiveLearningData(): ComprehensiveLearningItem[]
   return data;
 }
 
-// Enhanced Skill Rating Data Generation
+// Generate skill rating data for all combinations
 export function generateSkillRatingData(): SkillRatingItem[] {
   const data: SkillRatingItem[] = [];
   let idCounter = 1;
 
-  // Ensure every skill-role combination has data
-  FILTER_OPTIONS.skills.forEach(skill => {
-    FILTER_OPTIONS.roles.forEach(role => {
-      // Generate entries across different time periods
-      const dates = ["2024-04-01", "2024-07-01", "2024-10-01", "2025-01-01"];
-      
-      dates.forEach(date => {
-        const contentType = FILTER_OPTIONS.contentTypes[Math.floor(Math.random() * FILTER_OPTIONS.contentTypes.length)];
-        const provider = FILTER_OPTIONS.providers[Math.floor(Math.random() * FILTER_OPTIONS.providers.length)];
-        const groups = getRandomElements(FILTER_OPTIONS.groups, 1, 2);
-        const customAttribute = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
+  // Define role-skill priorities to ensure relevant skill gaps
+  const roleSkillPriorities = {
+    "Software Engineer": ["Python Programming", "Java", "Cloud Computing", "Data Analytics"],
+    "Senior Software Engineer": ["Python Programming", "Java", "Cloud Computing", "Leadership"],
+    "Tech Lead": ["Leadership", "Project Management", "Python Programming", "Innovation"],
+    "Engineering Manager": ["Leadership", "Project Management", "Innovation", "Business Analysis"],
+    "Product Manager": ["Leadership", "Project Management", "Business Analysis", "Innovation"],
+    "Senior Product Manager": ["Leadership", "Project Management", "Business Analysis", "Business Intelligence"],
+    "Data Scientist": ["Python Programming", "Machine Learning", "Data Analytics", "Big Data Analysis"],
+    "Senior Data Scientist": ["Python Programming", "Machine Learning", "Data Analytics", "Business Intelligence"],
+    "Data Analyst": ["Data Analytics", "Business Intelligence", "Data Visualization", "Python Programming"],
+    "UX Designer": ["Innovation", "Data Visualization", "Leadership", "Business Analysis"],
+    "Senior UX Designer": ["Innovation", "Data Visualization", "Leadership", "Project Management"],
+    "Marketing Manager": ["Leadership", "Data Analytics", "Business Intelligence", "Innovation"],
+    "Sales Manager": ["Leadership", "Business Analysis", "Project Management", "Innovation"],
+    "DevOps Engineer": ["Cloud Computing", "Python Programming", "Leadership", "Project Management"],
+    "QA Engineer": ["Java", "Python Programming", "Project Management", "Cloud Computing"],
+    "Business Analyst": ["Business Analysis", "Data Analytics", "Business Intelligence", "Data Visualization"],
+    "Project Manager": ["Project Management", "Leadership", "Business Analysis", "Innovation"],
+    "Scrum Master": ["Project Management", "Leadership", "Business Analysis", "Innovation"],
+    "Director": ["Leadership", "Project Management", "Business Analysis", "Innovation"],
+    "VP Engineering": ["Leadership", "Project Management", "Innovation", "Business Analysis"],
+    "CTO": ["Leadership", "Innovation", "Project Management", "Cloud Computing"]
+  };
+
+  // Generate entries for priority skills per role first
+  Object.entries(roleSkillPriorities).forEach(([role, prioritySkills]) => {
+    FILTER_OPTIONS.groups.forEach(group => {
+      prioritySkills.forEach(skill => {
+        // Generate 3-4 entries per role-skill-group combination for priority skills
+        const entriesCount = getRandomInRange(3, 4);
         
-        // Generate realistic skill ratings based on role-skill affinity
-        const currentRating = getRandomFloat(2.0, 4.5, 1);
-        const targetRating = Math.min(5.0, currentRating + getRandomFloat(0.5, 1.5, 1));
+        for (let i = 0; i < entriesCount; i++) {
+          const contentTypes = getRandomElements(FILTER_OPTIONS.contentTypes, 1, 1);
+          const providers = getRandomElements(FILTER_OPTIONS.providers, 1, 1);
+          const customAttributes = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
+          
+          // Generate realistic ratings with bigger gaps for priority skills
+          const currentRating = getRoleSkillBaseline(role, skill) + getRandomFloat(-0.8, 0.4);
+          const targetRating = Math.min(5, currentRating + getRandomFloat(0.6, 1.8));
+          
+          // Random recent date
+          const randomQuarter = Math.floor(Math.random() * 4) + 1;
+          const quarterData = DATE_HIERARCHY.FY25[`Q${randomQuarter}` as keyof typeof DATE_HIERARCHY.FY25];
+          const randomDate = quarterData.dates[Math.floor(Math.random() * quarterData.dates.length)];
 
-        data.push({
-          id: `skill-${idCounter++}`,
-          skill,
-          currentRating,
-          targetRating,
-          date,
-          contentType,
-          provider,
-          skills: [skill],
-          groups,
-          roles: [role],
-          customAttribute
-        });
+          data.push({
+            id: `rating-${idCounter++}`,
+            skill,
+            currentRating: Math.max(1, Math.min(5, +currentRating.toFixed(1))),
+            targetRating: Math.max(1, Math.min(5, +targetRating.toFixed(1))),
+            date: randomDate,
+            contentType: contentTypes[0],
+            provider: providers[0],
+            skills: [skill],
+            groups: [group],
+            roles: [role],
+            customAttribute: customAttributes
+          });
+        }
       });
     });
   });
 
-  return data;
-}
-
-// Comprehensive trending topics data
-export function generateTrendingTopicsData() {
-  const data: any[] = [];
-  let idCounter = 1;
-
-  // Ensure every skill has trending topic data across all filter dimensions
+  // Then add some additional data for all skill-role combinations (reduced volume)
   FILTER_OPTIONS.skills.forEach(skill => {
     FILTER_OPTIONS.roles.forEach(role => {
-      FILTER_OPTIONS.groups.forEach(group => {
-        const provider = FILTER_OPTIONS.providers[Math.floor(Math.random() * FILTER_OPTIONS.providers.length)];
-        const contentType = FILTER_OPTIONS.contentTypes[Math.floor(Math.random() * FILTER_OPTIONS.contentTypes.length)];
-        const customAttribute = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
+      // Skip if this is already a priority skill for this role
+      const rolePriorities = roleSkillPriorities[role as keyof typeof roleSkillPriorities];
+      if (rolePriorities && rolePriorities.includes(skill)) {
+        return; // Already generated above
+      }
+      
+      // Generate fewer entries for non-priority skills
+      FILTER_OPTIONS.groups.slice(0, 3).forEach(group => { // Only first 3 groups to reduce volume
+        const entriesCount = getRandomInRange(1, 2);
+        
+        for (let i = 0; i < entriesCount; i++) {
+          const contentTypes = getRandomElements(FILTER_OPTIONS.contentTypes, 1, 1);
+          const providers = getRandomElements(FILTER_OPTIONS.providers, 1, 1);
+          const customAttributes = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
+          
+          // Generate realistic ratings with smaller gaps for non-priority skills
+          const currentRating = getRoleSkillBaseline(role, skill) + getRandomFloat(-0.3, 0.3);
+          const targetRating = Math.min(5, currentRating + getRandomFloat(0.2, 0.8));
+          
+          // Random recent date
+          const randomQuarter = Math.floor(Math.random() * 4) + 1;
+          const quarterData = DATE_HIERARCHY.FY25[`Q${randomQuarter}` as keyof typeof DATE_HIERARCHY.FY25];
+          const randomDate = quarterData.dates[Math.floor(Math.random() * quarterData.dates.length)];
 
-        data.push({
-          id: `trending-${idCounter++}`,
-          topic: skill,
-          learners: Math.max(5, getRandomInRange(15, 150)),
-          growth: getRandomInRange(-10, 80),
-          date: "2024-09-15",
-          skills: [skill],
-          groups: [group],
-          roles: [role],
-          provider,
-          contentType,
-          customAttribute,
-          rating: getRandomInRange(3, 5),
-          region: FILTER_OPTIONS.regions[Math.floor(Math.random() * FILTER_OPTIONS.regions.length)]
-        });
+          data.push({
+            id: `rating-${idCounter++}`,
+            skill,
+            currentRating: Math.max(1, Math.min(5, +currentRating.toFixed(1))),
+            targetRating: Math.max(1, Math.min(5, +targetRating.toFixed(1))),
+            date: randomDate,
+            contentType: contentTypes[0],
+            provider: providers[0],
+            skills: [skill],
+            groups: [group],
+            roles: [role],
+            customAttribute: customAttributes
+          });
+        }
       });
     });
   });
@@ -331,7 +338,209 @@ export function generateTrendingTopicsData() {
   return data;
 }
 
-// Data aggregation utility
+// Helper functions for realistic data generation
+function getProviderMultiplier(provider: string): number {
+  const multipliers: Record<string, number> = {
+    "Udemy": 120,
+    "Coursera": 100,
+    "LinkedIn Learning": 110,
+    "Pluralsight": 90,
+    "Codecademy": 85,
+    "Cloud Academy": 75,
+    "edX": 95,
+    "Skillsoft": 80
+  };
+  return multipliers[provider] || 100;
+}
+
+function getContentTypeMultiplier(contentType: string): number {
+  const multipliers: Record<string, number> = {
+    "Course": 1.2,
+    "Article": 0.8,
+    "Video": 1.1,
+    "Assessment": 0.6,
+    "Podcast": 0.7,
+    "Book": 0.9,
+    "Event": 0.5,
+    "Academy": 1.3,
+    "Task": 0.4
+  };
+  return multipliers[contentType] || 1.0;
+}
+
+function getRoleSkillBaseline(role: string, skill: string): number {
+  // Define skill affinity by role for realistic baselines
+  const roleSkillMatrix: Record<string, Record<string, number>> = {
+    "Software Engineer": {
+      "Python Programming": 3.8,
+      "Java": 4.0,
+      "Cloud Computing": 3.6,
+      "Data Analytics": 3.2,
+      "Machine Learning": 2.8,
+      "Leadership": 3.0,
+      "Project Management": 3.2
+    },
+    "Senior Software Engineer": {
+      "Python Programming": 4.2,
+      "Java": 4.3,
+      "Cloud Computing": 4.0,
+      "Data Analytics": 3.5,
+      "Machine Learning": 3.2,
+      "Leadership": 3.5,
+      "Project Management": 3.8
+    },
+    "Tech Lead": {
+      "Python Programming": 4.0,
+      "Java": 3.8,
+      "Cloud Computing": 3.9,
+      "Leadership": 4.1,
+      "Project Management": 4.2,
+      "Innovation": 3.7
+    },
+    "Engineering Manager": {
+      "Leadership": 4.4,
+      "Project Management": 4.2,
+      "Python Programming": 3.5,
+      "Innovation": 3.9,
+      "Business Analysis": 3.7,
+      "Data Visualization": 3.3
+    },
+    "Product Manager": {
+      "Leadership": 4.1,
+      "Project Management": 4.3,
+      "Business Analysis": 4.0,
+      "Data Visualization": 3.5,
+      "Innovation": 3.8,
+      "Business Intelligence": 3.6
+    },
+    "Senior Product Manager": {
+      "Leadership": 4.4,
+      "Project Management": 4.5,
+      "Business Analysis": 4.2,
+      "Innovation": 4.1,
+      "Business Intelligence": 3.9,
+      "Data Visualization": 3.8
+    },
+    "Data Scientist": {
+      "Python Programming": 4.2,
+      "Machine Learning": 4.0,
+      "Data Analytics": 4.3,
+      "Business Intelligence": 3.8,
+      "Big Data Analysis": 4.1,
+      "Leadership": 3.2,
+      "Data Visualization": 4.0
+    },
+    "Senior Data Scientist": {
+      "Python Programming": 4.5,
+      "Machine Learning": 4.4,
+      "Data Analytics": 4.5,
+      "Business Intelligence": 4.2,
+      "Big Data Analysis": 4.3,
+      "Leadership": 3.8,
+      "Data Visualization": 4.2
+    },
+    "Data Analyst": {
+      "Data Analytics": 4.0,
+      "Business Intelligence": 3.8,
+      "Data Visualization": 3.9,
+      "Python Programming": 3.2,
+      "Big Data Analysis": 3.5,
+      "Business Analysis": 3.6
+    },
+    "UX Designer": {
+      "Innovation": 3.9,
+      "Data Visualization": 3.7,
+      "Leadership": 3.1,
+      "Project Management": 3.4,
+      "Business Analysis": 3.3
+    },
+    "Senior UX Designer": {
+      "Innovation": 4.2,
+      "Data Visualization": 4.0,
+      "Leadership": 3.6,
+      "Project Management": 3.8,
+      "Business Analysis": 3.6
+    },
+    "Marketing Manager": {
+      "Leadership": 3.9,
+      "Project Management": 3.7,
+      "Data Analytics": 3.4,
+      "Business Intelligence": 3.5,
+      "Innovation": 3.6,
+      "Data Visualization": 3.2
+    },
+    "Sales Manager": {
+      "Leadership": 4.0,
+      "Business Analysis": 3.8,
+      "Project Management": 3.6,
+      "Data Analytics": 3.2,
+      "Innovation": 3.4
+    },
+    "DevOps Engineer": {
+      "Cloud Computing": 4.2,
+      "Python Programming": 3.7,
+      "Java": 3.5,
+      "Leadership": 3.2,
+      "Project Management": 3.4
+    },
+    "QA Engineer": {
+      "Java": 3.6,
+      "Python Programming": 3.4,
+      "Project Management": 3.5,
+      "Leadership": 3.0,
+      "Cloud Computing": 3.2
+    },
+    "Business Analyst": {
+      "Business Analysis": 4.2,
+      "Data Analytics": 3.8,
+      "Business Intelligence": 3.9,
+      "Project Management": 3.7,
+      "Data Visualization": 3.6,
+      "Leadership": 3.3
+    },
+    "Project Manager": {
+      "Project Management": 4.3,
+      "Leadership": 3.9,
+      "Business Analysis": 3.6,
+      "Data Visualization": 3.3,
+      "Innovation": 3.4
+    },
+    "Scrum Master": {
+      "Project Management": 4.1,
+      "Leadership": 3.8,
+      "Business Analysis": 3.5,
+      "Innovation": 3.6
+    },
+    "Director": {
+      "Leadership": 4.6,
+      "Project Management": 4.3,
+      "Business Analysis": 4.0,
+      "Innovation": 4.2,
+      "Business Intelligence": 3.9,
+      "Data Visualization": 3.7
+    },
+    "VP Engineering": {
+      "Leadership": 4.7,
+      "Project Management": 4.5,
+      "Innovation": 4.4,
+      "Business Analysis": 4.1,
+      "Python Programming": 3.6,
+      "Cloud Computing": 3.8
+    },
+    "CTO": {
+      "Leadership": 4.8,
+      "Innovation": 4.6,
+      "Project Management": 4.4,
+      "Cloud Computing": 4.0,
+      "Business Analysis": 4.2,
+      "Python Programming": 3.7
+    }
+  };
+
+  return roleSkillMatrix[role]?.[skill] || getRandomFloat(2.5, 3.8);
+}
+
+// Aggregation helper functions
 export function aggregateDataByPeriod<T extends { date: string }>(
   data: T[],
   aggregationLevel: 'month' | 'quarter' | 'year'
@@ -339,20 +548,22 @@ export function aggregateDataByPeriod<T extends { date: string }>(
   const grouped: Record<string, T[]> = {};
 
   data.forEach(item => {
-    let key: string;
     const date = new Date(item.date);
-    
+    let key: string;
+
     switch (aggregationLevel) {
       case 'month':
         key = format(date, 'yyyy-MM');
         break;
       case 'quarter':
-        const quarter = Math.ceil((date.getMonth() + 1) / 3);
+        const quarter = Math.floor(date.getMonth() / 3) + 1;
         key = `${date.getFullYear()}-Q${quarter}`;
         break;
       case 'year':
         key = date.getFullYear().toString();
         break;
+      default:
+        key = item.date;
     }
 
     if (!grouped[key]) {
@@ -364,39 +575,95 @@ export function aggregateDataByPeriod<T extends { date: string }>(
   return grouped;
 }
 
-// Generate comprehensive datasets with regional and rating data
+// Generate comprehensive datasets - Force regeneration with updated baselines
 export const comprehensiveLearningData = generateComprehensiveLearningData().map(item => ({
   ...item,
-  rating: Math.floor(item.avgRating), // Add rating for filtering (1-5)
-  region: FILTER_OPTIONS.regions[Math.floor(Math.random() * FILTER_OPTIONS.regions.length)]
+  rating: Math.floor(Math.random() * 5) + 1, // 1-5 star rating
+  region: ['North America (NA)', 'Europe, Middle East & Africa (EMEA)', 'Asia-Pacific (APAC)'][Math.floor(Math.random() * 3)]
 }));
 
-export const comprehensiveSkillRatings = generateSkillRatingData().map(item => ({
-  ...item,
-  rating: Math.floor(item.currentRating), // Add rating for filtering (1-5)
-  region: FILTER_OPTIONS.regions[Math.floor(Math.random() * FILTER_OPTIONS.regions.length)]
+export const comprehensiveSkillRatings = generateSkillRatingData().map(rating => ({
+  ...rating,
+  rating: Math.floor(Math.random() * 5) + 1, // 1-5 star rating  
+  region: ['North America (NA)', 'Europe, Middle East & Africa (EMEA)', 'Asia-Pacific (APAC)'][Math.floor(Math.random() * 3)]
 }));
 
-// Generate comprehensive trending topics
-export const comprehensiveTrendingTopics = generateTrendingTopicsData();
-
-console.log('🚀 Comprehensive Mock Data Generated:', {
+console.log('🚀 Updated Mock Data Generated:', {
   learningDataCount: comprehensiveLearningData.length,
   skillRatingsCount: comprehensiveSkillRatings.length,
-  trendingTopicsCount: comprehensiveTrendingTopics.length,
   sampleLearningItem: comprehensiveLearningData[0],
-  filterCoverage: {
-    roles: FILTER_OPTIONS.roles.length,
-    contentTypes: FILTER_OPTIONS.contentTypes.length,
-    providers: FILTER_OPTIONS.providers.length,
-    skills: FILTER_OPTIONS.skills.length,
-    groups: FILTER_OPTIONS.groups.length,
-    customAttributes: FILTER_OPTIONS.customAttributes.length,
-    regions: FILTER_OPTIONS.regions.length
-  }
+  sampleSkillRating: comprehensiveSkillRatings[0],
+  uniqueRoles: [...new Set(comprehensiveLearningData.flatMap(item => item.roles))],
+  skillRatingSample: comprehensiveSkillRatings.slice(0, 5).map(r => ({
+    role: r.roles[0], 
+    skill: r.skill, 
+    current: r.currentRating, 
+    target: r.targetRating,
+    gap: r.targetRating - r.currentRating
+  }))
 });
 
 // Export aggregated views for dashboard consumption
 export const learningDataByMonth = aggregateDataByPeriod(comprehensiveLearningData, 'month');
 export const learningDataByQuarter = aggregateDataByPeriod(comprehensiveLearningData, 'quarter');
 export const learningDataByYear = aggregateDataByPeriod(comprehensiveLearningData, 'year');
+
+// Trending topics with comprehensive filter coverage
+export function generateTrendingTopicsData(): Array<{
+  id: string;
+  topic: string;
+  learners: number;
+  growth: number;
+  date: string;
+  contentType: string;
+  provider: string;
+  skills: string[];
+  groups: string[];
+  roles: string[];
+  customAttribute: string[];
+}> {
+  const topics = [
+    "Artificial Intelligence", "Machine Learning", "Cloud Computing", "Data Science",
+    "Cybersecurity", "Agile Methodology", "DevOps", "Blockchain", "IoT", "Digital Marketing",
+    "Product Management", "Leadership Development", "Project Management", "UX Design"
+  ];
+
+  const data: any[] = [];
+  let idCounter = 1;
+
+  topics.forEach(topic => {
+    // Generate multiple entries per topic with different filter combinations
+    const entriesCount = getRandomInRange(3, 6);
+    
+    for (let i = 0; i < entriesCount; i++) {
+      const skills = getRandomElements(FILTER_OPTIONS.skills, 1, 2);
+      const groups = getRandomElements(FILTER_OPTIONS.groups, 1, 3);
+      const roles = getRandomElements(FILTER_OPTIONS.roles, 1, 4);
+      const contentTypes = getRandomElements(FILTER_OPTIONS.contentTypes, 1, 1);
+      const providers = getRandomElements(FILTER_OPTIONS.providers, 1, 1);
+      const customAttributes = getRandomElements(FILTER_OPTIONS.customAttributes, 1, 2);
+      
+      // Random recent date
+      const allDates = Object.values(DATE_HIERARCHY.FY25).flatMap(q => q.dates);
+      const randomDate = allDates[Math.floor(Math.random() * allDates.length)];
+      
+      data.push({
+        id: `topic-${idCounter++}`,
+        topic,
+        learners: getRandomInRange(500, 2500),
+        growth: getRandomInRange(15, 200),
+        date: randomDate,
+        contentType: contentTypes[0],
+        provider: providers[0],
+        skills,
+        groups,
+        roles,
+        customAttribute: customAttributes
+      });
+    }
+  });
+
+  return data;
+}
+
+export const comprehensiveTrendingTopics = generateTrendingTopicsData();
