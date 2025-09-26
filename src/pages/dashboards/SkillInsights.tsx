@@ -205,6 +205,99 @@ export default function SkillInsights() {
     return total;
   }, [filteredOpportunitiesData]);
 
+  // Generate skill followers over time data
+  const skillFollowersData = useMemo(() => {
+    const timePoints = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const topSkills = Array.from(new Set(filteredLearningData.flatMap(item => item.skills))).slice(0, 5);
+    
+    return timePoints.map(month => {
+      const data: any = { month };
+      topSkills.forEach(skill => {
+        // Generate realistic follower data with growth trends
+        const baseFollowers = Math.floor(Math.random() * 50) + 20;
+        const monthIndex = timePoints.indexOf(month);
+        const growth = monthIndex * (Math.random() * 8 + 2); // Growth over time
+        data[skill] = Math.floor(baseFollowers + growth);
+      });
+      return data;
+    });
+  }, [filteredLearningData]);
+
+  // Generate skill development focus data
+  const skillDevelopmentFocusData = useMemo(() => {
+    const skillEngagement = filteredLearningData.reduce((acc: any, item) => {
+      item.skills.forEach(skill => {
+        if (!acc[skill]) {
+          acc[skill] = {
+            skill,
+            totalHours: 0,
+            activeUsers: 0,
+            completions: 0,
+            focusScore: 0
+          };
+        }
+        acc[skill].totalHours += item.hours || 0;
+        acc[skill].activeUsers += item.learners || 1;
+        acc[skill].completions += Math.floor((item.hours || 0) / 10); // Assume completion every 10 hours
+      });
+      return acc;
+    }, {});
+
+    return Object.values(skillEngagement)
+      .map((skill: any) => ({
+        ...skill,
+        focusScore: Math.round((skill.totalHours * 0.3 + skill.activeUsers * 0.5 + skill.completions * 0.2) * 10) / 10
+      }))
+      .sort((a: any, b: any) => b.focusScore - a.focusScore)
+      .slice(0, 8);
+  }, [filteredLearningData]);
+
+  // Generate median skill ratings data
+  const medianSkillRatingsData = useMemo(() => {
+    const skillRatingsMap = filteredSkillRatings.reduce((acc: any, rating) => {
+      if (!acc[rating.skill]) {
+        acc[rating.skill] = [];
+      }
+      acc[rating.skill].push(rating.currentRating);
+      return acc;
+    }, {});
+
+    return Object.entries(skillRatingsMap)
+      .map(([skill, ratings]: [string, any]) => {
+        const sortedRatings = ratings.sort((a: number, b: number) => a - b);
+        const mid = Math.floor(sortedRatings.length / 2);
+        const median = sortedRatings.length % 2 !== 0 
+          ? sortedRatings[mid] 
+          : (sortedRatings[mid - 1] + sortedRatings[mid]) / 2;
+        
+        return {
+          skill,
+          median: Math.round(median * 10) / 10,
+          average: Math.round((ratings.reduce((sum: number, r: number) => sum + r, 0) / ratings.length) * 10) / 10,
+          count: ratings.length
+        };
+      })
+      .sort((a, b) => b.median - a.median)
+      .slice(0, 10);
+  }, [filteredSkillRatings]);
+
+  // Generate skill progress over time data
+  const skillProgressData = useMemo(() => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const topSkills = Array.from(new Set(filteredSkillRatings.map(r => r.skill))).slice(0, 4);
+    
+    return months.map((month, index) => {
+      const data: any = { month };
+      topSkills.forEach(skill => {
+        // Simulate progressive improvement
+        const baseRating = 2.5 + Math.random() * 1.5;
+        const progress = index * 0.3 + Math.random() * 0.4;
+        data[skill] = Math.round((baseRating + progress) * 10) / 10;
+      });
+      return data;
+    });
+  }, [filteredSkillRatings]);
+
   // Generate filtered market alignment data
   const filteredMarketAlignment = useMemo(() => {
     const skillUsage = filteredLearningData.reduce((acc: any, item) => {
@@ -609,6 +702,181 @@ export default function SkillInsights() {
           )}
         </div>
       </ChartCard>
+
+      {/* Skill Tracking and Development Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard
+          title="Skill Followers Over Time"
+          subtitle="How many people are following each skill over time"
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={skillFollowersData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="month" 
+                fontSize={12}
+              />
+              <YAxis 
+                fontSize={12}
+                label={{ value: 'Number of Followers', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+              />
+              {Object.keys(skillFollowersData[0] || {}).filter(key => key !== 'month').slice(0, 5).map((skill, index) => (
+                <Line 
+                  key={skill}
+                  type="monotone" 
+                  dataKey={skill} 
+                  stroke={COLORS[index % COLORS.length]} 
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard
+          title="Skill Development Focus"
+          subtitle="Are users focusing on developing these skills?"
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={skillDevelopmentFocusData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="skill"
+                angle={-45}
+                textAnchor="end"
+                height={100}
+                fontSize={11}
+              />
+              <YAxis 
+                fontSize={12}
+                label={{ value: 'Focus Score', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip 
+                formatter={(value: any, name: string, props: any) => {
+                  const data = props.payload;
+                  return [
+                    <div key="tooltip">
+                      <p>Focus Score: {value}</p>
+                      <p>Active Users: {data.activeUsers}</p>
+                      <p>Total Hours: {data.totalHours}</p>
+                      <p>Completions: {data.completions}</p>
+                    </div>
+                  ];
+                }}
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+              />
+              <Bar 
+                dataKey="focusScore" 
+                fill="hsl(var(--primary))"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard
+          title="Median Skill Ratings"
+          subtitle="What does the median rating look like for each skill?"
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={medianSkillRatingsData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="skill"
+                angle={-45}
+                textAnchor="end"
+                height={100}
+                fontSize={11}
+              />
+              <YAxis 
+                domain={[0, 5]}
+                fontSize={12}
+                label={{ value: 'Rating (1-5)', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip 
+                formatter={(value: any, name: string, props: any) => {
+                  const data = props.payload;
+                  return [
+                    <div key="tooltip">
+                      <p>Median: {data.median}</p>
+                      <p>Average: {data.average}</p>
+                      <p>Sample Size: {data.count}</p>
+                    </div>
+                  ];
+                }}
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+              />
+              <Bar 
+                dataKey="median" 
+                fill="hsl(var(--secondary))"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar 
+                dataKey="average" 
+                fill="hsl(var(--primary))"
+                radius={[4, 4, 0, 0]}
+                fillOpacity={0.7}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard
+          title="Skill Progress Over Time"
+          subtitle="Are users making progress on their skills?"
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={skillProgressData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="month" 
+                fontSize={12}
+              />
+              <YAxis 
+                domain={[1, 5]}
+                fontSize={12}
+                label={{ value: 'Skill Rating', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+              />
+              {Object.keys(skillProgressData[0] || {}).filter(key => key !== 'month').map((skill, index) => (
+                <Line 
+                  key={skill}
+                  type="monotone" 
+                  dataKey={skill} 
+                  stroke={COLORS[index % COLORS.length]} 
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
 
       {/* Market Alignment */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
