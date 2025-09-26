@@ -271,6 +271,26 @@ export default function SkillProgression() {
       Math.max(0, 6 - (filteredData.reduce((sum, item) => sum + item.avgRating, 0) / filteredData.length)) : 0
   };
 
+  const handleCompleteReset = () => {
+    // Reset filters
+    const resetFilters: FilterState = {
+      roles: [],
+      skills: [],
+      timePeriod: [],
+      ratingLevels: [],
+      ratingTypes: []
+    };
+    setFilters(resetFilters);
+    
+    // Reset chart selections
+    setHighlightedDataPoint(null);
+    setHighlightedBarData(null);
+    
+    // Reset pagination
+    setHeatmapCurrentPage(0);
+    setGapsCurrentPage(0);
+  };
+
   const handleFilterChange = (newFilters: FilterState) => {
     setFilters(newFilters);
   };
@@ -466,7 +486,7 @@ export default function SkillProgression() {
       </div>
 
       {/* Filters */}
-      <SkillProgressionFilterBar filters={filters} onFilterChange={handleFilterChange} />
+      <SkillProgressionFilterBar filters={filters} onFilterChange={handleFilterChange} onReset={handleCompleteReset} />
 
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

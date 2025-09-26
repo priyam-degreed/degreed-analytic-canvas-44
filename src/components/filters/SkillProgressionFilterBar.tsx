@@ -20,10 +20,11 @@ interface FilterState {
 interface SkillProgressionFilterBarProps {
   filters: FilterState;
   onFilterChange: (filters: FilterState) => void;
+  onReset?: () => void;
 }
 
 
-export function SkillProgressionFilterBar({ filters, onFilterChange }: SkillProgressionFilterBarProps) {
+export function SkillProgressionFilterBar({ filters, onFilterChange, onReset }: SkillProgressionFilterBarProps) {
 
   const handleFilterChange = (filterType: keyof FilterState, value: any) => {
     const newFilters = { ...filters, [filterType]: value };
@@ -42,14 +43,18 @@ export function SkillProgressionFilterBar({ filters, onFilterChange }: SkillProg
   };
 
   const handleReset = () => {
-    const resetFilters: FilterState = {
-      roles: [],
-      skills: [],
-      timePeriod: [],
-      ratingLevels: [],
-      ratingTypes: []
-    };
-    onFilterChange(resetFilters);
+    if (onReset) {
+      onReset();
+    } else {
+      const resetFilters: FilterState = {
+        roles: [],
+        skills: [],
+        timePeriod: [],
+        ratingLevels: [],
+        ratingTypes: []
+      };
+      onFilterChange(resetFilters);
+    }
   };
 
   const ratingLevelOptions = ratingLevels.map(level => `${level.value} - ${level.label}`);
