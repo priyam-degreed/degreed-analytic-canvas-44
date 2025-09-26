@@ -262,18 +262,20 @@ export default function SkillInsights() {
             <ResponsiveContainer width="100%" height={400}>
               <BarChart
                 data={mostNeededSkillsData}
-                margin={{ top: 20, right: 80, left: 120, bottom: 5 }}
+                margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
-                  type="number" 
-                  domain={[0, 'dataMax + 100']}
+                  dataKey="skill"
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  fontSize={11}
+                  interval={0}
                 />
                 <YAxis 
-                  dataKey="skill" 
-                  type="category" 
-                  width={120}
-                  fontSize={11}
+                  fontSize={12}
+                  label={{ value: 'Number of Opportunities', angle: -90, position: 'insideLeft' }}
                 />
                 <Tooltip 
                   formatter={(value: any) => [value, 'Opportunities']}
@@ -287,7 +289,7 @@ export default function SkillInsights() {
                 <Bar 
                   dataKey="opportunities" 
                   fill="hsl(var(--primary))"
-                  label={{ position: 'right', fontSize: 12 }}
+                  radius={[4, 4, 0, 0]}
                 />
               </BarChart>
             </ResponsiveContainer>
