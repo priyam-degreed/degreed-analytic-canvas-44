@@ -50,7 +50,7 @@ interface ChatMessage {
 
 interface VisualizationData {
   id: string;
-  type: "column" | "bar" | "line" | "pie" | "heatmap" | "table" | "treemap";
+  type: "column" | "bar" | "line" | "pie" | "heatmap" | "treemap";
   title: string;
   metrics: string[];
   attributes: string[];
@@ -627,7 +627,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return [
         "Filter to Region = APAC",
         "Add assignment status breakdown",
-        "Switch to table view",
+        
         "Compare with previous year",
         "Show by learning category",
         "Save as 'Past Due Tracking'"
@@ -724,7 +724,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   };
 
   // Enhanced chart type switching with more options
-  const handleChartTypeSwitch = (messageId: string, newType: "column" | "bar" | "line" | "pie" | "heatmap" | "table" | "treemap") => {
+  const handleChartTypeSwitch = (messageId: string, newType: "column" | "bar" | "line" | "pie" | "heatmap" | "treemap") => {
     setChatMessages(prev => prev.map(message => {
       if (message.id === messageId && message.visualization) {
         return {
@@ -738,8 +738,6 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               message.visualization.title.replace(/Bar Chart|Column Chart|Pie Chart|Analysis/gi, "Line Chart") :
               newType === "heatmap" ?
               message.visualization.title.replace(/Chart|Analysis/gi, "Heatmap") :
-              newType === "table" ?
-              message.visualization.title.replace(/Chart|Analysis/gi, "Table") :
               newType === "treemap" ?
               message.visualization.title.replace(/Chart|Analysis/gi, "Treemap") :
               message.visualization.title
@@ -919,41 +917,6 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       );
     }
     
-    // Table view for detailed analysis
-    if (viz.type === "table") {
-      return (
-        <div className="bg-white border rounded-lg p-4 overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b bg-gray-50">
-                <th className="text-left p-2 font-medium">Name</th>
-                <th className="text-right p-2 font-medium">Value</th>
-                <th className="text-right p-2 font-medium">%</th>
-                <th className="text-right p-2 font-medium">Trend</th>
-              </tr>
-            </thead>
-            <tbody>
-              {viz.data.map((item, idx) => {
-                const value = item.rate || item.growth || item.engagement || item.value || 50;
-                const trend = item.trend || (value > 50 ? "up" : "down");
-                return (
-                  <tr key={idx} className="border-b hover:bg-gray-50">
-                    <td className="p-2 text-gray-700">{item.name}</td>
-                    <td className="p-2 text-right font-medium">{Math.round(value)}</td>
-                    <td className="p-2 text-right text-gray-600">{Math.round(value)}%</td>
-                    <td className="p-2 text-right">
-                      <span className={`text-xs ${trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-600'}`}>
-                        {trend === 'up' ? '↗️' : trend === 'down' ? '↘️' : '➡️'}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      );
-    }
     
     // Treemap for hierarchical data
     if (viz.type === "treemap") {
@@ -1291,15 +1254,6 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 >
                   {viz.type === "line" ? <PieChart className="h-3 w-3 mr-1" /> : <LineChart className="h-3 w-3 mr-1" />}
                   {viz.type === "line" ? "Pie chart" : "Line chart"}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs h-7"
-                  onClick={() => handleChartTypeSwitch(message.id, "table")}
-                >
-                  <Filter className="h-3 w-3 mr-1" />
-                  Table
                 </Button>
               </div>
               
