@@ -189,19 +189,19 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return {
         id: `viz-${Date.now()}`,
         type: "bar",
-        title: "Completion Rate for Assigned Learning by Org Unit",
-        metrics: ["Completion Rate %", "Assignments Completed", "Assignments Assigned"],
-        attributes: ["Org Unit", "Job Role"],
-        filters: ["Assigned Learning", "All Org Units", "Current Period"],
+        title: "Learning Completion Rate by Organization Unit",
+        metrics: ["Completion Rate %", "Assignments Completed", "Total Assignments"],
+        attributes: ["Organization Unit", "Job Role Category"],
+        filters: ["Assigned Learning", "All Org Units", "Last 90 Days"],
         data: [
-          { name: "Associate UI Engineer", rate: 100.0, completed: 45, assigned: 45, orgUnit: "Product Design" },
-          { name: "Web Designer", rate: 60.7, completed: 17, assigned: 28, orgUnit: "Product Design" },
-          { name: "Civil Engineer", rate: 57.9, completed: 22, assigned: 38, orgUnit: "Infrastructure" },
-          { name: "Mobile Developer", rate: 55.4, completed: 31, assigned: 56, orgUnit: "Engineering" },
-          { name: "Software Engineer", rate: 50.0, completed: 89, assigned: 178, orgUnit: "Engineering" },
-          { name: "Content Creator", rate: 47.8, completed: 11, assigned: 23, orgUnit: "Marketing" },
-          { name: "Data Analyst", rate: 41.9, completed: 18, assigned: 43, orgUnit: "Analytics" },
-          { name: "Database Administrator", rate: 33.3, completed: 12, assigned: 36, orgUnit: "IT Operations" }
+          { name: "Product Design", rate: 89.2, completed: 125, assigned: 140, employees: 45, avgTime: "3.2 weeks" },
+          { name: "Engineering", rate: 76.4, completed: 267, assigned: 349, employees: 156, avgTime: "4.1 weeks" },
+          { name: "Marketing", rate: 72.8, completed: 91, assigned: 125, employees: 38, avgTime: "2.8 weeks" },
+          { name: "Data Science", rate: 68.5, completed: 87, assigned: 127, employees: 41, avgTime: "5.2 weeks" },
+          { name: "Sales", rate: 64.2, completed: 108, assigned: 168, employees: 62, avgTime: "3.9 weeks" },
+          { name: "IT Operations", rate: 58.7, completed: 76, assigned: 129, employees: 34, avgTime: "6.1 weeks" },
+          { name: "HR", rate: 54.3, completed: 43, assigned: 79, employees: 28, avgTime: "4.7 weeks" },
+          { name: "Finance", rate: 47.2, completed: 59, assigned: 125, employees: 45, avgTime: "7.3 weeks" }
         ],
         canModify: true,
         saveOptions: true
@@ -213,19 +213,19 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return {
         id: `viz-${Date.now()}`,
         type: "heatmap",
-        title: "Drivers of Learning Completion Rate",
-        metrics: ["Impact on Completion Rate", "Frequency", "Correlation"],
-        attributes: ["Driver Category", "Impact Type"],
-        filters: ["All Learning Items", "Assignment Status", "Recommendation Type"],
+        title: "Key Drivers of Learning Completion Rate",
+        metrics: ["Correlation Score", "Impact Magnitude", "Frequency"],
+        attributes: ["Driver Category", "Impact Direction"],
+        filters: ["All Learning Types", "Statistical Significance > 95%"],
         data: [
-          { name: "Assignment Status: Completed", impact: 85, frequency: 1247, type: "positive" },
-          { name: "Learning Type: Video", impact: 72, frequency: 892, type: "positive" },
-          { name: "Provider: SuccessFactors", impact: 68, frequency: 743, type: "positive" },
-          { name: "Recommendation: Assigned", impact: 65, frequency: 1543, type: "positive" },
-          { name: "Assignment Status: Pending", impact: -43, frequency: 2341, type: "negative" },
-          { name: "Learning Type: Course", impact: -38, frequency: 1876, type: "negative" },
-          { name: "Assignment Status: Dismissed", impact: -52, frequency: 234, type: "negative" },
-          { name: "Learning Type: Pathway", impact: -29, frequency: 567, type: "negative" }
+          { name: "Manager Support", impact: 92.4, frequency: 2847, correlation: 0.78, type: "positive", description: "Strong manager engagement" },
+          { name: "Video-Based Content", impact: 84.7, frequency: 1934, correlation: 0.71, type: "positive", description: "Interactive video format" },
+          { name: "Clear Deadlines", impact: 79.3, frequency: 2341, correlation: 0.65, type: "positive", description: "Specific due dates" },
+          { name: "Bite-sized Modules", impact: 76.8, frequency: 1567, correlation: 0.62, type: "positive", description: "15-30 min sessions" },
+          { name: "Mobile Accessibility", impact: 73.2, frequency: 1243, correlation: 0.58, type: "positive", description: "Mobile-friendly content" },
+          { name: "Text-Heavy Content", impact: -67.4, frequency: 892, correlation: -0.54, type: "negative", description: "Document-based learning" },
+          { name: "Long Sessions", impact: -59.8, frequency: 567, correlation: -0.48, type: "negative", description: ">2 hour sessions" },
+          { name: "No Reminders", impact: -71.2, frequency: 743, correlation: -0.61, type: "negative", description: "Lack of notifications" }
         ],
         canModify: true,
         saveOptions: true
@@ -237,20 +237,23 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return {
         id: `viz-${Date.now()}`,
         type: "line",
-        title: "Past Due Learning Assignments Trend",
-        metrics: ["Past Due Count", "Total Assignments", "Past Due %"],
-        attributes: ["Time Period", "Assignment Status"],
-        filters: ["Past Due Status", "12 Month Period"],
+        title: "Past Due Learning Assignments - 12 Month Trend",
+        metrics: ["Past Due Count", "Total Assignments", "Past Due Rate %"],
+        attributes: ["Month", "Assignment Status"],
+        filters: ["Past Due Status", "All Departments", "12 Month View"],
         data: [
-          { name: "Jan", month: "Jan 2024", value: 234, total: 3421, percentage: 6.8 },
-          { name: "Feb", month: "Feb 2024", value: 189, total: 3156, percentage: 6.0 },  
-          { name: "Mar", month: "Mar 2024", value: 267, total: 3634, percentage: 7.3 },
-          { name: "Apr", month: "Apr 2024", value: 198, total: 3298, percentage: 6.0 },
-          { name: "May", month: "May 2024", value: 312, total: 3876, percentage: 8.1 },
-          { name: "Jun", month: "Jun 2024", value: 278, total: 3567, percentage: 7.8 },
-          { name: "Jul", month: "Jul 2024", value: 245, total: 3421, percentage: 7.2 },
-          { name: "Aug", month: "Aug 2024", value: 289, total: 3698, percentage: 7.8 },
-          { name: "Sep", month: "Sep 2024", value: 198, total: 3234, percentage: 6.1 }
+          { name: "Oct 2023", month: "Oct 2023", value: 287, total: 3421, percentage: 8.4, newAssignments: 425 },
+          { name: "Nov 2023", month: "Nov 2023", value: 245, total: 3298, percentage: 7.4, newAssignments: 398 },
+          { name: "Dec 2023", month: "Dec 2023", value: 198, total: 2987, percentage: 6.6, newAssignments: 287 },
+          { name: "Jan 2024", month: "Jan 2024", value: 234, total: 3567, percentage: 6.6, newAssignments: 456 },
+          { name: "Feb 2024", month: "Feb 2024", value: 189, total: 3234, percentage: 5.8, newAssignments: 398 },  
+          { name: "Mar 2024", month: "Mar 2024", value: 267, total: 3789, percentage: 7.0, newAssignments: 523 },
+          { name: "Apr 2024", month: "Apr 2024", value: 198, total: 3456, percentage: 5.7, newAssignments: 467 },
+          { name: "May 2024", month: "May 2024", value: 312, total: 4012, percentage: 7.8, newAssignments: 601 },
+          { name: "Jun 2024", month: "Jun 2024", value: 278, total: 3876, percentage: 7.2, newAssignments: 543 },
+          { name: "Jul 2024", month: "Jul 2024", value: 245, total: 3654, percentage: 6.7, newAssignments: 489 },
+          { name: "Aug 2024", month: "Aug 2024", value: 289, total: 3923, percentage: 7.4, newAssignments: 578 },
+          { name: "Sep 2024", month: "Sep 2024", value: 198, total: 3567, percentage: 5.5, newAssignments: 445 }
         ],
         canModify: true,
         saveOptions: true
@@ -263,17 +266,19 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return {
         id: `viz-${Date.now()}`,
         type: "column",
-        title: "Endorsed Skills Development Analysis",
-        metrics: ["Endorsed Skill %", "Skill Development Events", "Endorsed Events"],
+        title: "Skills Development vs Endorsement Analysis",
+        metrics: ["Endorsement Rate %", "Development Events", "Endorsed Events"],
         attributes: ["Skill Category", "Development Method"],
         filters: ["Active Skills", "All Users", "Current Quarter"],
         data: [
-          { name: "AI/ML", rate: 78.4, events: 1247, endorsed: 978, category: "Technical" },
-          { name: "Leadership", rate: 65.2, events: 892, endorsed: 582, category: "Soft Skills" },
-          { name: "Data Analytics", rate: 71.8, events: 1134, endorsed: 814, category: "Technical" },
-          { name: "Project Management", rate: 58.9, events: 567, endorsed: 334, category: "Management" },
-          { name: "Communication", rate: 82.1, events: 743, endorsed: 610, category: "Soft Skills" },
-          { name: "Cloud Computing", rate: 69.3, events: 1021, endorsed: 708, category: "Technical" }
+          { name: "Communication", rate: 84.6, events: 1247, endorsed: 1055, category: "Soft Skills", endorsers: 324 },
+          { name: "Leadership", rate: 81.2, events: 892, endorsed: 724, category: "Management", endorsers: 267 },
+          { name: "AI/ML", rate: 78.4, events: 1567, endorsed: 1228, category: "Technical", endorsers: 412 },
+          { name: "Data Analytics", rate: 75.8, events: 1134, endorsed: 859, category: "Technical", endorsers: 298 },
+          { name: "Cloud Computing", rate: 72.3, events: 1021, endorsed: 738, category: "Technical", endorsers: 245 },
+          { name: "Project Management", rate: 69.7, events: 743, endorsed: 518, category: "Management", endorsers: 189 },
+          { name: "UX Design", rate: 66.4, events: 567, endorsed: 376, category: "Creative", endorsers: 134 },
+          { name: "Cybersecurity", rate: 63.8, events: 456, endorsed: 291, category: "Technical", endorsers: 98 }
         ],
         canModify: true,
         saveOptions: true
@@ -285,17 +290,17 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return {
         id: `viz-${Date.now()}`,
         type: "pie",
-        title: "Skill Development Methods Distribution", 
-        metrics: ["Usage Count", "% of Total", "Completion Rate"],
-        attributes: ["Development Method", "Skill Category"],
-        filters: ["Active Development", "All Skills"],
+        title: "Skill Development Methods - Current Distribution", 
+        metrics: ["Usage Count", "Percentage of Total", "Avg Completion Rate"],
+        attributes: ["Development Method", "Content Format"],
+        filters: ["Active Development", "All Skills", "Past 6 Months"],
         data: [
-          { name: "Online Courses", value: 2847, percentage: 42.1, completion: 78.4 },
-          { name: "Learning Paths", value: 1934, percentage: 28.6, completion: 82.1 },
-          { name: "Projects", value: 892, percentage: 13.2, completion: 65.7 },
-          { name: "Coaching", value: 567, percentage: 8.4, completion: 91.2 },
-          { name: "Workshops", value: 312, percentage: 4.6, completion: 87.3 },  
-          { name: "Mentoring", value: 213, percentage: 3.1, completion: 94.1 }
+          { name: "Online Courses", value: 3247, percentage: 45.2, completion: 78.4, avgDuration: "2.4 weeks" },
+          { name: "Learning Paths", value: 2156, percentage: 30.0, completion: 82.1, avgDuration: "6.1 weeks" },
+          { name: "Hands-on Projects", value: 892, percentage: 12.4, completion: 89.7, avgDuration: "4.2 weeks" },
+          { name: "Mentoring Sessions", value: 534, percentage: 7.4, completion: 94.1, avgDuration: "8.3 weeks" },
+          { name: "Workshops", value: 267, percentage: 3.7, completion: 87.3, avgDuration: "0.5 weeks" },  
+          { name: "Peer Learning", value: 93, percentage: 1.3, completion: 91.2, avgDuration: "3.1 weeks" }
         ],
         canModify: true,
         saveOptions: true
@@ -307,18 +312,19 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return {
         id: `viz-${Date.now()}`,
         type: "column",
-        title: "Learning Completion Rate by Category",
-        metrics: ["Completion Rate %", "Total Enrollments", "Completions"],
-        attributes: ["Learning Category", "Provider"],
-        filters: ["All Categories", "Active Learning"],
+        title: "Learning Completion Rate by Category - Performance Ranking",
+        metrics: ["Completion Rate %", "Total Enrollments", "Successful Completions"],
+        attributes: ["Learning Category", "Content Provider"],
+        filters: ["All Categories", "Active Learning", "Min 100 Enrollments"],
         data: [
-          { name: "Leadership Skills", rate: 89.4, enrollments: 1247, completions: 1115 },
-          { name: "Technical Skills", rate: 84.7, enrollments: 2341, completions: 1983 },
-          { name: "Communication", rate: 82.1, enrollments: 892, completions: 732 },
-          { name: "Project Management", rate: 78.9, enrollments: 1134, completions: 895 },
-          { name: "Data & Analytics", rate: 76.3, enrollments: 1876, completions: 1431 },
-          { name: "Sales & Marketing", rate: 71.2, enrollments: 743, completions: 529 },
-          { name: "Compliance", rate: 68.5, enrollments: 567, completions: 388 }
+          { name: "Leadership & Management", rate: 91.3, enrollments: 1247, completions: 1138, avgRating: 4.6, providers: 8 },
+          { name: "Professional Skills", rate: 87.9, enrollments: 2341, completions: 2057, avgRating: 4.4, providers: 12 },
+          { name: "Technical Skills", rate: 84.7, enrollments: 3156, completions: 2673, avgRating: 4.3, providers: 15 },
+          { name: "Communication", rate: 82.1, enrollments: 892, completions: 732, avgRating: 4.5, providers: 6 },
+          { name: "Digital Literacy", rate: 79.4, enrollments: 1567, completions: 1244, avgRating: 4.2, providers: 9 },
+          { name: "Data & Analytics", rate: 76.3, enrollments: 1876, completions: 1431, avgRating: 4.1, providers: 7 },
+          { name: "Sales & Marketing", rate: 73.8, enrollments: 743, completions: 548, avgRating: 4.0, providers: 5 },
+          { name: "Compliance", rate: 68.5, enrollments: 1234, completions: 845, avgRating: 3.8, providers: 4 }
         ],
         canModify: true,
         saveOptions: true
@@ -330,17 +336,18 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return {
         id: `viz-${Date.now()}`,
         type: "bar",
-        title: "Learning Provider Satisfaction Scores",
-        metrics: ["Avg Satisfaction", "Review Count", "Satisfaction Change"],
-        attributes: ["Learning Provider", "Content Type"],
-        filters: ["Active Providers", "Min 50 reviews"],
+        title: "Learning Provider Satisfaction - Trending Performance",
+        metrics: ["Current Rating", "Review Count", "Rating Change"],
+        attributes: ["Learning Provider", "Content Categories"],
+        filters: ["Active Providers", "Min 100 Reviews", "Past 12 Months"],
         data: [
-          { name: "LinkedIn Learning", rate: 4.7, reviews: 1247, change: 0.3, trend: "up" },
-          { name: "Coursera", rate: 4.5, reviews: 2341, change: 0.2, trend: "up" },
-          { name: "Udemy", rate: 4.3, reviews: 1876, change: 0.1, trend: "up" },
-          { name: "SuccessFactors", rate: 4.2, reviews: 892, change: -0.1, trend: "down" },
-          { name: "Pluralsight", rate: 4.4, reviews: 743, change: 0.4, trend: "up" },
-          { name: "Internal Training", rate: 3.9, reviews: 567, change: 0.0, trend: "stable" }
+          { name: "LinkedIn Learning", rate: 4.73, reviews: 2847, change: 0.34, trend: "up", categories: 12, completions: 89.2 },
+          { name: "Pluralsight", rate: 4.68, reviews: 1934, change: 0.41, trend: "up", categories: 8, completions: 85.7 },
+          { name: "Coursera", rate: 4.52, reviews: 3421, change: 0.18, trend: "up", categories: 15, completions: 78.3 },
+          { name: "Udemy Business", rate: 4.31, reviews: 2156, change: 0.07, trend: "up", categories: 20, completions: 72.1 },
+          { name: "SuccessFactors", rate: 4.19, reviews: 1567, change: -0.08, trend: "down", categories: 6, completions: 76.8 },
+          { name: "Internal Training", rate: 3.94, reviews: 892, change: 0.03, trend: "stable", categories: 4, completions: 81.4 },
+          { name: "MindTools", rate: 3.87, reviews: 534, change: -0.12, trend: "down", categories: 3, completions: 69.3 }
         ],
         canModify: true,
         saveOptions: true
@@ -1137,18 +1144,36 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       );
     }
     
-    // Default vertical column chart  
+    // Default vertical column chart with hover tooltips
     return (
-      <div className="bg-white border rounded-lg p-4">
-        <div className="h-48 flex items-end justify-around gap-1">
+      <div className="bg-white border rounded-lg p-4 relative">
+        <div className="h-48 flex items-end justify-around gap-1 relative" id="chart-container">
           {viz.data.map((item, idx) => {
             let value = item.rate || item.gap || item.growth || item.engagement || item.learners/10 || item.value || 50;
             const height = Math.max((value / maxValue) * 160, 12);
             
             return (
-              <div key={idx} className="flex flex-col items-center flex-1 max-w-16">
+              <div 
+                key={idx} 
+                className="flex flex-col items-center flex-1 max-w-16 relative group"
+                onMouseEnter={(e) => {
+                  const tooltip = document.getElementById('tooltip');
+                  const tooltipContent = document.getElementById('tooltip-content');
+                  
+                  if (tooltip && tooltipContent) {
+                    tooltipContent.innerHTML = `<div class="font-semibold">${item.name}</div>
+                      <div>Completion Rate: ${item.rate || item.value || 0}%</div>
+                      <div>Details: ${item.completed || item.value || 'N/A'}</div>`;
+                    tooltip.style.opacity = '1';
+                  }
+                }}
+                onMouseLeave={() => {
+                  const tooltip = document.getElementById('tooltip');
+                  if (tooltip) tooltip.style.opacity = '0';
+                }}
+              >
                 <div 
-                  className="rounded-t-sm w-full mb-1 flex items-end justify-center text-xs text-white font-medium transition-all duration-300 hover:opacity-80 bg-gradient-to-r from-purple-500 to-purple-600"
+                  className="rounded-t-sm w-full mb-1 flex items-end justify-center text-xs text-white font-medium transition-all duration-300 hover:opacity-90 hover:scale-105 bg-gradient-to-r from-purple-500 to-purple-600 cursor-pointer"
                   style={{ height: `${height}px` }}
                 >
                   <span className="text-xs mb-1">{Math.round(value)}</span>
@@ -1159,6 +1184,11 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               </div>
             );
           })}
+        </div>
+        
+        {/* Tooltip */}
+        <div id="tooltip" className="absolute bg-gray-900 text-white text-xs rounded-lg px-3 py-2 pointer-events-none opacity-0 transition-opacity duration-200 z-10 min-w-48">
+          <div id="tooltip-content"></div>
         </div>
       </div>
     );
