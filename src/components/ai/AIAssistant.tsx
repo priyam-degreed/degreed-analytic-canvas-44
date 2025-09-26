@@ -1205,22 +1205,6 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                         fill={colors[idx % colors.length]}
                         className="hover:opacity-80 transition-opacity cursor-pointer"
                       />
-                      {/* Data labels */}
-                      {angle > 15 && ( // Only show labels for slices larger than 15 degrees
-                        <text
-                          x={labelX}
-                          y={labelY}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          className="text-xs font-medium fill-gray-700"
-                          transform={`rotate(${midAngle > 90 && midAngle < 270 ? midAngle + 180 : midAngle}, ${labelX}, ${labelY})`}
-                        >
-                          {(item.percentage || Math.round(percentage)).toFixed ? 
-                            (item.percentage || Math.round(percentage)).toFixed(1) + '%' : 
-                            Math.round(percentage) + '%'
-                          }
-                        </text>
-                      )}
                     </g>
                   );
                 })}
