@@ -381,17 +381,17 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     if (lowerQuery.includes("top") && lowerQuery.includes("skill") && lowerQuery.includes("month")) {
       return {
         id: `viz-${Date.now()}`,
-        type: "column",
-        title: "Top 5 Trending Skills - 6 Month Period",
-        metrics: ["Growth %", "New Learners"],
-        attributes: ["Skill Name", "Trend Period"],
-        filters: ["Past 6 months", "Trending Skills"],
+        type: "pie",
+        title: "Top Skills Distribution - 6 Month Analysis",
+        metrics: ["New Learner Count", "Growth Percentage", "Market Demand"],
+        attributes: ["Skill Category", "Trend Direction", "Industry Relevance"],
+        filters: ["Past 6 months", "Trending Skills", "Growth > 50%"],
         data: [
-          { name: "Generative AI", growth: 158, learners: 3247, trend: "up" },
-          { name: "Cloud Security", growth: 134, learners: 2891, trend: "up" },
-          { name: "DevOps", growth: 112, learners: 2543, trend: "up" },
-          { name: "Data Analytics", growth: 98, learners: 2134, trend: "up" },
-          { name: "Product Management", growth: 87, learners: 1876, trend: "up" }
+          { name: "Generative AI", value: 3247, percentage: 42.8, growth: 158, demandScore: 9.2 },
+          { name: "Cloud Security", value: 2109, percentage: 27.8, growth: 134, demandScore: 8.7 },
+          { name: "DevOps Tools", value: 1456, percentage: 19.2, growth: 112, demandScore: 8.3 },
+          { name: "Data Analytics", value: 567, percentage: 7.5, growth: 98, demandScore: 7.9 },
+          { name: "Product Strategy", value: 203, percentage: 2.7, growth: 87, demandScore: 7.2 }
         ],
         canModify: true,
         saveOptions: true
@@ -446,16 +446,16 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       return {
         id: `viz-${Date.now()}`,
         type: "pie",
-        title: "Learners Preparing for Leadership Roles",
-        metrics: ["Learner Count", "Progress %"],
-        attributes: ["Leadership Track", "Job Role"],
-        filters: ["Active Leadership Programs"],
+        title: "Leadership Development Distribution",
+        metrics: ["Learner Count", "Progress %", "Program Type"],
+        attributes: ["Leadership Track", "Job Role", "Seniority Level"],
+        filters: ["Active Leadership Programs", "All Departments"],
         data: [
-          { name: "Middle Management", value: 312, progress: 67 },
-          { name: "Team Lead Track", value: 189, progress: 78 },
-          { name: "Senior Leadership", value: 98, progress: 45 },
-          { name: "Executive Preparation", value: 47, progress: 34 },
-          { name: "Cross-Functional Lead", value: 134, progress: 72 }
+          { name: "Emerging Leaders", value: 428, percentage: 54.8, progress: 72, departments: 8 },
+          { name: "Team Leads", value: 189, percentage: 24.2, progress: 85, departments: 6 },
+          { name: "Senior Managers", value: 98, percentage: 12.5, progress: 63, departments: 5 },
+          { name: "Executive Track", value: 47, percentage: 6.0, progress: 41, departments: 3 },
+          { name: "Cross-Functional", value: 19, percentage: 2.4, progress: 89, departments: 4 }
         ],
         canModify: true,
         saveOptions: true
@@ -588,7 +588,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     }
     
     if (lowerQuery.includes("top") && lowerQuery.includes("skill") && lowerQuery.includes("month")) {
-      return "Analyzing trending skills over the past 6 months...\n\nHere's a column chart showing the Top 5 Trending Skills.\n\nKey insights:\n• Generative AI leads with 158% growth and 3,247 new learners\n• Cloud Security shows strong demand with 134% growth\n• DevOps continues upward trend with 112% growth\n• All top skills show consistent upward trajectory";
+      return "Analyzing trending skills over the past 6 months...\n\nHere's a pie chart showing the Top 5 Trending Skills Distribution.\n\nKey insights:\n• Generative AI dominates with 42.8% of new learners (3,247 people)\n• Cloud Security captures 27.8% market share (2,109 learners)\n• DevOps Tools growing rapidly at 19.2% (1,456 learners)\n• Data Analytics and Product Strategy round out top 5\n• Clear concentration in AI/Cloud technologies driving learning trends";
     }
     
     if (lowerQuery.includes("completion") && lowerQuery.includes("rate")) {
@@ -608,7 +608,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     }
     
     if (lowerQuery.includes("satisfaction") || (lowerQuery.includes("content") && lowerQuery.includes("score"))) {
-      return "Analyzing content satisfaction scores...\n\nHere's a column chart showing Content with Highest Satisfaction Scores.\n\nTop performing content:\n• AI Ethics Course leads with 4.8/5 rating (234 reviews)\n• Leadership Workshop maintains 4.7/5 score\n• All top content maintains 4.3+ satisfaction rating\n• Strong correlation between satisfaction and completion rates";
+      return "Analyzing content satisfaction score distribution...\n\nHere's a pie chart showing Content Satisfaction Score Distribution.\n\n**Performance breakdown:**\n• **Excellent content** (4.5-5.0 stars): 41.2% of all reviews (1,456 reviews)\n• **Good content** (4.0-4.4 stars): 33.6% distribution (1,187 reviews)\n• **Average content** (3.5-3.9 stars): 17.9% of content (634 reviews)\n• **Poor content** (<3.5 stars): Only 7.3% combined\n\n**Insight**: Over 74% of content achieves good to excellent satisfaction ratings, indicating strong content quality across the platform.";
     }
     
     return "I can help you analyze learning data, create visualizations, and provide insights about skills, content performance, and learner engagement. What specific aspect would you like to explore?";
@@ -1154,7 +1154,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       
       return (
         <div className="bg-white border rounded-lg p-4">
-          <div className="h-48 flex items-center justify-center">
+          <div className="h-48 flex items-center justify-center relative">
             <div className="relative w-40 h-40">
               <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
                 {viz.data.map((item, idx) => {
@@ -1178,13 +1178,36 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   
                   const colors = ["#8b5cf6", "#3b82f6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"];
                   
+                  // Calculate label position (outside the slice)
+                  const midAngle = (startAngle + endAngle) / 2;
+                  const labelRadius = 52; // Outside the pie
+                  const labelX = 50 + labelRadius * Math.cos((midAngle * Math.PI) / 180);
+                  const labelY = 50 + labelRadius * Math.sin((midAngle * Math.PI) / 180);
+                  
                   return (
-                    <path
-                      key={idx}
-                      d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`}
-                      fill={colors[idx % colors.length]}
-                      className="hover:opacity-80 transition-opacity"
-                    />
+                    <g key={idx}>
+                      <path
+                        d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`}
+                        fill={colors[idx % colors.length]}
+                        className="hover:opacity-80 transition-opacity cursor-pointer"
+                      />
+                      {/* Data labels */}
+                      {angle > 15 && ( // Only show labels for slices larger than 15 degrees
+                        <text
+                          x={labelX}
+                          y={labelY}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          className="text-xs font-medium fill-gray-700"
+                          transform={`rotate(${midAngle > 90 && midAngle < 270 ? midAngle + 180 : midAngle}, ${labelX}, ${labelY})`}
+                        >
+                          {(item.percentage || Math.round(percentage)).toFixed ? 
+                            (item.percentage || Math.round(percentage)).toFixed(1) + '%' : 
+                            Math.round(percentage) + '%'
+                          }
+                        </text>
+                      )}
+                    </g>
                   );
                 })}
               </svg>
@@ -1193,15 +1216,21 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
             {viz.data.map((item, idx) => {
               const colors = ["#8b5cf6", "#3b82f6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"];
+              const percentage = item.percentage || ((item.value || item.rate || item.growth || item.engagement || 50) / total * 100);
               return (
                 <div key={idx} className="flex items-center gap-2">
                   <div 
                     className="w-3 h-3 rounded-sm"
                     style={{ backgroundColor: colors[idx % colors.length] }}
                   />
-                  <span className="text-gray-600 truncate">
-                    {(item.name || item.month || `Item ${idx + 1}`).substring(0, 10)}
-                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-gray-600 truncate text-xs">
+                      {(item.name || item.month || `Item ${idx + 1}`)}
+                    </div>
+                    <div className="text-gray-500 text-xs">
+                      {typeof percentage === 'number' ? percentage.toFixed(1) : percentage}%
+                    </div>
+                  </div>
                 </div>
               );
             })}
