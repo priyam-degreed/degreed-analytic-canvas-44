@@ -318,17 +318,27 @@ export default function SkillInsights() {
                 <YAxis 
                   domain={['dataMin - 0.1', 'dataMax + 0.1']}
                   fontSize={12}
+                  tickFormatter={(value) => `${value}K`}
                 />
                 <Tooltip 
-                  formatter={(value: any) => [`${value}K`, 'Opportunities']}
+                  formatter={(value: any, name: string, props: any) => [
+                    props.payload.displayValue || `${value}K`, 
+                    'Opportunities'
+                  ]}
                   labelFormatter={(label: any) => `Month: ${label}`}
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--background))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="opportunities" 
                   stroke="hsl(var(--primary))" 
-                  strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                  strokeWidth={3}
+                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 5 }}
+                  activeDot={{ r: 7 }}
                 />
               </LineChart>
             </ResponsiveContainer>
