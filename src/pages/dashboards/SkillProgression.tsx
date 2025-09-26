@@ -375,7 +375,7 @@ export default function SkillProgression() {
       return (
         <div className="bg-background border border-border rounded-lg p-3 shadow-lg" style={{zIndex: 9999, position: 'relative'}}>
           <p className="font-semibold text-foreground mb-2">{label}</p>
-          {payload.map((entry: any, index: number) => (
+          {payload.filter((entry: any) => entry.name !== 'Target').map((entry: any, index: number) => (
             <div key={index} className="mb-1">
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm" style={{ color: entry.fill }}>
@@ -601,22 +601,22 @@ export default function SkillProgression() {
               <CardTitle>Skills vs Rating Type</CardTitle>
               <CardDescription>Comparison of ratings across Self, Peer, and Manager assessments with target levels</CardDescription>
             </div>
+            {highlightedBarData && (
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  Highlighted: {highlightedBarData.skill} - {highlightedBarData.ratingType} Rating
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setHighlightedBarData(null)}
+                  className="text-xs"
+                >
+                  Clear
+                </Button>
+              </div>
+            )}
           </div>
-          {highlightedBarData && (
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-xs">
-                Highlighted: {highlightedBarData.skill} - {highlightedBarData.ratingType} Rating
-              </Badge>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setHighlightedBarData(null)}
-                className="text-xs"
-              >
-                Clear
-              </Button>
-            </div>
-          )}
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
