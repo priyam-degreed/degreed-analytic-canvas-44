@@ -12,7 +12,7 @@ export function AIStickyIcon({ onClick, isOpen }: AIStickyIconProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 left-6 z-50">
       <Button
         onClick={onClick}
         onMouseEnter={() => setIsHovered(true)}
@@ -24,7 +24,7 @@ export function AIStickyIcon({ onClick, isOpen }: AIStickyIconProps) {
           isOpen && "rotate-180"
         )}
         size="lg"
-        style={{ position: 'fixed', bottom: '24px', right: '24px' }}
+        style={{ position: 'fixed', bottom: '24px', left: '24px' }}
       >
         <Sparkles className={cn(
           "h-8 w-8 text-white transition-transform duration-200",

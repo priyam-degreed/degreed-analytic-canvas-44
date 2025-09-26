@@ -3,8 +3,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { TopNavigation } from "./TopNavigation";
 import { AppSidebar } from "./AppSidebar";
 import { AIAssistant } from "@/components/ai/AIAssistant";
-import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { AIStickyIcon } from "@/components/ai/AIStickyIcon";
 import { cn } from "@/lib/utils";
 
 export function AppLayout() {
@@ -34,16 +33,11 @@ export function AppLayout() {
         </main>
       </div>
 
-      {/* Create with AI Button */}
-      <div className="fixed bottom-6 left-6 z-50">
-        <Button
-          onClick={() => setAiChatOpen(!aiChatOpen)}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg px-4 py-3 rounded-lg text-sm font-medium"
-        >
-          <Sparkles className="h-4 w-4 mr-2" />
-          Create with AI
-        </Button>
-      </div>
+      {/* AI Sticky Icon */}
+      <AIStickyIcon 
+        onClick={() => setAiChatOpen(!aiChatOpen)}
+        isOpen={aiChatOpen}
+      />
       
       {/* AI Assistant Modal */}
       <AIAssistant 
