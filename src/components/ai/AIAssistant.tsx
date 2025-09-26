@@ -1305,15 +1305,6 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   variant="outline" 
                   size="sm" 
                   className="text-xs h-7"
-                  onClick={() => handleChartTypeSwitch(message.id, "heatmap")}
-                >
-                  <Activity className="h-3 w-3 mr-1" />
-                  Heatmap
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs h-7"
                   onClick={() => handleChartTypeSwitch(message.id, "table")}
                 >
                   <Filter className="h-3 w-3 mr-1" />
@@ -1340,21 +1331,6 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 >
                   <TrendingUp className="h-3 w-3 mr-1" />
                   Show trend
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs h-7"
-                  onClick={() => {
-                    toast({
-                      title: "Filter Applied", 
-                      description: "Filtering to Region = APAC, Provider = Top 3",
-                      duration: 3000
-                    });
-                  }}
-                >
-                  <Filter className="h-3 w-3 mr-1" />
-                  Add filters
                 </Button>
               </div>
             </div>
