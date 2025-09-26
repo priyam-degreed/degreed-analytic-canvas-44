@@ -17,7 +17,9 @@ import {
   skillOpportunitiesData, 
   getMostNeededSkillsData, 
   getSkillTrendData, 
-  getTotalOpportunities 
+  getTotalOpportunities,
+  getSkillsInRolesData,
+  getTotalRoleSkillsCount
 } from '@/data/skillOpportunitiesData';
 import { useMemo } from 'react';
 import { useSkillMetrics, useTopSkillsGained } from "@/hooks/useSkillMetrics";
@@ -173,6 +175,19 @@ export default function SkillInsights() {
   const totalOpportunities = useMemo(() => {
     const total = getTotalOpportunities(filteredOpportunitiesData);
     console.log('🎯 Total opportunities:', total);
+    return total;
+  }, [filteredOpportunitiesData]);
+
+  // Skills in roles chart data
+  const skillsInRolesData = useMemo(() => {
+    const data = getSkillsInRolesData(filteredOpportunitiesData);
+    console.log('👥 Skills in roles data:', data);
+    return data;
+  }, [filteredOpportunitiesData]);
+
+  const totalRoleSkillsCount = useMemo(() => {
+    const total = getTotalRoleSkillsCount(filteredOpportunitiesData);
+    console.log('📊 Total role skills count:', total);
     return total;
   }, [filteredOpportunitiesData]);
 
@@ -351,6 +366,55 @@ export default function SkillInsights() {
           </div>
         </ChartCard>
       </div>
+
+      {/* Skills in Roles Chart */}
+      <ChartCard
+        title="Skills that Appear in the Most Roles"
+        subtitle="Sep 2025"
+      >
+        <div className="space-y-4">
+          <ResponsiveContainer width="100%" height={500}>
+            <BarChart
+              data={skillsInRolesData}
+              margin={{ top: 20, right: 80, left: 150, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                type="number"
+                domain={[0, 'dataMax + 50']}
+                fontSize={12}
+              />
+              <YAxis 
+                dataKey="skill" 
+                type="category" 
+                width={150}
+                fontSize={12}
+              />
+              <Tooltip 
+                formatter={(value: any) => [value, 'Role Count']}
+                labelFormatter={(label: any) => `${label}`}
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+              />
+              <Bar 
+                dataKey="roleCount" 
+                fill="hsl(var(--primary))"
+                radius={[0, 4, 4, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-primary"></div>
+              <span className="text-sm font-medium">Role Skills Count</span>
+            </div>
+            <span className="text-2xl font-bold text-primary">{totalRoleSkillsCount}</span>
+          </div>
+        </div>
+      </ChartCard>
 
       {/* Critical Skill Gaps */}
       <ChartCard
