@@ -554,21 +554,74 @@ export default function LearningEngagement() {
 
         <ChartCard title="Learning Provider Usage Trends" subtitle="Which providers are gaining momentum">
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={[
-              { provider: 'Coursera', currentPeriod: 847, previousPeriod: 623, growth: 36 },
-              { provider: 'LinkedIn Learning', currentPeriod: 693, previousPeriod: 578, growth: 20 },
-              { provider: 'Internal Training', currentPeriod: 521, previousPeriod: 445, growth: 17 },
-              { provider: 'Udemy Business', currentPeriod: 432, previousPeriod: 398, growth: 9 },
-              { provider: 'Pluralsight', currentPeriod: 287, previousPeriod: 234, growth: 23 }
-            ]}>
+            <BarChart data={(() => {
+              // Calculate provider usage trends from filtered data
+              const currentPeriodData: Record<string, number> = {};
+              const previousPeriodData: Record<string, number> = {};
+              
+              // Current period data from filtered results
+              filteredLearningData.forEach(item => {
+                const provider = item.provider || 'Unknown';
+                if (!currentPeriodData[provider]) {
+                  currentPeriodData[provider] = 0;
+                }
+                currentPeriodData[provider] += item.completions;
+              });
+              
+              // Previous period data (simulate previous period by using different date range)
+              comprehensiveLearningData
+                .filter(item => {
+                  const itemDate = new Date(item.date);
+                  const sixMonthsAgo = new Date();
+                  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 12);
+                  const twelveMonthsAgo = new Date();
+                  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 18);
+                  return itemDate >= twelveMonthsAgo && itemDate < sixMonthsAgo;
+                })
+                .forEach(item => {
+                  const provider = item.provider || 'Unknown';
+                  if (!previousPeriodData[provider]) {
+                    previousPeriodData[provider] = 0;
+                  }
+                  previousPeriodData[provider] += item.completions;
+                });
+              
+              // Combine and calculate growth
+              const allProviders = new Set([...Object.keys(currentPeriodData), ...Object.keys(previousPeriodData)]);
+              
+              return Array.from(allProviders)
+                .map(provider => {
+                  const current = currentPeriodData[provider] || 0;
+                  const previous = previousPeriodData[provider] || 0;
+                  const growth = previous > 0 ? Math.round(((current - previous) / previous) * 100) : 0;
+                  
+                  return {
+                    provider,
+                    currentPeriod: current,
+                    previousPeriod: previous,
+                    growth
+                  };
+                })
+                .filter(item => item.currentPeriod > 0 || item.previousPeriod > 0)
+                .sort((a, b) => b.currentPeriod - a.currentPeriod)
+                .slice(0, 10); // Show top 10 providers
+            })()}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="provider" angle={-45} textAnchor="end" height={80} />
               <YAxis />
-              <Tooltip contentStyle={{
-                backgroundColor: 'hsl(var(--popover))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px'
-              }} />
+              <Tooltip 
+                formatter={(value: any, name: string) => {
+                  if (name === 'Current Period' || name === 'Previous Period') {
+                    return [`${value} completions`, name];
+                  }
+                  return [value, name];
+                }}
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--popover))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }} 
+              />
               <Bar dataKey="currentPeriod" fill="hsl(var(--primary))" name="Current Period" />
               <Bar dataKey="previousPeriod" fill="hsl(var(--muted))" name="Previous Period" />
             </BarChart>
