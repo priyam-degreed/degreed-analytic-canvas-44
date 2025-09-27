@@ -456,74 +456,74 @@ export default function LearningEngagement() {
         </div>
       </ChartCard>
 
-      {/* Learning Completions by Provider */}
-      <ChartCard
-        title="Learning Completions (In Period) by Item & Provider"
-        subtitle="Q3 2025"
-      >
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Pie Chart */}
-          <div className="flex-1">
-            <ResponsiveContainer width="100%" height={400}>
-              <PieChart>
-                <Pie
-                  data={Object.entries(
-                    filteredLearningData.reduce((acc: Record<string, number>, item) => {
-                      const provider = item.provider || 'Unknown';
-                      if (!acc[provider]) {
-                        acc[provider] = 0;
-                      }
-                      acc[provider] += item.completions;
-                      return acc;
-                    }, {})
-                  ).map(([provider, completions], index) => ({
-                    name: provider,
-                    value: completions as number,
-                    fill: COLORS[index % COLORS.length]
-                  })).sort((a, b) => b.value - a.value)}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}\n${value}`}
-                  outerRadius={120}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {Object.entries(
-                    filteredLearningData.reduce((acc: Record<string, number>, item) => {
-                      const provider = item.provider || 'Unknown';
-                      if (!acc[provider]) {
-                        acc[provider] = 0;
-                      }
-                      acc[provider] += item.completions;
-                      return acc;
-                    }, {})
-                  ).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--popover))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '6px'
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            
-            {/* Total Count */}
-            <div className="mt-4 text-left">
-              <div className="text-sm text-muted-foreground">Learning Completions (in Period)</div>
-              <div className="text-4xl font-bold">
-                {filteredLearningData.reduce((sum, item) => sum + item.completions, 0)}
+      {/* Learning Completions by Provider & Provider Usage Trends */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard
+          title="Learning Completions (In Period) by Item & Provider"
+          subtitle="Q3 2025"
+        >
+          <div className="flex flex-col gap-6">
+            {/* Pie Chart */}
+            <div className="flex-1">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={Object.entries(
+                      filteredLearningData.reduce((acc: Record<string, number>, item) => {
+                        const provider = item.provider || 'Unknown';
+                        if (!acc[provider]) {
+                          acc[provider] = 0;
+                        }
+                        acc[provider] += item.completions;
+                        return acc;
+                      }, {})
+                    ).map(([provider, completions], index) => ({
+                      name: provider,
+                      value: completions as number,
+                      fill: COLORS[index % COLORS.length]
+                    })).sort((a, b) => b.value - a.value)}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}\n${value}`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {Object.entries(
+                      filteredLearningData.reduce((acc: Record<string, number>, item) => {
+                        const provider = item.provider || 'Unknown';
+                        if (!acc[provider]) {
+                          acc[provider] = 0;
+                        }
+                        acc[provider] += item.completions;
+                        return acc;
+                      }, {})
+                    ).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--popover))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '6px'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              
+              {/* Total Count */}
+              <div className="mt-4 text-center">
+                <div className="text-sm text-muted-foreground">Learning Completions (in Period)</div>
+                <div className="text-3xl font-bold">
+                  {filteredLearningData.reduce((sum, item) => sum + item.completions, 0)}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Legend */}
-          <div className="lg:w-64">
-            <div className="space-y-2">
+            {/* Legend */}
+            <div className="space-y-2 max-h-40 overflow-y-auto">
               {Object.entries(
                 filteredLearningData.reduce((acc: Record<string, number>, item) => {
                   const provider = item.provider || 'Unknown';
@@ -542,14 +542,37 @@ export default function LearningEngagement() {
                     className="w-3 h-3 rounded-full flex-shrink-0" 
                     style={{ backgroundColor: COLORS[index % COLORS.length] }}
                   />
-                  <span className="text-sm font-medium flex-1">{provider}</span>
+                  <span className="text-sm font-medium flex-1 truncate">{provider}</span>
                   <span className="text-sm text-muted-foreground">{completions}</span>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </ChartCard>
+        </ChartCard>
+
+        <ChartCard title="Learning Provider Usage Trends" subtitle="Which providers are gaining momentum">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={[
+              { provider: 'Coursera', currentPeriod: 847, previousPeriod: 623, growth: 36 },
+              { provider: 'LinkedIn Learning', currentPeriod: 693, previousPeriod: 578, growth: 20 },
+              { provider: 'Internal Training', currentPeriod: 521, previousPeriod: 445, growth: 17 },
+              { provider: 'Udemy Business', currentPeriod: 432, previousPeriod: 398, growth: 9 },
+              { provider: 'Pluralsight', currentPeriod: 287, previousPeriod: 234, growth: 23 }
+            ]}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="provider" angle={-45} textAnchor="end" height={80} />
+              <YAxis />
+              <Tooltip contentStyle={{
+                backgroundColor: 'hsl(var(--popover))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '6px'
+              }} />
+              <Bar dataKey="currentPeriod" fill="hsl(var(--primary))" name="Current Period" />
+              <Bar dataKey="previousPeriod" fill="hsl(var(--muted))" name="Previous Period" />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
 
       {/* Trend of Learning Activities vs Average Ratings */}
       <ChartCard
@@ -906,30 +929,6 @@ export default function LearningEngagement() {
 
       {/* New Analysis Charts to Answer All Questions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* Provider Usage Comparison */}
-        <ChartCard title="Learning Provider Usage Trends" subtitle="Which providers are gaining momentum">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={[
-              { provider: 'Coursera', currentPeriod: 847, previousPeriod: 623, growth: 36 },
-              { provider: 'LinkedIn Learning', currentPeriod: 693, previousPeriod: 578, growth: 20 },
-              { provider: 'Internal Training', currentPeriod: 521, previousPeriod: 445, growth: 17 },
-              { provider: 'Udemy Business', currentPeriod: 432, previousPeriod: 398, growth: 9 },
-              { provider: 'Pluralsight', currentPeriod: 287, previousPeriod: 234, growth: 23 }
-            ]}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="provider" angle={-45} textAnchor="end" height={80} />
-              <YAxis />
-              <Tooltip contentStyle={{
-                backgroundColor: 'hsl(var(--popover))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px'
-              }} />
-              <Bar dataKey="currentPeriod" fill="hsl(var(--primary))" name="Current Period" />
-              <Bar dataKey="previousPeriod" fill="hsl(var(--muted))" name="Previous Period" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
 
         {/* Learning Time by Skill Categories */}
         <ChartCard title="Learning Time by Skill Categories" subtitle="How participants spend time on different skills">
