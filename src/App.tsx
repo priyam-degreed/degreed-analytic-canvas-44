@@ -19,7 +19,6 @@ import SkillInsights from "./pages/dashboards/SkillInsights";
 import SkillProgression from "./pages/dashboards/SkillProgression";
 import ContentPerformance from "./pages/dashboards/ContentPerformance";
 import CareerDevelopment from "./pages/dashboards/CareerDevelopment";
-import DrillDownPaths from "./pages/dashboards/DrillDownPaths";
 import EngagementOverviewDashboard from "./pages/dashboards/EngagementOverviewDashboard";
 import DashboardBuilder from "./pages/DashboardBuilder";
 import NotFound from "./pages/NotFound";
@@ -52,7 +51,6 @@ const App = () => (
             <Route path="dashboards/skill-progression" element={<SkillProgression />} />
             <Route path="dashboards/content-performance" element={<ContentPerformance />} />
             <Route path="dashboards/career-development" element={<CareerDevelopment />} />
-            <Route path="dashboards/drill-down" element={<DrillDownPaths />} />
             <Route path="dashboards/engagement-overview" element={<EngagementOverviewDashboard />} />
             {/* Dashboard Builder Routes */}
             <Route path="dashboard-builder" element={<DashboardBuilder mode="create" />} />

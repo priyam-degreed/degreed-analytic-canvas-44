@@ -47,9 +47,8 @@ const adminDashboards: Dashboard[] = [
   { id: "01", name: "Learning Dashboard", path: "/dashboards/learning-engagement" },
   { id: "02", name: "Skills Dashboard", path: "/dashboards/skill-insights" },
   { id: "03", name: "Skill Progression", path: "/dashboards/skill-progression" },
-  { id: "04", name: "Drill Down Paths", path: "/dashboards/drill-down" },
-  { id: "05", name: "Content Performance", path: "/dashboards/content-performance" },
-  { id: "06", name: "Engagement Overview", path: "/dashboards/engagement-overview" }
+  { id: "04", name: "Content Performance", path: "/dashboards/content-performance" },
+  { id: "05", name: "Engagement Overview", path: "/dashboards/engagement-overview" }
 ];
 
 // Manager dashboards (limited scope with realistic data)
