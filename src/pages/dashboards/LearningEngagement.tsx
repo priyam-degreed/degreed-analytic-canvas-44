@@ -462,7 +462,7 @@ export default function LearningEngagement() {
           title="Learning Completions (In Period) by Item & Provider"
           subtitle="Q3 2025"
         >
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col lg:flex-row gap-6">
             {/* Pie Chart */}
             <div className="flex-1">
               <ResponsiveContainer width="100%" height={300}>
@@ -484,9 +484,7 @@ export default function LearningEngagement() {
                     })).sort((a, b) => b.value - a.value)}
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name}\n${value}`}
-                    outerRadius={80}
+                    outerRadius={120}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -504,6 +502,7 @@ export default function LearningEngagement() {
                     ))}
                   </Pie>
                   <Tooltip 
+                    formatter={(value, name) => [`${value} completions`, name]}
                     contentStyle={{
                       backgroundColor: 'hsl(var(--popover))',
                       border: '1px solid hsl(var(--border))',
@@ -522,30 +521,33 @@ export default function LearningEngagement() {
               </div>
             </div>
 
-            {/* Legend */}
-            <div className="space-y-2 max-h-40 overflow-y-auto">
-              {Object.entries(
-                filteredLearningData.reduce((acc: Record<string, number>, item) => {
-                  const provider = item.provider || 'Unknown';
-                  if (!acc[provider]) {
-                    acc[provider] = 0;
-                  }
-                  acc[provider] += item.completions;
-                  return acc;
-                }, {})
-              )
-              .map(([provider, completions], index) => ({ provider, completions: completions as number, index }))
-              .sort((a, b) => b.completions - a.completions)
-              .map(({ provider, completions, index }) => (
-                <div key={provider} className="flex items-center gap-3">
-                  <div 
-                    className="w-3 h-3 rounded-full flex-shrink-0" 
-                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                  />
-                  <span className="text-sm font-medium flex-1 truncate">{provider}</span>
-                  <span className="text-sm text-muted-foreground">{completions}</span>
-                </div>
-              ))}
+            {/* Legend on the right side */}
+            <div className="lg:w-64 space-y-2">
+              <h4 className="text-sm font-semibold text-muted-foreground mb-3">Providers</h4>
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {Object.entries(
+                  filteredLearningData.reduce((acc: Record<string, number>, item) => {
+                    const provider = item.provider || 'Unknown';
+                    if (!acc[provider]) {
+                      acc[provider] = 0;
+                    }
+                    acc[provider] += item.completions;
+                    return acc;
+                  }, {})
+                )
+                .map(([provider, completions], index) => ({ provider, completions: completions as number, index }))
+                .sort((a, b) => b.completions - a.completions)
+                .map(({ provider, completions, index }) => (
+                  <div key={provider} className="flex items-center gap-3">
+                    <div 
+                      className="w-3 h-3 rounded-full flex-shrink-0" 
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    />
+                    <span className="text-sm font-medium flex-1 truncate">{provider}</span>
+                    <span className="text-sm text-muted-foreground">{completions}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </ChartCard>
