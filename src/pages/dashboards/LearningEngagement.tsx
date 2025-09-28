@@ -1165,56 +1165,176 @@ export default function LearningEngagement() {
         {/* Internal vs External Learning Adoption */}
         <ChartCard title="Internal vs External Learning Adoption" subtitle="Learning source preference trends">
           <div className="space-y-6">
-            {/* Current Period Comparison */}
+            {/* Visual Comparison with Icons */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="text-center">
-                <div className="text-sm text-muted-foreground mb-2">External Learning</div>
-                <div className="text-3xl font-bold text-blue-600">68%</div>
-                <div className="text-sm text-muted-foreground">4,234 completions</div>
+              <div className="relative p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800 hover-scale">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-blue-500 rounded-lg text-white">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+                    </svg>
+                  </div>
+                  <div className="text-sm bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full">
+                    ↗ +5% vs last quarter
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-blue-700 dark:text-blue-300">External Learning</div>
+                  <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">68%</div>
+                  <div className="text-sm text-blue-600/70 dark:text-blue-400/70">4,234 completions</div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-full bg-blue-200 dark:bg-blue-800/30 rounded-full h-2 mt-3">
+                    <div className="bg-blue-500 h-2 rounded-full animate-fade-in" style={{ width: '68%' }}></div>
+                  </div>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-sm text-muted-foreground mb-2">Internal Learning</div>
-                <div className="text-3xl font-bold text-green-600">32%</div>
-                <div className="text-sm text-muted-foreground">1,987 completions</div>
+
+              <div className="relative p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/20 rounded-xl border border-green-200 dark:border-green-800 hover-scale">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-green-500 rounded-lg text-white">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div className="text-sm bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 px-2 py-1 rounded-full">
+                    ↘ -3% vs last quarter
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-green-700 dark:text-green-300">Internal Learning</div>
+                  <div className="text-4xl font-bold text-green-600 dark:text-green-400">32%</div>
+                  <div className="text-sm text-green-600/70 dark:text-green-400/70">1,987 completions</div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-full bg-green-200 dark:bg-green-800/30 rounded-full h-2 mt-3">
+                    <div className="bg-green-500 h-2 rounded-full animate-fade-in" style={{ width: '32%' }}></div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Trend Chart */}
-            <ResponsiveContainer width="100%" height={200}>
-              <AreaChart data={[
-                { month: 'Jan', external: 65, internal: 35 },
-                { month: 'Feb', external: 67, internal: 33 },
-                { month: 'Mar', external: 66, internal: 34 },
-                { month: 'Apr', external: 69, internal: 31 },
-                { month: 'May', external: 70, internal: 30 },
-                { month: 'Jun', external: 68, internal: 32 },
-                { month: 'Jul', external: 67, internal: 33 },
-                { month: 'Aug', external: 68, internal: 32 }
-              ]}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip 
-                  formatter={(value, name) => [`${value}%`, name === 'external' ? 'External Learning' : 'Internal Learning']}
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--popover))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '6px'
-                  }}
-                />
-                <Area type="monotone" dataKey="external" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" />
-                <Area type="monotone" dataKey="internal" stackId="1" stroke="hsl(var(--secondary))" fill="hsl(var(--secondary))" />
-              </AreaChart>
-            </ResponsiveContainer>
-            
-            <div className="flex justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-primary"></div>
-                <span>External Learning (68%)</span>
+            {/* Key Insights */}
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
+                  <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="font-medium text-amber-800 dark:text-amber-200 mb-1">Key Insight</div>
+                  <div className="text-sm text-amber-700 dark:text-amber-300">
+                    External learning adoption is increasing, suggesting employees prefer diverse, external content sources. 
+                    Consider expanding partnerships with top-rated external providers.
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-secondary"></div>
-                <span>Internal Learning (32%)</span>
+            </div>
+
+            {/* Trend Chart with Enhanced Styling */}
+            <div className="space-y-4">
+              <div className="text-lg font-semibold text-foreground">Adoption Trends Over Time</div>
+              <ResponsiveContainer width="100%" height={220}>
+                <AreaChart data={[
+                  { month: 'Jan', external: 65, internal: 35, externalUsers: 3800, internalUsers: 2100 },
+                  { month: 'Feb', external: 67, internal: 33, externalUsers: 3920, internalUsers: 1950 },
+                  { month: 'Mar', external: 66, internal: 34, externalUsers: 3850, internalUsers: 2000 },
+                  { month: 'Apr', external: 69, internal: 31, externalUsers: 4100, internalUsers: 1850 },
+                  { month: 'May', external: 70, internal: 30, externalUsers: 4200, internalUsers: 1800 },
+                  { month: 'Jun', external: 68, internal: 32, externalUsers: 4050, internalUsers: 1900 },
+                  { month: 'Jul', external: 67, internal: 33, externalUsers: 3980, internalUsers: 1950 },
+                  { month: 'Aug', external: 68, internal: 32, externalUsers: 4234, internalUsers: 1987 }
+                ]}>
+                  <defs>
+                    <linearGradient id="externalGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                    </linearGradient>
+                    <linearGradient id="internalGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--secondary))" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="hsl(var(--secondary))" stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
+                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                  <YAxis domain={[0, 100]} stroke="hsl(var(--muted-foreground))" />
+                  <Tooltip 
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-popover p-4 border border-border rounded-lg shadow-lg">
+                            <p className="font-semibold text-popover-foreground mb-2">{label} 2024</p>
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-3 h-3 rounded-full bg-primary"></div>
+                                  <span className="text-sm">External Learning</span>
+                                </div>
+                                <div className="text-right">
+                                  <div className="font-medium">{data.external}%</div>
+                                  <div className="text-xs text-muted-foreground">{data.externalUsers.toLocaleString()} users</div>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-3 h-3 rounded-full bg-secondary"></div>
+                                  <span className="text-sm">Internal Learning</span>
+                                </div>
+                                <div className="text-right">
+                                  <div className="font-medium">{data.internal}%</div>
+                                  <div className="text-xs text-muted-foreground">{data.internalUsers.toLocaleString()} users</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="external" 
+                    stackId="1" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={2}
+                    fill="url(#externalGradient)" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="internal" 
+                    stackId="1" 
+                    stroke="hsl(var(--secondary))" 
+                    strokeWidth={2}
+                    fill="url(#internalGradient)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            
+            {/* Enhanced Legend with Statistics */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-primary animate-pulse"></div>
+                  <span className="font-medium">External Learning</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-primary">68%</div>
+                  <div className="text-xs text-muted-foreground">Trending up</div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg border border-secondary/20">
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-secondary animate-pulse"></div>
+                  <span className="font-medium">Internal Learning</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-secondary">32%</div>
+                  <div className="text-xs text-muted-foreground">Stable</div>
+                </div>
               </div>
             </div>
           </div>
