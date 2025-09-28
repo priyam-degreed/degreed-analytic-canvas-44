@@ -991,14 +991,44 @@ export default function LearningEngagement() {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={[
-                  { name: 'Technical Skills', value: 445, hours: '445h' },
-                  { name: 'Leadership', value: 287, hours: '287h' },
-                  { name: 'Communication', value: 234, hours: '234h' },
-                  { name: 'Project Management', value: 198, hours: '198h' },
-                  { name: 'Data Analysis', value: 176, hours: '176h' },
-                  { name: 'Other', value: 123, hours: '123h' }
-                ]}
+                data={(() => {
+                  // Calculate skill category hours from filtered data
+                  const skillCategories: Record<string, number> = {};
+                  
+                  filteredLearningData.forEach(item => {
+                    if (item.skills && Array.isArray(item.skills)) {
+                      item.skills.forEach(skill => {
+                        // Categorize skills
+                        let category = 'Other';
+                        if (['Python Programming', 'Java', 'Cloud Computing', 'Machine Learning', 'Data Analytics', 'Big Data Analysis', 'Business Intelligence'].includes(skill)) {
+                          category = 'Technical Skills';
+                        } else if (['Leadership', 'Innovation'].includes(skill)) {
+                          category = 'Leadership';
+                        } else if (['Project Management'].includes(skill)) {
+                          category = 'Project Management';
+                        } else if (['Data Visualization', 'Data Analytics'].includes(skill)) {
+                          category = 'Data Analysis';
+                        } else if (['Business Analysis'].includes(skill)) {
+                          category = 'Communication';
+                        }
+                        
+                        if (!skillCategories[category]) {
+                          skillCategories[category] = 0;
+                        }
+                        skillCategories[category] += item.hours || 0;
+                      });
+                    }
+                  });
+                  
+                  return Object.entries(skillCategories)
+                    .map(([name, value]) => ({
+                      name,
+                      value,
+                      hours: `${Math.round(value)}h`
+                    }))
+                    .sort((a, b) => b.value - a.value)
+                    .slice(0, 6); // Show top 6 categories
+                })()}
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
@@ -1018,16 +1048,32 @@ export default function LearningEngagement() {
         {/* Learning Satisfaction Trends */}
         <ChartCard title="Learning Satisfaction Over Time" subtitle="Participant satisfaction ratings">
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={[
-              { month: 'Jan', satisfaction: 86, responses: 234 },
-              { month: 'Feb', satisfaction: 87, responses: 267 },
-              { month: 'Mar', satisfaction: 85, responses: 289 },
-              { month: 'Apr', satisfaction: 88, responses: 312 },
-              { month: 'May', satisfaction: 89, responses: 345 },
-              { month: 'Jun', satisfaction: 91, responses: 378 },
-              { month: 'Jul', satisfaction: 89, responses: 398 },
-              { month: 'Aug', satisfaction: 92, responses: 423 }
-            ]}>
+            <LineChart data={(() => {
+              // Calculate satisfaction trends from filtered data by month
+              const satisfactionByMonth: Record<string, { satisfaction: number, responses: number, count: number }> = {};
+              
+              filteredLearningData.forEach(item => {
+                const month = new Date(item.date).toLocaleDateString('en-US', { month: 'short' });
+                if (!satisfactionByMonth[month]) {
+                  satisfactionByMonth[month] = { satisfaction: 0, responses: 0, count: 0 };
+                }
+                
+                satisfactionByMonth[month].satisfaction += (item.avgRating || 4.2) * 20; // Convert 1-5 to percentage
+                satisfactionByMonth[month].responses += item.learners || 0;
+                satisfactionByMonth[month].count += 1;
+              });
+              
+              return Object.entries(satisfactionByMonth)
+                .map(([month, data]) => ({
+                  month,
+                  satisfaction: Math.round(data.satisfaction / data.count),
+                  responses: data.responses
+                }))
+                .sort((a, b) => {
+                  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  return months.indexOf(a.month) - months.indexOf(b.month);
+                });
+            })()}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis domain={[80, 95]} />
@@ -1050,16 +1096,33 @@ export default function LearningEngagement() {
         {/* Assignment vs Completion Tracking */}
         <ChartCard title="Learning Assignments vs Completions" subtitle="Assignment effectiveness tracking">
           <ResponsiveContainer width="100%" height={300}>
-            <ComposedChart data={[
-              { month: 'Jan', assigned: 1200, completed: 847, rate: 71 },
-              { month: 'Feb', assigned: 1350, completed: 956, rate: 71 },
-              { month: 'Mar', assigned: 1180, completed: 874, rate: 74 },
-              { month: 'Apr', assigned: 1420, completed: 1087, rate: 77 },
-              { month: 'May', assigned: 1560, completed: 1234, rate: 79 },
-              { month: 'Jun', assigned: 1380, completed: 1156, rate: 84 },
-              { month: 'Jul', assigned: 1650, completed: 1378, rate: 84 },
-              { month: 'Aug', assigned: 1720, completed: 1487, rate: 86 }
-            ]}>
+            <ComposedChart data={(() => {
+              // Calculate assignments vs completions from filtered data
+              const assignmentsByMonth: Record<string, { assigned: number, completed: number }> = {};
+              
+              filteredLearningData.forEach(item => {
+                const month = new Date(item.date).toLocaleDateString('en-US', { month: 'short' });
+                if (!assignmentsByMonth[month]) {
+                  assignmentsByMonth[month] = { assigned: 0, completed: 0 };
+                }
+                
+                // Estimate assignments as learners * average assignments per learner (1.5x)
+                assignmentsByMonth[month].assigned += Math.round((item.learners || 0) * 1.5);
+                assignmentsByMonth[month].completed += item.completions || 0;
+              });
+              
+              return Object.entries(assignmentsByMonth)
+                .map(([month, data]) => ({
+                  month,
+                  assigned: data.assigned,
+                  completed: data.completed,
+                  rate: data.assigned > 0 ? Math.round((data.completed / data.assigned) * 100) : 0
+                }))
+                .sort((a, b) => {
+                  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  return months.indexOf(a.month) - months.indexOf(b.month);
+                });
+            })()}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis yAxisId="left" />
@@ -1120,14 +1183,32 @@ export default function LearningEngagement() {
         {/* Provider Satisfaction Analysis */}
         <ChartCard title="Learning Provider Satisfaction Ratings" subtitle="Which provider has the highest user satisfaction?">
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={[
-              { provider: 'LinkedIn Learning', satisfaction: 92, users: 1234, avgRating: 4.6 },
-              { provider: 'Coursera', satisfaction: 89, users: 987, avgRating: 4.5 },
-              { provider: 'Udemy', satisfaction: 87, users: 856, avgRating: 4.4 },
-              { provider: 'Internal LMS', satisfaction: 84, users: 1567, avgRating: 4.2 },
-              { provider: 'Pluralsight', satisfaction: 91, users: 678, avgRating: 4.6 },
-              { provider: 'edX', satisfaction: 88, users: 445, avgRating: 4.4 }
-            ].sort((a, b) => b.satisfaction - a.satisfaction)}>
+            <BarChart data={(() => {
+              // Calculate provider satisfaction from filtered data
+              const providerStats: Record<string, { satisfaction: number, users: number, avgRating: number, count: number }> = {};
+              
+              filteredLearningData.forEach(item => {
+                const provider = item.provider || 'Unknown';
+                if (!providerStats[provider]) {
+                  providerStats[provider] = { satisfaction: 0, users: 0, avgRating: 0, count: 0 };
+                }
+                
+                providerStats[provider].satisfaction += (item.engagementRate || 75);
+                providerStats[provider].users += item.learners || 0;
+                providerStats[provider].avgRating += item.avgRating || 4.2;
+                providerStats[provider].count += 1;
+              });
+              
+              return Object.entries(providerStats)
+                .map(([provider, stats]) => ({
+                  provider,
+                  satisfaction: Math.round(stats.satisfaction / stats.count),
+                  users: stats.users,
+                  avgRating: +(stats.avgRating / stats.count).toFixed(1)
+                }))
+                .filter(item => item.users > 0)
+                .sort((a, b) => b.satisfaction - a.satisfaction);
+            })()}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="provider" angle={-45} textAnchor="end" height={80} />
               <YAxis domain={[75, 95]} />
@@ -1499,16 +1580,42 @@ export default function LearningEngagement() {
           <div className="space-y-4">
             <div className="text-lg font-semibold text-foreground">Adoption Trends Over Time</div>
             <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={[
-                { month: 'Jan', external: 65, internal: 35, externalUsers: 3800, internalUsers: 2100 },
-                { month: 'Feb', external: 67, internal: 33, externalUsers: 3920, internalUsers: 1950 },
-                { month: 'Mar', external: 66, internal: 34, externalUsers: 3850, internalUsers: 2000 },
-                { month: 'Apr', external: 69, internal: 31, externalUsers: 4100, internalUsers: 1850 },
-                { month: 'May', external: 70, internal: 30, externalUsers: 4200, internalUsers: 1800 },
-                { month: 'Jun', external: 68, internal: 32, externalUsers: 4050, internalUsers: 1900 },
-                { month: 'Jul', external: 67, internal: 33, externalUsers: 3980, internalUsers: 1950 },
-                { month: 'Aug', external: 68, internal: 32, externalUsers: 4234, internalUsers: 1987 }
-              ]}>
+              <AreaChart data={(() => {
+                // Calculate internal vs external learning from filtered data
+                const adoptionByMonth: Record<string, { external: number, internal: number, externalUsers: number, internalUsers: number }> = {};
+                
+                filteredLearningData.forEach(item => {
+                  const month = new Date(item.date).toLocaleDateString('en-US', { month: 'short' });
+                  if (!adoptionByMonth[month]) {
+                    adoptionByMonth[month] = { external: 0, internal: 0, externalUsers: 0, internalUsers: 0 };
+                  }
+                  
+                  // Classify providers as internal vs external
+                  const isInternal = ['Internal LMS', 'Academy'].includes(item.provider || '');
+                  
+                  if (isInternal) {
+                    adoptionByMonth[month].internalUsers += item.learners || 0;
+                  } else {
+                    adoptionByMonth[month].externalUsers += item.learners || 0;
+                  }
+                });
+                
+                return Object.entries(adoptionByMonth)
+                  .map(([month, data]) => {
+                    const totalUsers = data.externalUsers + data.internalUsers;
+                    return {
+                      month,
+                      external: totalUsers > 0 ? Math.round((data.externalUsers / totalUsers) * 100) : 65,
+                      internal: totalUsers > 0 ? Math.round((data.internalUsers / totalUsers) * 100) : 35,
+                      externalUsers: data.externalUsers,
+                      internalUsers: data.internalUsers
+                    };
+                  })
+                  .sort((a, b) => {
+                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    return months.indexOf(a.month) - months.indexOf(b.month);
+                  });
+              })()}>
                 <defs>
                   <linearGradient id="externalGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
