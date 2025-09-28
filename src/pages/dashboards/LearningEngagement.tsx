@@ -47,10 +47,31 @@ export default function LearningEngagement() {
     setIsDrillDownOpen(true);
   };
   
-  // Use comprehensive filtered data
-  const filteredLearningData = useFilteredData(comprehensiveLearningData, filters);
-  const filteredSkillRatings = useFilteredData(comprehensiveSkillRatings, filters);
-  const filteredTrendingTopics = useFilteredData(comprehensiveTrendingTopics, filters);
+  // Use comprehensive filtered data with enhanced properties
+  const enhancedLearningData = useMemo(() => 
+    comprehensiveLearningData.map(item => ({
+      ...item,
+      rating: Math.floor(Math.random() * 5) + 1, // 1-5 star rating
+      region: ['North America (NA)', 'Europe, Middle East & Africa (EMEA)', 'Asia-Pacific (APAC)'][Math.floor(Math.random() * 3)]
+    })), []);
+
+  const enhancedSkillRatings = useMemo(() => 
+    comprehensiveSkillRatings.map(rating => ({
+      ...rating,
+      rating: Math.floor(Math.random() * 5) + 1, // 1-5 star rating  
+      region: ['North America (NA)', 'Europe, Middle East & Africa (EMEA)', 'Asia-Pacific (APAC)'][Math.floor(Math.random() * 3)]
+    })), []);
+
+  const enhancedTrendingTopics = useMemo(() => 
+    comprehensiveTrendingTopics.map(topic => ({
+      ...topic,
+      rating: Math.floor(Math.random() * 5) + 1, // 1-5 star rating
+      region: ['North America (NA)', 'Europe, Middle East & Africa (EMEA)', 'Asia-Pacific (APAC)'][Math.floor(Math.random() * 3)]
+    })), []);
+
+  const filteredLearningData = useFilteredData(enhancedLearningData, filters);
+  const filteredSkillRatings = useFilteredData(enhancedSkillRatings, filters);
+  const filteredTrendingTopics = useFilteredData(enhancedTrendingTopics, filters);
 
   // Calculate aggregated metrics from filtered data
   const aggregatedMetrics = useMemo(() => {
@@ -1319,14 +1340,55 @@ export default function LearningEngagement() {
         {/* Organizational Completion Rate Breakdown */}
         <ChartCard title="Completion Rate by Department" subtitle="Which parts of the organization have highest/lowest completion rates?">
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={[
-              { department: 'Engineering', completionRate: 92, totalAssigned: 245, completed: 225, avgDays: 12 },
-              { department: 'Marketing', completionRate: 88, totalAssigned: 156, completed: 137, avgDays: 14 },
-              { department: 'Sales', completionRate: 85, totalAssigned: 189, completed: 161, avgDays: 16 },
-              { department: 'Finance', completionRate: 81, totalAssigned: 98, completed: 79, avgDays: 18 },
-              { department: 'HR', completionRate: 78, totalAssigned: 67, completed: 52, avgDays: 21 },
-              { department: 'Operations', completionRate: 74, totalAssigned: 134, completed: 99, avgDays: 23 }
-            ].sort((a, b) => b.completionRate - a.completionRate)}>
+            <BarChart data={(() => {
+              // Calculate completion rates by groups (departments) from filtered data
+              const completionByGroup: Record<string, { 
+                totalLearners: number, 
+                totalCompletions: number, 
+                totalAssigned: number,
+                totalHours: number,
+                count: number 
+              }> = {};
+              
+              filteredLearningData.forEach(item => {
+                item.groups?.forEach(group => {
+                  if (!completionByGroup[group]) {
+                    completionByGroup[group] = { 
+                      totalLearners: 0, 
+                      totalCompletions: 0, 
+                      totalAssigned: 0,
+                      totalHours: 0,
+                      count: 0 
+                    };
+                  }
+                  
+                  completionByGroup[group].totalLearners += item.learners;
+                  completionByGroup[group].totalCompletions += item.completions;
+                  completionByGroup[group].totalAssigned += Math.floor(item.learners * 1.2); // Estimate assignments
+                  completionByGroup[group].totalHours += item.hours;
+                  completionByGroup[group].count += 1;
+                });
+              });
+              
+              return Object.entries(completionByGroup)
+                .map(([department, data]) => {
+                  const completionRate = data.totalAssigned > 0 
+                    ? (data.totalCompletions / data.totalAssigned) * 100 
+                    : 0;
+                  const avgDays = Math.max(7, Math.floor((data.totalHours / Math.max(data.totalCompletions, 1)) * 2));
+                  
+                  return {
+                    department: department.replace(' Team', ''), // Clean team names
+                    completionRate: Math.round(Math.min(100, completionRate)),
+                    totalAssigned: data.totalAssigned,
+                    completed: data.totalCompletions,
+                    avgDays: Math.min(30, avgDays)
+                  };
+                })
+                .filter(item => item.totalAssigned > 0) // Only show groups with assignments
+                .sort((a, b) => b.completionRate - a.completionRate)
+                .slice(0, 8); // Top 8 departments
+            })()}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="department" angle={-45} textAnchor="end" height={80} />
               <YAxis domain={[70, 95]} />
@@ -1435,16 +1497,58 @@ export default function LearningEngagement() {
           
           {/* Multi-factor Trend Analysis */}
           <ResponsiveContainer width="100%" height={300}>
-            <ComposedChart data={[
-              { month: 'Jan', completionRate: 78, managerEngagement: 65, contentRelevance: 72, timeAllocation: 58, deadlineClarity: 70 },
-              { month: 'Feb', completionRate: 81, managerEngagement: 68, contentRelevance: 75, timeAllocation: 62, deadlineClarity: 74 },
-              { month: 'Mar', completionRate: 79, managerEngagement: 67, contentRelevance: 73, timeAllocation: 60, deadlineClarity: 72 },
-              { month: 'Apr', completionRate: 83, managerEngagement: 72, contentRelevance: 78, timeAllocation: 65, deadlineClarity: 77 },
-              { month: 'May', completionRate: 85, managerEngagement: 74, contentRelevance: 80, timeAllocation: 68, deadlineClarity: 79 },
-              { month: 'Jun', completionRate: 82, managerEngagement: 71, contentRelevance: 77, timeAllocation: 64, deadlineClarity: 76 },
-              { month: 'Jul', completionRate: 87, managerEngagement: 76, contentRelevance: 82, timeAllocation: 71, deadlineClarity: 81 },
-              { month: 'Aug', completionRate: 85, managerEngagement: 75, contentRelevance: 81, timeAllocation: 69, deadlineClarity: 80 }
-            ]}>
+            <ComposedChart data={(() => {
+              // Calculate completion factors from filtered data by month
+              const factorsByMonth: Record<string, { 
+                completionRate: number, 
+                managerEngagement: number, 
+                contentRelevance: number, 
+                timeAllocation: number, 
+                deadlineClarity: number,
+                count: number 
+              }> = {};
+              
+              filteredLearningData.forEach(item => {
+                const month = new Date(item.date).toLocaleDateString('en-US', { month: 'short' });
+                if (!factorsByMonth[month]) {
+                  factorsByMonth[month] = { 
+                    completionRate: 0, 
+                    managerEngagement: 0, 
+                    contentRelevance: 0, 
+                    timeAllocation: 0, 
+                    deadlineClarity: 0,
+                    count: 0 
+                  };
+                }
+                
+                // Calculate factors based on engagement rate and completion rate
+                const completionRate = (item.completions / item.learners) * 100;
+                const engagementRate = item.engagementRate;
+                const rating = item.avgRating;
+                
+                // Derive other factors from available data
+                factorsByMonth[month].completionRate += completionRate;
+                factorsByMonth[month].managerEngagement += Math.min(100, engagementRate * 0.8 + (rating - 1) * 5);
+                factorsByMonth[month].contentRelevance += Math.min(100, rating * 18 + Math.random() * 10);
+                factorsByMonth[month].timeAllocation += Math.min(100, engagementRate * 0.7 + Math.random() * 20);
+                factorsByMonth[month].deadlineClarity += Math.min(100, engagementRate * 0.75 + (rating - 1) * 8);
+                factorsByMonth[month].count += 1;
+              });
+              
+              return Object.entries(factorsByMonth)
+                .map(([month, data]) => ({
+                  month,
+                  completionRate: data.count > 0 ? Math.round(data.completionRate / data.count) : 78,
+                  managerEngagement: data.count > 0 ? Math.round(data.managerEngagement / data.count) : 65, 
+                  contentRelevance: data.count > 0 ? Math.round(data.contentRelevance / data.count) : 72,
+                  timeAllocation: data.count > 0 ? Math.round(data.timeAllocation / data.count) : 58,
+                  deadlineClarity: data.count > 0 ? Math.round(data.deadlineClarity / data.count) : 70
+                }))
+                .sort((a, b) => {
+                  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  return months.indexOf(a.month) - months.indexOf(b.month);
+                });
+            })()}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis yAxisId="left" domain={[55, 90]} />
