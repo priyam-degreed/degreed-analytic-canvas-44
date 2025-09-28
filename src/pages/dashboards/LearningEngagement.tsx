@@ -1113,6 +1113,167 @@ export default function LearningEngagement() {
         </div>
       </ChartCard>
 
+      {/* New Charts for Missing Questions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Provider Satisfaction Analysis */}
+        <ChartCard title="Learning Provider Satisfaction Ratings" subtitle="Which provider has the highest user satisfaction?">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={[
+              { provider: 'LinkedIn Learning', satisfaction: 92, users: 1234, avgRating: 4.6 },
+              { provider: 'Coursera', satisfaction: 89, users: 987, avgRating: 4.5 },
+              { provider: 'Udemy', satisfaction: 87, users: 856, avgRating: 4.4 },
+              { provider: 'Internal LMS', satisfaction: 84, users: 1567, avgRating: 4.2 },
+              { provider: 'Pluralsight', satisfaction: 91, users: 678, avgRating: 4.6 },
+              { provider: 'edX', satisfaction: 88, users: 445, avgRating: 4.4 }
+            ].sort((a, b) => b.satisfaction - a.satisfaction)}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="provider" angle={-45} textAnchor="end" height={80} />
+              <YAxis domain={[75, 95]} />
+              <Tooltip 
+                formatter={(value, name, props) => [
+                  name === 'satisfaction' ? `${value}%` : value,
+                  name === 'satisfaction' ? 'Satisfaction Score' : name
+                ]}
+                labelFormatter={(label) => `Provider: ${label}`}
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--popover))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px'
+                }}
+              />
+              <Bar dataKey="satisfaction" fill="hsl(var(--primary))" />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="mt-4 p-3 bg-muted/20 rounded-lg">
+            <div className="text-sm font-medium text-green-600">🏆 Highest Satisfaction: LinkedIn Learning (92%)</div>
+          </div>
+        </ChartCard>
+
+        {/* Internal vs External Learning Adoption */}
+        <ChartCard title="Internal vs External Learning Adoption" subtitle="Learning source preference trends">
+          <div className="space-y-6">
+            {/* Current Period Comparison */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground mb-2">External Learning</div>
+                <div className="text-3xl font-bold text-blue-600">68%</div>
+                <div className="text-sm text-muted-foreground">4,234 completions</div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground mb-2">Internal Learning</div>
+                <div className="text-3xl font-bold text-green-600">32%</div>
+                <div className="text-sm text-muted-foreground">1,987 completions</div>
+              </div>
+            </div>
+
+            {/* Trend Chart */}
+            <ResponsiveContainer width="100%" height={200}>
+              <AreaChart data={[
+                { month: 'Jan', external: 65, internal: 35 },
+                { month: 'Feb', external: 67, internal: 33 },
+                { month: 'Mar', external: 66, internal: 34 },
+                { month: 'Apr', external: 69, internal: 31 },
+                { month: 'May', external: 70, internal: 30 },
+                { month: 'Jun', external: 68, internal: 32 },
+                { month: 'Jul', external: 67, internal: 33 },
+                { month: 'Aug', external: 68, internal: 32 }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip 
+                  formatter={(value, name) => [`${value}%`, name === 'external' ? 'External Learning' : 'Internal Learning']}
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--popover))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                />
+                <Area type="monotone" dataKey="external" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" />
+                <Area type="monotone" dataKey="internal" stackId="1" stroke="hsl(var(--secondary))" fill="hsl(var(--secondary))" />
+              </AreaChart>
+            </ResponsiveContainer>
+            
+            <div className="flex justify-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-primary"></div>
+                <span>External Learning (68%)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-secondary"></div>
+                <span>Internal Learning (32%)</span>
+              </div>
+            </div>
+          </div>
+        </ChartCard>
+
+        {/* Overdue Assignments Tracking */}
+        <ChartCard title="Learning Assignments Status" subtitle="Assignment completion and overdue tracking">
+          <div className="space-y-6">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Total Assigned</div>
+                <div className="text-2xl font-bold">1,720</div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Completed</div>
+                <div className="text-2xl font-bold text-green-600">1,487</div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Past Due</div>
+                <div className="text-2xl font-bold text-red-600">89</div>
+              </div>
+            </div>
+
+            {/* Status Breakdown */}
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: 'Completed', value: 1487, fill: '#22c55e' },
+                    { name: 'In Progress', value: 144, fill: '#3b82f6' },
+                    { name: 'Past Due', value: 89, fill: '#ef4444' }
+                  ]}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                >
+                </Pie>
+                <Tooltip 
+                  formatter={(value, name) => [value, `${name} Assignments`]}
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--popover))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+
+            <div className="grid grid-cols-1 gap-3">
+              <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <span className="text-sm font-medium">Overdue Assignments</span>
+                </div>
+                <span className="text-lg font-bold text-red-600">89</span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                • 34 assignments overdue by 1-7 days
+                <br />
+                • 28 assignments overdue by 8-14 days  
+                <br />
+                • 27 assignments overdue by 15+ days
+              </div>
+            </div>
+          </div>
+        </ChartCard>
+
+      </div>
+
       {/* Drill Down Dialog */}
       <DrillDownDialog
         isOpen={isDrillDownOpen}
