@@ -1131,15 +1131,27 @@ export default function LearningEngagement() {
               <XAxis dataKey="provider" angle={-45} textAnchor="end" height={80} />
               <YAxis domain={[75, 95]} />
               <Tooltip 
-                formatter={(value, name, props) => [
-                  name === 'satisfaction' ? `${value}%` : value,
-                  name === 'satisfaction' ? 'Satisfaction Score' : name
-                ]}
-                labelFormatter={(label) => `Provider: ${label}`}
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--popover))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '6px'
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-popover p-3 border border-border rounded-lg shadow-md">
+                        <p className="font-semibold text-popover-foreground">{label}</p>
+                        <div className="space-y-1 mt-2">
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">Satisfaction Score:</span> {data.satisfaction}%
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">Average Rating:</span> {data.avgRating}★
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">Total Users:</span> {data.users.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
                 }}
               />
               <Bar dataKey="satisfaction" fill="hsl(var(--primary))" />
