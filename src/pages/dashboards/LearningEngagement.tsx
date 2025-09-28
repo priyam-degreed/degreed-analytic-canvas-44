@@ -1232,6 +1232,199 @@ export default function LearningEngagement() {
 
       </div>
 
+      {/* Completion Rate Analysis - New Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Organizational Completion Rate Breakdown */}
+        <ChartCard title="Completion Rate by Department" subtitle="Which parts of the organization have highest/lowest completion rates?">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={[
+              { department: 'Engineering', completionRate: 92, totalAssigned: 245, completed: 225, avgDays: 12 },
+              { department: 'Marketing', completionRate: 88, totalAssigned: 156, completed: 137, avgDays: 14 },
+              { department: 'Sales', completionRate: 85, totalAssigned: 189, completed: 161, avgDays: 16 },
+              { department: 'Finance', completionRate: 81, totalAssigned: 98, completed: 79, avgDays: 18 },
+              { department: 'HR', completionRate: 78, totalAssigned: 67, completed: 52, avgDays: 21 },
+              { department: 'Operations', completionRate: 74, totalAssigned: 134, completed: 99, avgDays: 23 }
+            ].sort((a, b) => b.completionRate - a.completionRate)}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="department" angle={-45} textAnchor="end" height={80} />
+              <YAxis domain={[70, 95]} />
+              <Tooltip 
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-popover p-4 border border-border rounded-lg shadow-lg">
+                        <p className="font-semibold text-popover-foreground mb-2">{label} Department</p>
+                        <div className="space-y-1">
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">Completion Rate:</span> {data.completionRate}%
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">Completed:</span> {data.completed}/{data.totalAssigned} assignments
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">Avg Completion Time:</span> {data.avgDays} days
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Bar dataKey="completionRate" fill="hsl(var(--primary))" />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="text-sm font-medium text-green-700 dark:text-green-300">🏆 Highest</div>
+              <div className="text-lg font-bold text-green-600 dark:text-green-400">Engineering (92%)</div>
+            </div>
+            <div className="p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
+              <div className="text-sm font-medium text-red-700 dark:text-red-300">⚠️ Lowest</div>
+              <div className="text-lg font-bold text-red-600 dark:text-red-400">Operations (74%)</div>
+            </div>
+          </div>
+        </ChartCard>
+
+        {/* Completion Rate Drivers */}
+        <ChartCard title="What Drives Learning Completion?" subtitle="Key factors impacting completion rates">
+          <div className="space-y-4">
+            {/* Factor Analysis */}
+            <div className="space-y-3">
+              {[
+                { factor: 'Manager Support', impact: 95, correlation: 0.87, description: 'Active manager engagement increases completion by 35%' },
+                { factor: 'Deadline Clarity', impact: 89, correlation: 0.82, description: 'Clear deadlines improve completion by 28%' },
+                { factor: 'Content Relevance', impact: 86, correlation: 0.79, description: 'Job-relevant content increases completion by 24%' },
+                { factor: 'Learning Path Length', impact: 72, correlation: -0.65, description: 'Shorter paths (< 5 modules) have higher completion' },
+                { factor: 'Time Allocation', impact: 83, correlation: 0.74, description: 'Dedicated learning time improves completion by 21%' }
+              ].map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover-scale">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="text-sm font-medium text-foreground">{item.factor}</div>
+                      <div className={`text-xs px-2 py-1 rounded-full ${
+                        item.correlation > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' : 
+                        'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+                      }`}>
+                        r={item.correlation}
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground">{item.description}</div>
+                    <div className="w-full bg-muted rounded-full h-2 mt-2">
+                      <div 
+                        className="bg-primary h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${item.impact}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="ml-4 text-right">
+                    <div className="text-lg font-bold text-primary">{item.impact}%</div>
+                    <div className="text-xs text-muted-foreground">Impact Score</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Key Recommendations */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+                  <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="font-medium text-blue-800 dark:text-blue-200 mb-1">💡 Key Recommendations</div>
+                  <div className="text-sm text-blue-700 dark:text-blue-300">
+                    Focus on manager training and support programs. Operations team needs targeted intervention with clear deadlines and dedicated learning time allocation.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ChartCard>
+
+      </div>
+
+      {/* Completion Rate Trends & Predictors - Full Width */}
+      <ChartCard title="Completion Rate Trends & Predictive Factors" subtitle="Understanding what drives successful learning completion over time">
+        <div className="space-y-6">
+          
+          {/* Multi-factor Trend Analysis */}
+          <ResponsiveContainer width="100%" height={300}>
+            <ComposedChart data={[
+              { month: 'Jan', completionRate: 78, managerEngagement: 65, contentRelevance: 72, timeAllocation: 58, deadlineClarity: 70 },
+              { month: 'Feb', completionRate: 81, managerEngagement: 68, contentRelevance: 75, timeAllocation: 62, deadlineClarity: 74 },
+              { month: 'Mar', completionRate: 79, managerEngagement: 67, contentRelevance: 73, timeAllocation: 60, deadlineClarity: 72 },
+              { month: 'Apr', completionRate: 83, managerEngagement: 72, contentRelevance: 78, timeAllocation: 65, deadlineClarity: 77 },
+              { month: 'May', completionRate: 85, managerEngagement: 74, contentRelevance: 80, timeAllocation: 68, deadlineClarity: 79 },
+              { month: 'Jun', completionRate: 82, managerEngagement: 71, contentRelevance: 77, timeAllocation: 64, deadlineClarity: 76 },
+              { month: 'Jul', completionRate: 87, managerEngagement: 76, contentRelevance: 82, timeAllocation: 71, deadlineClarity: 81 },
+              { month: 'Aug', completionRate: 85, managerEngagement: 75, contentRelevance: 81, timeAllocation: 69, deadlineClarity: 80 }
+            ]}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis yAxisId="left" domain={[55, 90]} />
+              <YAxis yAxisId="right" orientation="right" domain={[55, 90]} />
+              <Tooltip 
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-popover p-4 border border-border rounded-lg shadow-lg">
+                        <p className="font-semibold text-popover-foreground mb-2">{label} 2024</p>
+                        <div className="space-y-1">
+                          {payload.map((entry, index) => (
+                            <div key={index} className="flex items-center justify-between gap-4">
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }}></div>
+                                <span className="text-sm">{entry.name}</span>
+                              </div>
+                              <span className="font-medium">{entry.value}%</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Line yAxisId="right" type="monotone" dataKey="completionRate" stroke="hsl(var(--primary))" strokeWidth={3} name="Completion Rate" />
+              <Line yAxisId="left" type="monotone" dataKey="managerEngagement" stroke="hsl(var(--secondary))" strokeWidth={2} name="Manager Engagement" />
+              <Line yAxisId="left" type="monotone" dataKey="contentRelevance" stroke="hsl(var(--accent))" strokeWidth={2} name="Content Relevance" />
+              <Line yAxisId="left" type="monotone" dataKey="timeAllocation" stroke="#8884d8" strokeWidth={2} name="Time Allocation" />
+              <Line yAxisId="left" type="monotone" dataKey="deadlineClarity" stroke="#82ca9d" strokeWidth={2} name="Deadline Clarity" />
+            </ComposedChart>
+          </ResponsiveContainer>
+
+          {/* Success Metrics Summary */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="text-sm text-green-700 dark:text-green-300 mb-1">Best Performing Factor</div>
+              <div className="text-lg font-bold text-green-600 dark:text-green-400">Manager Support</div>
+              <div className="text-xs text-green-600/70 dark:text-green-400/70">+35% completion impact</div>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="text-sm text-blue-700 dark:text-blue-300 mb-1">Current Overall Rate</div>
+              <div className="text-lg font-bold text-blue-600 dark:text-blue-400">84.7%</div>
+              <div className="text-xs text-blue-600/70 dark:text-blue-400/70">+2.1% vs last month</div>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
+              <div className="text-sm text-amber-700 dark:text-amber-300 mb-1">Target Rate</div>
+              <div className="text-lg font-bold text-amber-600 dark:text-amber-400">90%</div>
+              <div className="text-xs text-amber-600/70 dark:text-amber-400/70">5.3% to reach goal</div>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30 rounded-lg border border-purple-200 dark:border-purple-800">
+              <div className="text-sm text-purple-700 dark:text-purple-300 mb-1">Prediction Model</div>
+              <div className="text-lg font-bold text-purple-600 dark:text-purple-400">87%</div>
+              <div className="text-xs text-purple-600/70 dark:text-purple-400/70">Next month forecast</div>
+            </div>
+          </div>
+        </div>
+      </ChartCard>
+
       {/* Internal vs External Learning Adoption - Full Width */}
       <ChartCard title="Internal vs External Learning Adoption" subtitle="Learning source preference trends">
         <div className="space-y-6">
