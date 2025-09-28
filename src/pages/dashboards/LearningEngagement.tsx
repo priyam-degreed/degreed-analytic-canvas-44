@@ -1113,10 +1113,125 @@ export default function LearningEngagement() {
         </div>
       </ChartCard>
 
-      {/* New Charts for Missing Questions */}
+      {/* Provider Satisfaction and Assignments Status - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Provider Satisfaction Analysis */}
+        <ChartCard title="Learning Provider Satisfaction Ratings" subtitle="Which provider has the highest user satisfaction?">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={[
+              { provider: 'LinkedIn Learning', satisfaction: 92, users: 1234, avgRating: 4.6 },
+              { provider: 'Coursera', satisfaction: 89, users: 987, avgRating: 4.5 },
+              { provider: 'Udemy', satisfaction: 87, users: 856, avgRating: 4.4 },
+              { provider: 'Internal LMS', satisfaction: 84, users: 1567, avgRating: 4.2 },
+              { provider: 'Pluralsight', satisfaction: 91, users: 678, avgRating: 4.6 },
+              { provider: 'edX', satisfaction: 88, users: 445, avgRating: 4.4 }
+            ].sort((a, b) => b.satisfaction - a.satisfaction)}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="provider" angle={-45} textAnchor="end" height={80} />
+              <YAxis domain={[75, 95]} />
+              <Tooltip 
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-popover p-3 border border-border rounded-lg shadow-md">
+                        <p className="font-semibold text-popover-foreground">{label}</p>
+                        <div className="space-y-1 mt-2">
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">Satisfaction Score:</span> {data.satisfaction}%
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">Average Rating:</span> {data.avgRating}★
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">Total Users:</span> {data.users.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Bar dataKey="satisfaction" fill="hsl(var(--primary))" />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="mt-4 p-3 bg-muted/20 rounded-lg">
+            <div className="text-sm font-medium text-green-600">🏆 Highest Satisfaction: LinkedIn Learning (92%)</div>
+          </div>
+        </ChartCard>
+
+        {/* Overdue Assignments Tracking */}
+        <ChartCard title="Learning Assignments Status" subtitle="Assignment completion and overdue tracking">
+          <div className="space-y-6">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Total Assigned</div>
+                <div className="text-2xl font-bold">1,720</div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Completed</div>
+                <div className="text-2xl font-bold text-green-600">1,456</div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">Overdue</div>
+                <div className="text-2xl font-bold text-red-600">89</div>
+              </div>
+            </div>
+
+            {/* Status Distribution Pie Chart */}
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: 'Completed', value: 84.7, count: 1456, color: 'hsl(var(--success))' },
+                    { name: 'In Progress', value: 10.1, count: 175, color: 'hsl(var(--warning))' },
+                    { name: 'Overdue', value: 5.2, count: 89, color: 'hsl(var(--destructive))' }
+                  ]}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}%`}
+                >
+                  {[
+                    { name: 'Completed', value: 84.7, count: 1456, color: 'hsl(var(--success))' },
+                    { name: 'In Progress', value: 10.1, count: 175, color: 'hsl(var(--warning))' },
+                    { name: 'Overdue', value: 5.2, count: 89, color: 'hsl(var(--destructive))' }
+                  ].map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  formatter={(value, name, props) => [
+                    `${value}% (${props.payload.count} assignments)`,
+                    name
+                  ]}
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--popover))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            
+            <div className="text-sm bg-red-50 dark:bg-red-950/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
+              <div className="font-medium text-red-800 dark:text-red-200 mb-1">⚠️ Overdue Analysis</div>
+              <div className="text-red-700 dark:text-red-300">
+                • 62 assignments overdue by &lt; 7 days
+                <br />
+                • 27 assignments overdue by 15+ days
+              </div>
+            </div>
+          </div>
+        </ChartCard>
+
+      </div>
+
+      {/* Internal vs External Learning Adoption - Full Width */}
         <ChartCard title="Learning Provider Satisfaction Ratings" subtitle="Which provider has the highest user satisfaction?">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={[
