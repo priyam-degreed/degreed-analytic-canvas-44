@@ -1199,11 +1199,11 @@ export default function LearningEngagement() {
               </div>
               <div className="text-center">
                 <div className="text-sm text-muted-foreground">Completed</div>
-                <div className="text-2xl font-bold text-green-600">1,456</div>
+                <div className="text-2xl font-bold" style={{ color: '#3b82f6' }}>1,456</div>
               </div>
               <div className="text-center">
                 <div className="text-sm text-muted-foreground">Overdue</div>
-                <div className="text-2xl font-bold text-red-600">89</div>
+                <div className="text-2xl font-bold" style={{ color: '#1e40af' }}>89</div>
               </div>
             </div>
 
@@ -1214,17 +1214,17 @@ export default function LearningEngagement() {
                 name: 'Completed',
                 value: 84.7,
                 count: 1456,
-                color: 'hsl(var(--success))'
+                color: '#3b82f6'
               }, {
                 name: 'In Progress',
                 value: 10.1,
                 count: 175,
-                color: 'hsl(var(--warning))'
+                color: '#93c5fd'
               }, {
                 name: 'Overdue',
                 value: 5.2,
                 count: 89,
-                color: 'hsl(var(--destructive))'
+                color: '#1e40af'
               }]} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({
                 name,
                 value
@@ -1233,17 +1233,17 @@ export default function LearningEngagement() {
                   name: 'Completed',
                   value: 84.7,
                   count: 1456,
-                  color: 'hsl(var(--success))'
+                  color: '#3b82f6'
                 }, {
                   name: 'In Progress',
                   value: 10.1,
                   count: 175,
-                  color: 'hsl(var(--warning))'
+                  color: '#93c5fd'
                 }, {
                   name: 'Overdue',
                   value: 5.2,
                   count: 89,
-                  color: 'hsl(var(--destructive))'
+                  color: '#1e40af'
                 }].map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                 </Pie>
                 <Tooltip formatter={(value, name, props) => [`${value}% (${props.payload.count} assignments)`, name]} contentStyle={{
