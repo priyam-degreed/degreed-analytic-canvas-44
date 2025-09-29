@@ -57,7 +57,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       ...dashboardData,
       id: `custom_${Date.now()}`,
       createdAt: new Date().toISOString(),
-      path: `/dashboard/${dashboardData.name.toLowerCase().replace(/\s+/g, '-')}`
+      path: `/dashboard/custom_${Date.now()}`
     };
 
     const updatedDashboards = [...dashboards, newDashboard];

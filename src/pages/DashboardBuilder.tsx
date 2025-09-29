@@ -95,22 +95,26 @@ export default function DashboardBuilder({ mode = "create", dashboardId }: Dashb
     
     if (mode === "create") {
       // Add the new dashboard to the list
-      addDashboard({
-        name: dashboardName,
+      const newDashboard = addDashboard({
+        name: dashboardName.trim(),
         isPublic,
         components: canvasComponents
       });
+      
+      toast.success(`Dashboard "${dashboardName.trim()}" created successfully!`);
+      // Navigate to the new dashboard for viewing
+      navigate(newDashboard.path);
     } else if (mode === "edit" && dashboardId) {
       // Update existing dashboard
       updateDashboard(dashboardId, {
-        name: dashboardName,
+        name: dashboardName.trim(),
         isPublic,
         components: canvasComponents
       });
+      
+      toast.success(`Dashboard "${dashboardName.trim()}" updated successfully!`);
+      navigate("/");
     }
-    
-    toast.success(`Dashboard ${mode === "edit" ? "updated" : "created"} successfully!`);
-    navigate("/");
   };
 
   const handleSaveAsNew = () => {

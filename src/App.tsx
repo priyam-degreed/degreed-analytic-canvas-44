@@ -22,6 +22,7 @@ import ContentPerformance from "./pages/dashboards/ContentPerformance";
 import CareerDevelopment from "./pages/dashboards/CareerDevelopment";
 import EngagementOverviewDashboard from "./pages/dashboards/EngagementOverviewDashboard";
 import DashboardBuilder from "./pages/DashboardBuilder";
+import { DynamicDashboard } from "./pages/DynamicDashboard";
 import NotFound from "./pages/NotFound";
 import Explore from "./pages/Explore";
 import Captures from "./pages/Captures";
@@ -57,6 +58,8 @@ const App = () => (
             {/* Dashboard Builder Routes */}
             <Route path="dashboard-builder" element={<DashboardBuilder mode="create" />} />
             <Route path="dashboard-builder/:id/edit" element={<DashboardBuilder mode="edit" />} />
+            {/* Dynamic Dashboard Route */}
+            <Route path="dashboard/:dashboardId" element={<DynamicDashboard />} />
             {/* Existing Routes */}
             <Route path="overview/strategic" element={<StrategicOverview />} />
             <Route path="overview/operational" element={<Dashboard />} />
