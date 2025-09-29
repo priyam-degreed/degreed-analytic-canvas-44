@@ -8,7 +8,9 @@ import { useFilters } from "@/contexts/FilterContext";
 import { useFilteredData, useFilteredMetrics } from "@/hooks/useFilteredData";
 import { useState, useMemo } from "react";
 import { DrillDownDialog } from "@/components/dashboard/DrillDownDialog";
+import { RecordsListDialog } from "@/components/dashboard/RecordsListDialog";
 import { getLearningDrillDownData } from "@/data/learningDrillDownData";
+import { generateRecords } from "@/data/recordsData";
 import { 
   comprehensiveLearningData, 
   comprehensiveSkillRatings, 
@@ -40,11 +42,32 @@ export default function LearningEngagement() {
   const { filters } = useFilters();
   const [drillDownData, setDrillDownData] = useState<any>(null);
   const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
+  const [recordsDialogData, setRecordsDialogData] = useState<{
+    isOpen: boolean;
+    title: string;
+    records: any[];
+    category: string;
+  }>({ isOpen: false, title: '', records: [], category: '' });
 
   const handleCardClick = (cardType: string) => {
     const data = getLearningDrillDownData(cardType);
     setDrillDownData({ additionalData: data });
     setIsDrillDownOpen(true);
+  };
+
+  const handleDrillDownToRecords = (category: string, title: string) => {
+    const records = generateRecords(category, title);
+    setRecordsDialogData({
+      isOpen: true,
+      title,
+      records,
+      category
+    });
+    setIsDrillDownOpen(false); // Close first dialog
+  };
+
+  const closeRecordsDialog = () => {
+    setRecordsDialogData({ isOpen: false, title: '', records: [], category: '' });
   };
   
   // Use comprehensive filtered data with enhanced properties
@@ -1798,6 +1821,15 @@ export default function LearningEngagement() {
         data={drillDownData}
         onApplyFilter={() => {}}
         onViewDetails={() => {}}
+        onDrillDownToRecords={handleDrillDownToRecords}
+      />
+
+      <RecordsListDialog
+        isOpen={recordsDialogData.isOpen}
+        onClose={closeRecordsDialog}
+        title={recordsDialogData.title}
+        records={recordsDialogData.records}
+        category={recordsDialogData.category}
       />
     </div>
   );

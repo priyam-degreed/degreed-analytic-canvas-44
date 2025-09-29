@@ -24,6 +24,7 @@ interface DrillDownDialogProps {
   data: DrillDownData | null;
   onApplyFilter: (filterType: string, filterValue: string) => void;
   onViewDetails: () => void;
+  onDrillDownToRecords?: (category: string, title: string) => void;
 }
 
 export function DrillDownDialog({ 
@@ -31,7 +32,8 @@ export function DrillDownDialog({
   onClose, 
   data, 
   onApplyFilter,
-  onViewDetails 
+  onViewDetails,
+  onDrillDownToRecords
 }: DrillDownDialogProps) {
   if (!data) return null;
 
@@ -69,7 +71,13 @@ export function DrillDownDialog({
                     {Object.entries(data.additionalData.ratingDistribution).map(([range, count]) => (
                       <div key={range} className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">{range}:</span>
-                        <Badge variant="outline">{count as number}</Badge>
+                        <Badge 
+                          variant="outline" 
+                          className="cursor-pointer hover:bg-muted"
+                          onClick={() => onDrillDownToRecords?.(range, `Learners with ${range} Rating`)}
+                        >
+                          {count as number}
+                        </Badge>
                       </div>
                     ))}
                   </div>
@@ -87,7 +95,13 @@ export function DrillDownDialog({
                       .map(([skill, count]) => (
                         <div key={skill} className="flex justify-between items-center">
                           <span className="text-sm text-muted-foreground">{skill}:</span>
-                          <Badge variant="outline">{count as number}</Badge>
+                          <Badge 
+                            variant="outline"
+                            className="cursor-pointer hover:bg-muted"
+                            onClick={() => onDrillDownToRecords?.(skill, `Top Learners in ${skill}`)}
+                          >
+                            {count as number}
+                          </Badge>
                         </div>
                       ))}
                   </div>
@@ -102,7 +116,13 @@ export function DrillDownDialog({
                     {Object.entries(data.additionalData.progressionTiers).map(([tier, count]) => (
                       <div key={tier} className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">{tier}:</span>
-                        <Badge variant="outline">{count as number}</Badge>
+                        <Badge 
+                          variant="outline"
+                          className="cursor-pointer hover:bg-muted"
+                          onClick={() => onDrillDownToRecords?.(tier, `Learners in ${tier} Tier`)}
+                        >
+                          {count as number}
+                        </Badge>
                       </div>
                     ))}
                   </div>
