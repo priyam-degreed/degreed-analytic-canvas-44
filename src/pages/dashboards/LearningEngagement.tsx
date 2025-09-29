@@ -74,6 +74,7 @@ export default function LearningEngagement() {
 
   const closeRecordsDialog = () => {
     setRecordsDialogData({ isOpen: false, title: '', records: [], category: '' });
+    setIsDrillDownOpen(true); // Reopen the first dialog when closing records dialog
   };
   
   // Use comprehensive filtered data with enhanced properties
