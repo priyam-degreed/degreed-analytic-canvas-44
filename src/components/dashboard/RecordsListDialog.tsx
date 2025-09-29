@@ -5,9 +5,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { User, Star, Clock, BookOpen } from "lucide-react";
 
 interface RecordItem {
@@ -68,7 +73,7 @@ export function RecordsListDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {getRecordIcon(category)}
@@ -76,76 +81,41 @@ export function RecordsListDialog({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-3">
-          {records.map((record, index) => (
-            <Card key={record.id} className="hover:bg-muted/50 transition-colors">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3 flex-1">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="text-xs">
-                        #{index + 1}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-medium text-sm truncate">
-                          {record.name}
-                        </h4>
-                        {record.department && (
-                          <Badge variant="outline" className="text-xs">
-                            {record.department}
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      {record.description && (
-                        <p className="text-xs text-muted-foreground mb-2">
-                          {record.description}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        {record.role && (
-                          <span>{record.role}</span>
-                        )}
-                        {record.rating && (
-                          <div className="flex items-center gap-1">
-                            <Star className="h-3 w-3" />
-                            <span>{record.rating.toFixed(1)}</span>
-                          </div>
-                        )}
-                        {record.hours && (
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{record.hours}h</span>
-                          </div>
-                        )}
-                        {record.completions && (
-                          <div className="flex items-center gap-1">
-                            <BookOpen className="h-3 w-3" />
-                            <span>{record.completions} completions</span>
-                          </div>
-                        )}
-                        {record.lastActivity && (
-                          <span>Last: {record.lastActivity}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="font-semibold text-lg">
-                      {formatValue(record.value, category)}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-          
-          {records.length === 0 && (
+        <div className="mt-4">
+          {records.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50px]">#</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Job Role</TableHead>
+                  <TableHead className="text-right">Learning Hours</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {records.map((record, index) => (
+                  <TableRow key={record.id} className="hover:bg-muted/50">
+                    <TableCell className="font-medium text-muted-foreground">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {record.name}
+                    </TableCell>
+                    <TableCell>
+                      {record.department || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {record.role || "N/A"}
+                    </TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {record.hours ? `${record.hours}h` : "0h"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
             <div className="text-center py-8 text-muted-foreground">
               No records found for this category.
             </div>
