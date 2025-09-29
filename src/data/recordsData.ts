@@ -22,6 +22,26 @@ export const generateRecords = (category: string, title: string, exactCount?: nu
     'Medium Engagement (60-79)': generateEngagementLearners('medium', countFromTitle),
     'Low Engagement (0-59)': generateEngagementLearners('low', countFromTitle),
     
+    // Completion-based records
+    'High Completers (10+)': generateCompletionLearners('high', countFromTitle),
+    'Medium Completers (5-9)': generateCompletionLearners('medium', countFromTitle),
+    'Low Completers (1-4)': generateCompletionLearners('low', countFromTitle),
+    
+    // Satisfaction-based records
+    'Highly Satisfied (4-5 stars)': generateSatisfactionLearners('high', countFromTitle),
+    'Satisfied (3 stars)': generateSatisfactionLearners('medium', countFromTitle),
+    'Unsatisfied (1-2 stars)': generateSatisfactionLearners('low', countFromTitle),
+    
+    // Assignment-based records
+    'Active Assigners': generateAssignmentLearners('active', countFromTitle),
+    'Regular Assigners': generateAssignmentLearners('regular', countFromTitle),
+    'Occasional Assigners': generateAssignmentLearners('occasional', countFromTitle),
+    
+    // Hour-based records
+    'Heavy Learners (40+ hrs)': generateHourLearners('heavy', countFromTitle),
+    'Regular Learners (20-39 hrs)': generateHourLearners('regular', countFromTitle),
+    'Light Learners (1-19 hrs)': generateHourLearners('light', countFromTitle),
+    
     // Rating-based records
     '1-2 Stars': generateLearnersByRating(1, 2, countFromTitle),
     '3 Stars': generateLearnersByRating(3, 3, countFromTitle),
@@ -53,27 +73,7 @@ function extractCountFromTitle(title: string): number {
 }
 
 function generateEngagementLearners(engagementLevel: 'high' | 'medium' | 'low', count: number): RecordItem[] {
-  const firstNames = [
-    'Alex', 'Sarah', 'Michael', 'Emily', 'David', 'Lisa', 'James', 'Maria', 'Robert', 'Jennifer',
-    'Christopher', 'Amanda', 'Daniel', 'Jessica', 'Matthew', 'Ashley', 'Joshua', 'Michelle', 'Andrew', 'Stephanie',
-    'Brian', 'Nicole', 'Kevin', 'Elizabeth', 'Steven', 'Helen', 'Thomas', 'Laura', 'Ryan', 'Rebecca'
-  ];
-  
-  const lastNames = [
-    'Chen', 'Torres', 'Rodriguez', 'Kim', 'Wang', 'Johnson', 'Gonzalez', 'Lee', 'Brown', 'Wilson',
-    'Garcia', 'Taylor', 'Miller', 'Anderson', 'Thompson', 'Martinez', 'Jackson', 'White', 'Lopez', 'Clark'
-  ];
-  
-  const departments = [
-    'Engineering', 'Product', 'Marketing', 'Sales', 'HR', 'Finance', 'Operations', 'Customer Success',
-    'Data Science', 'Design', 'Legal', 'IT', 'Quality Assurance', 'Business Development'
-  ];
-  
-  const roles = [
-    'Software Engineer', 'Senior Software Engineer', 'Data Scientist', 'Product Manager', 'Marketing Manager',
-    'Sales Representative', 'HR Specialist', 'Financial Analyst', 'Operations Manager', 'Customer Success Manager',
-    'UX Designer', 'DevOps Engineer', 'QA Engineer', 'Business Analyst', 'Technical Lead'
-  ];
+  const baseNames = generateBaseNames();
   
   // Define engagement level properties
   const engagementProps = {
@@ -85,16 +85,15 @@ function generateEngagementLearners(engagementLevel: 'high' | 'medium' | 'low', 
   const props = engagementProps[engagementLevel];
   
   return Array.from({ length: count }, (_, index) => {
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const { firstName, lastName } = baseNames[index % baseNames.length];
     const name = `${firstName} ${lastName}`;
     
     return {
       id: `engagement_${engagementLevel}_${index + 1}`,
       name,
       value: Math.floor(Math.random() * (props.maxScore - props.minScore) + props.minScore),
-      department: departments[Math.floor(Math.random() * departments.length)],
-      role: roles[Math.floor(Math.random() * roles.length)],
+      department: getRandomDepartment(),
+      role: getRandomRole(),
       rating: Math.random() * (props.maxScore - props.minScore) / 20 + 3, // 3-5 star range
       hours: Math.floor(Math.random() * (props.maxHours - props.minHours) + props.minHours),
       completions: Math.floor(Math.random() * 25) + (engagementLevel === 'high' ? 10 : engagementLevel === 'medium' ? 5 : 1),
@@ -104,46 +103,135 @@ function generateEngagementLearners(engagementLevel: 'high' | 'medium' | 'low', 
   });
 }
 
-function generateLearnersByRating(minRating: number, maxRating: number, count: number): RecordItem[] {
-  const firstNames = [
-    'Alex', 'Maria', 'David', 'Sarah', 'Michael', 'Emily', 'James', 'Lisa', 'Robert', 'Jennifer',
-    'Christopher', 'Amanda', 'Daniel', 'Jessica', 'Matthew', 'Ashley', 'Joshua', 'Michelle', 'Andrew', 'Stephanie',
-    'Brian', 'Nicole', 'Kevin', 'Elizabeth', 'Steven', 'Helen', 'Thomas', 'Laura', 'Ryan', 'Rebecca',
-    'Jason', 'Sharon', 'Anthony', 'Cynthia', 'Mark', 'Kathleen', 'Donald', 'Amy', 'Kenneth', 'Angela',
-    'Paul', 'Brenda', 'Jonathan', 'Emma', 'Walter', 'Olivia', 'Wayne', 'Rachel', 'Carl', 'Madison'
-  ];
+function generateCompletionLearners(level: 'high' | 'medium' | 'low', count: number): RecordItem[] {
+  const baseNames = generateBaseNames();
+  const completionRanges = {
+    high: { min: 10, max: 25 },
+    medium: { min: 5, max: 9 },
+    low: { min: 1, max: 4 }
+  };
   
-  const lastNames = [
-    'Johnson', 'Garcia', 'Chen', 'Wilson', 'Brown', 'Davis', 'Rodriguez', 'Anderson', 'Taylor', 'White',
-    'Lee', 'Thompson', 'Martinez', 'Miller', 'Jackson', 'Harris', 'Clark', 'Lewis', 'Robinson', 'Walker',
-    'Young', 'Allen', 'King', 'Wright', 'Lopez', 'Hill', 'Scott', 'Green', 'Adams', 'Baker',
-    'Gonzalez', 'Nelson', 'Carter', 'Mitchell', 'Perez', 'Roberts', 'Turner', 'Phillips', 'Campbell', 'Parker',
-    'Evans', 'Edwards', 'Collins', 'Stewart', 'Sanchez', 'Morris', 'Rogers', 'Reed', 'Cook', 'Morgan'
-  ];
-  
-  const departments = [
-    'Engineering', 'Product', 'Marketing', 'Sales', 'HR', 'Finance', 'Operations', 'Customer Success',
-    'Data Science', 'Design', 'Legal', 'IT', 'Quality Assurance', 'Business Development', 'Research'
-  ];
-  
-  const roles = [
-    'Software Engineer', 'Senior Software Engineer', 'Data Scientist', 'Product Manager', 'Marketing Manager',
-    'Sales Representative', 'HR Specialist', 'Financial Analyst', 'Operations Manager', 'Customer Success Manager',
-    'UX Designer', 'DevOps Engineer', 'QA Engineer', 'Business Analyst', 'Research Scientist', 'Technical Lead',
-    'Account Manager', 'Content Strategist', 'Project Manager', 'Solutions Engineer'
-  ];
+  const range = completionRanges[level];
   
   return Array.from({ length: count }, (_, index) => {
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const { firstName, lastName } = baseNames[index % baseNames.length];
+    const name = `${firstName} ${lastName}`;
+    
+    return {
+      id: `completion_${level}_${index + 1}`,
+      name,
+      value: Math.floor(Math.random() * (range.max - range.min + 1) + range.min),
+      department: getRandomDepartment(),
+      role: getRandomRole(),
+      rating: Math.random() * 2 + 3, // 3-5 star range
+      hours: Math.floor(Math.random() * 80) + 20,
+      completions: Math.floor(Math.random() * (range.max - range.min + 1) + range.min),
+      lastActivity: `${Math.floor(Math.random() * 30) + 1} days ago`,
+      description: `${level} completion learner`
+    };
+  });
+}
+
+function generateSatisfactionLearners(level: 'high' | 'medium' | 'low', count: number): RecordItem[] {
+  const baseNames = generateBaseNames();
+  const satisfactionRatings = {
+    high: { min: 4, max: 5 },
+    medium: { min: 3, max: 3 },
+    low: { min: 1, max: 2 }
+  };
+  
+  const range = satisfactionRatings[level];
+  
+  return Array.from({ length: count }, (_, index) => {
+    const { firstName, lastName } = baseNames[index % baseNames.length];
+    const name = `${firstName} ${lastName}`;
+    
+    return {
+      id: `satisfaction_${level}_${index + 1}`,
+      name,
+      value: Math.random() * (range.max - range.min) + range.min,
+      department: getRandomDepartment(),
+      role: getRandomRole(),
+      rating: Math.random() * (range.max - range.min) + range.min,
+      hours: Math.floor(Math.random() * 80) + 20,
+      completions: Math.floor(Math.random() * 15) + 5,
+      lastActivity: `${Math.floor(Math.random() * 30) + 1} days ago`,
+      description: `${level} satisfaction learner`
+    };
+  });
+}
+
+function generateAssignmentLearners(level: 'active' | 'regular' | 'occasional', count: number): RecordItem[] {
+  const baseNames = generateBaseNames();
+  const assignmentLevels = {
+    active: { assignments: { min: 15, max: 30 }, hours: { min: 60, max: 120 } },
+    regular: { assignments: { min: 8, max: 14 }, hours: { min: 30, max: 59 } },
+    occasional: { assignments: { min: 3, max: 7 }, hours: { min: 10, max: 29 } }
+  };
+  
+  const props = assignmentLevels[level];
+  
+  return Array.from({ length: count }, (_, index) => {
+    const { firstName, lastName } = baseNames[index % baseNames.length];
+    const name = `${firstName} ${lastName}`;
+    
+    return {
+      id: `assignment_${level}_${index + 1}`,
+      name,
+      value: Math.floor(Math.random() * (props.assignments.max - props.assignments.min + 1) + props.assignments.min),
+      department: getRandomDepartment(),
+      role: getRandomRole(),
+      rating: Math.random() * 2 + 3,
+      hours: Math.floor(Math.random() * (props.hours.max - props.hours.min + 1) + props.hours.min),
+      completions: Math.floor(Math.random() * 15) + 5,
+      lastActivity: `${Math.floor(Math.random() * 30) + 1} days ago`,
+      description: `${level} assignment creator`
+    };
+  });
+}
+
+function generateHourLearners(level: 'heavy' | 'regular' | 'light', count: number): RecordItem[] {
+  const baseNames = generateBaseNames();
+  const hourRanges = {
+    heavy: { min: 40, max: 120 },
+    regular: { min: 20, max: 39 },
+    light: { min: 1, max: 19 }
+  };
+  
+  const range = hourRanges[level];
+  
+  return Array.from({ length: count }, (_, index) => {
+    const { firstName, lastName } = baseNames[index % baseNames.length];
+    const name = `${firstName} ${lastName}`;
+    
+    return {
+      id: `hours_${level}_${index + 1}`,
+      name,
+      value: Math.floor(Math.random() * (range.max - range.min + 1) + range.min),
+      department: getRandomDepartment(),
+      role: getRandomRole(),
+      rating: Math.random() * 2 + 3,
+      hours: Math.floor(Math.random() * (range.max - range.min + 1) + range.min),
+      completions: Math.floor(Math.random() * 20) + 3,
+      lastActivity: `${Math.floor(Math.random() * 30) + 1} days ago`,
+      description: `${level} hour learner`
+    };
+  });
+}
+
+function generateLearnersByRating(minRating: number, maxRating: number, count: number): RecordItem[] {
+  const baseNames = generateBaseNames();
+  
+  return Array.from({ length: count }, (_, index) => {
+    const { firstName, lastName } = baseNames[index % baseNames.length];
     const name = `${firstName} ${lastName}`;
     
     return {
       id: `learner_${index + 1}`,
       name,
       value: (Math.random() * (maxRating - minRating) + minRating).toFixed(1),
-      department: departments[Math.floor(Math.random() * departments.length)],
-      role: roles[Math.floor(Math.random() * roles.length)],
+      department: getRandomDepartment(),
+      role: getRandomRole(),
       rating: Math.random() * (maxRating - minRating) + minRating,
       hours: Math.floor(Math.random() * 120) + 20,
       completions: Math.floor(Math.random() * 25) + 5,
@@ -154,21 +242,7 @@ function generateLearnersByRating(minRating: number, maxRating: number, count: n
 }
 
 function generateSkillLearners(skill: string, count: number): RecordItem[] {
-  const firstNames = [
-    'Alex', 'Sarah', 'Michael', 'Emily', 'David', 'Lisa', 'James', 'Maria', 'Robert', 'Jennifer',
-    'Christopher', 'Amanda', 'Daniel', 'Jessica', 'Matthew', 'Ashley', 'Joshua', 'Michelle', 'Andrew', 'Stephanie',
-    'Brian', 'Nicole', 'Kevin', 'Elizabeth', 'Steven', 'Helen', 'Thomas', 'Laura', 'Ryan', 'Rebecca',
-    'Jason', 'Sharon', 'Anthony', 'Cynthia', 'Mark', 'Kathleen', 'Donald', 'Amy', 'Kenneth', 'Angela',
-    'Paul', 'Brenda', 'Jonathan', 'Emma', 'Walter', 'Olivia', 'Wayne', 'Rachel', 'Carl', 'Madison'
-  ];
-  
-  const lastNames = [
-    'Thompson', 'Kim', 'Zhang', 'Rodriguez', 'Wilson', 'Chen', 'Park', 'Gonzalez', 'Johnson', 'Lee',
-    'Brown', 'Davis', 'Garcia', 'Taylor', 'Miller', 'Moore', 'Anderson', 'Thomas', 'Jackson', 'White',
-    'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson', 'Clark', 'Lewis', 'Walker', 'Hall',
-    'Allen', 'Young', 'Hernandez', 'King', 'Wright', 'Lopez', 'Hill', 'Scott', 'Green', 'Adams',
-    'Baker', 'Gonzalez', 'Nelson', 'Carter', 'Mitchell', 'Perez', 'Roberts', 'Turner', 'Phillips', 'Campbell'
-  ];
+  const baseNames = generateBaseNames();
   
   const departments = [
     'Engineering', 'Product', 'Data Science', 'DevOps', 'QA', 'Research', 'IT', 'Analytics',
@@ -182,8 +256,7 @@ function generateSkillLearners(skill: string, count: number): RecordItem[] {
   ];
   
   return Array.from({ length: count }, (_, index) => {
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const { firstName, lastName } = baseNames[index % baseNames.length];
     const name = `${firstName} ${lastName}`;
     
     return {
@@ -202,21 +275,7 @@ function generateSkillLearners(skill: string, count: number): RecordItem[] {
 }
 
 function generateTierLearners(tier: string, count: number): RecordItem[] {
-  const firstNames = [
-    'Taylor', 'Jordan', 'Casey', 'Morgan', 'Riley', 'Avery', 'Quinn', 'Cameron', 'Dakota', 'Sage',
-    'River', 'Phoenix', 'Skyler', 'Blake', 'Reese', 'Drew', 'Peyton', 'Hayden', 'Logan', 'Rowan',
-    'Devon', 'Finley', 'Harper', 'Kendall', 'Sloan', 'Parker', 'Emery', 'Tatum', 'Sage', 'Jamie',
-    'Alex', 'Jordan', 'Avery', 'Taylor', 'Casey', 'Riley', 'Morgan', 'Quinn', 'Emerson', 'Lennox',
-    'Marlowe', 'Sutton', 'Briar', 'Ellis', 'Indigo', 'Remy', 'Shay', 'Wren', 'Lane', 'Gray'
-  ];
-  
-  const lastNames = [
-    'Johnson', 'Smith', 'Brown', 'Davis', 'Wilson', 'Garcia', 'Rodriguez', 'Lee', 'Miller', 'Anderson',
-    'Thompson', 'Martinez', 'Jackson', 'White', 'Lopez', 'Clark', 'Lewis', 'Walker', 'Hall', 'Allen',
-    'Young', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores', 'Green', 'Adams',
-    'Nelson', 'Baker', 'Mitchell', 'Perez', 'Roberts', 'Turner', 'Phillips', 'Campbell', 'Parker', 'Evans',
-    'Edwards', 'Collins', 'Stewart', 'Sanchez', 'Morris', 'Rogers', 'Reed', 'Cook', 'Morgan', 'Bell'
-  ];
+  const baseNames = generateBaseNames();
   
   const departments = [
     'Engineering', 'Product', 'Marketing', 'Sales', 'Operations', 'HR', 'Finance', 'Customer Success',
@@ -230,17 +289,16 @@ function generateTierLearners(tier: string, count: number): RecordItem[] {
   ];
   
   const tierMultipliers = {
-    'Beginner': { hours: 0.4, completions: 0.3, rating: 0.7, count: [25, 35] },
-    'Intermediate': { hours: 0.8, completions: 0.7, rating: 0.9, count: [35, 45] },
-    'Advanced': { hours: 1.2, completions: 1.1, rating: 1.1, count: [40, 50] },
-    'Expert': { hours: 1.5, completions: 1.4, rating: 1.2, count: [30, 40] }
+    'Beginner': { hours: 0.4, completions: 0.3, rating: 0.7 },
+    'Intermediate': { hours: 0.8, completions: 0.7, rating: 0.9 },
+    'Advanced': { hours: 1.2, completions: 1.1, rating: 1.1 },
+    'Expert': { hours: 1.5, completions: 1.4, rating: 1.2 }
   };
   
   const multiplier = tierMultipliers[tier] || tierMultipliers['Intermediate'];
   
   return Array.from({ length: count }, (_, index) => {
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const { firstName, lastName } = baseNames[index % baseNames.length];
     const name = `${firstName} ${lastName}`;
     
     return {
@@ -280,4 +338,45 @@ function generateDefaultRecords(category: string, title: string, count: number =
     lastActivity: `${Math.floor(Math.random() * 30) + 1} days ago`,
     description: `Member of ${category} category`
   }));
+}
+
+// Helper functions for consistent data generation
+function generateBaseNames() {
+  const firstNames = [
+    'Alex', 'Sarah', 'Michael', 'Emily', 'David', 'Lisa', 'James', 'Maria', 'Robert', 'Jennifer',
+    'Christopher', 'Amanda', 'Daniel', 'Jessica', 'Matthew', 'Ashley', 'Joshua', 'Michelle', 'Andrew', 'Stephanie',
+    'Brian', 'Nicole', 'Kevin', 'Elizabeth', 'Steven', 'Helen', 'Thomas', 'Laura', 'Ryan', 'Rebecca',
+    'Jason', 'Sharon', 'Anthony', 'Cynthia', 'Mark', 'Kathleen', 'Donald', 'Amy', 'Kenneth', 'Angela',
+    'Paul', 'Brenda', 'Jonathan', 'Emma', 'Walter', 'Olivia', 'Wayne', 'Rachel', 'Carl', 'Madison'
+  ];
+  
+  const lastNames = [
+    'Johnson', 'Garcia', 'Chen', 'Wilson', 'Brown', 'Davis', 'Rodriguez', 'Anderson', 'Taylor', 'White',
+    'Lee', 'Thompson', 'Martinez', 'Miller', 'Jackson', 'Harris', 'Clark', 'Lewis', 'Robinson', 'Walker',
+    'Young', 'Allen', 'King', 'Wright', 'Lopez', 'Hill', 'Scott', 'Green', 'Adams', 'Baker',
+    'Gonzalez', 'Nelson', 'Carter', 'Mitchell', 'Perez', 'Roberts', 'Turner', 'Phillips', 'Campbell', 'Parker'
+  ];
+  
+  return firstNames.map((firstName, i) => ({
+    firstName,
+    lastName: lastNames[i % lastNames.length]
+  }));
+}
+
+function getRandomDepartment(): string {
+  const departments = [
+    'Engineering', 'Product', 'Marketing', 'Sales', 'HR', 'Finance', 'Operations', 'Customer Success',
+    'Data Science', 'Design', 'Legal', 'IT', 'Quality Assurance', 'Business Development', 'Research'
+  ];
+  return departments[Math.floor(Math.random() * departments.length)];
+}
+
+function getRandomRole(): string {
+  const roles = [
+    'Software Engineer', 'Senior Software Engineer', 'Data Scientist', 'Product Manager', 'Marketing Manager',
+    'Sales Representative', 'HR Specialist', 'Financial Analyst', 'Operations Manager', 'Customer Success Manager',
+    'UX Designer', 'DevOps Engineer', 'QA Engineer', 'Business Analyst', 'Research Scientist', 'Technical Lead',
+    'Account Manager', 'Content Strategist', 'Project Manager', 'Solutions Engineer'
+  ];
+  return roles[Math.floor(Math.random() * roles.length)];
 }

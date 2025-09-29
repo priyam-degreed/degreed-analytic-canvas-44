@@ -115,9 +115,9 @@ export function getLearningDrillDownData(cardType: string): any {
         employees: learningEmployees.filter(e => e.completions > 0).length,
         value: learningEmployees.reduce((sum, e) => sum + e.completions, 0),
         ratingDistribution: {
-          'This Month': Math.floor(learningEmployees.reduce((sum, e) => sum + e.completions, 0) * 0.3),
-          'Last Month': Math.floor(learningEmployees.reduce((sum, e) => sum + e.completions, 0) * 0.25),
-          'Previous Months': Math.floor(learningEmployees.reduce((sum, e) => sum + e.completions, 0) * 0.45),
+          'High Completers (10+)': learningEmployees.filter(e => e.completions >= 10).length,
+          'Medium Completers (5-9)': learningEmployees.filter(e => e.completions >= 5 && e.completions < 10).length,
+          'Low Completers (1-4)': learningEmployees.filter(e => e.completions >= 1 && e.completions < 5).length,
         },
         monthlyTrend: '+87 vs last month',
       };
@@ -137,6 +137,19 @@ export function getLearningDrillDownData(cardType: string): any {
           'Neutral Feedback': 18,
           'Negative Feedback': 8,
         },
+      };
+
+    case 'Assignments Created':
+      return {
+        ...baseData,
+        employees: learningEmployees.filter(e => e.completions > 0).length,
+        value: Math.floor(learningEmployees.reduce((sum, e) => sum + e.completions, 0) * 1.3),
+        ratingDistribution: {
+          'Active Assigners': Math.floor(learningEmployees.length * 0.35),
+          'Regular Assigners': Math.floor(learningEmployees.length * 0.45),
+          'Occasional Assigners': Math.floor(learningEmployees.length * 0.20),
+        },
+        departmentBreakdown: getDepartmentBreakdown(),
       };
 
     case 'Total Learning Hours':

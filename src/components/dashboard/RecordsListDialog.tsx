@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { User, Star, Clock, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { User, Star, Clock, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface RecordItem {
   id: string;
@@ -43,6 +44,36 @@ export function RecordsListDialog({
   records,
   category
 }: RecordsListDialogProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 20;
+  
+  // Pagination logic
+  const { paginatedRecords, totalPages, startRecord, endRecord } = useMemo(() => {
+    const startIndex = (currentPage - 1) * recordsPerPage;
+    const endIndex = startIndex + recordsPerPage;
+    const paginated = records.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(records.length / recordsPerPage);
+    
+    return {
+      paginatedRecords: paginated,
+      totalPages,
+      startRecord: startIndex + 1,
+      endRecord: Math.min(endIndex, records.length)
+    };
+  }, [records, currentPage]);
+
+  // Reset page when dialog opens or records change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [isOpen, records]);
+
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
+  const goToPrevPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
   const getRecordIcon = (category: string) => {
     switch (category.toLowerCase()) {
       case 'learners':
@@ -79,10 +110,17 @@ export function RecordsListDialog({
             {getRecordIcon(category)}
             {title}
           </DialogTitle>
+          <div className="text-sm text-muted-foreground">
+            {records.length > 0 ? (
+              <>Showing {startRecord}-{endRecord} of {records.length} records</>
+            ) : (
+              "No records found"
+            )}
+          </div>
         </DialogHeader>
         
         <div className="mt-4 max-h-[60vh] overflow-y-auto">
-          {records.length > 0 ? (
+          {paginatedRecords.length > 0 ? (
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>
@@ -94,10 +132,10 @@ export function RecordsListDialog({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {records.map((record, index) => (
+                {paginatedRecords.map((record, index) => (
                   <TableRow key={record.id} className="hover:bg-muted/50">
                     <TableCell className="font-medium text-muted-foreground">
-                      {index + 1}
+                      {startRecord + index}
                     </TableCell>
                     <TableCell className="font-medium">
                       {record.name}
@@ -121,6 +159,37 @@ export function RecordsListDialog({
             </div>
           )}
         </div>
+        
+        {/* Pagination Controls */}
+        {records.length > recordsPerPage && (
+          <div className="flex items-center justify-between px-4 py-3 border-t">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToPrevPage}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <span>Page {currentPage} of {totalPages}</span>
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1"
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -359,7 +359,7 @@ export default function LearningEngagement() {
           value={`${metrics.learningHours.toLocaleString()}h`}
           change={{ value: 12.4, type: "positive" }}
           icon={<Clock className="h-5 w-5" />}
-          onClick={() => handleCardClick("Total Learning Hours")}
+          onClick={() => handleCardClick("Learning Hours")}
         />
         <MetricCard
           title="Learning Satisfaction"
