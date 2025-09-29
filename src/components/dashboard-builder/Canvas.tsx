@@ -3,6 +3,8 @@ import { useDrop } from "react-dnd";
 import { BarChart3, X, Filter, ToggleLeft, Type } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { ChartCard } from "@/components/dashboard/ChartCard";
 
 interface CanvasProps {
   components: any[];
@@ -31,6 +33,93 @@ function CanvasComponent({ component, onRemove }: { component: any; onRemove: ()
   const title = component.name || component.id;
   const isRichText = component.componentType === "rich-text";
   const isKPI = component.type === "KPI Metric";
+  const isSavedVisualization = component.componentType === "saved-visualization";
+
+  // Sample data for charts
+  const chartData = [
+    { name: 'Jan', value: 400 },
+    { name: 'Feb', value: 300 },
+    { name: 'Mar', value: 600 },
+    { name: 'Apr', value: 800 },
+    { name: 'May', value: 500 },
+    { name: 'Jun', value: 700 }
+  ];
+
+  const pieData = [
+    { name: 'Online Courses', value: 42.1, fill: 'hsl(var(--primary))' },
+    { name: 'Learning Paths', value: 28.6, fill: 'hsl(var(--secondary))' },
+    { name: 'Projects', value: 13.2, fill: 'hsl(var(--accent))' },
+    { name: 'Other', value: 16.1, fill: 'hsl(var(--muted))' }
+  ];
+
+  const renderChart = () => {
+    const chartType = component.type?.toLowerCase();
+    
+    if (chartType?.includes('area')) {
+      return (
+        <ResponsiveContainer width="100%" height={200}>
+          <AreaChart data={chartData}>
+            <defs>
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="name" axisLine={false} tickLine={false} />
+            <YAxis axisLine={false} tickLine={false} />
+            <Tooltip />
+            <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fill="url(#colorValue)" />
+          </AreaChart>
+        </ResponsiveContainer>
+      );
+    }
+    
+    if (chartType?.includes('line')) {
+      return (
+        <ResponsiveContainer width="100%" height={200}>
+          <LineChart data={chartData}>
+            <XAxis dataKey="name" axisLine={false} tickLine={false} />
+            <YAxis axisLine={false} tickLine={false} />
+            <Tooltip />
+            <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2} />
+          </LineChart>
+        </ResponsiveContainer>
+      );
+    }
+    
+    if (chartType?.includes('pie')) {
+      return (
+        <ResponsiveContainer width="100%" height={200}>
+          <PieChart>
+            <Pie
+              data={pieData}
+              cx="50%"
+              cy="50%"
+              outerRadius={60}
+              dataKey="value"
+            >
+              {pieData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      );
+    }
+    
+    // Default to bar chart
+    return (
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={chartData}>
+          <XAxis dataKey="name" axisLine={false} tickLine={false} />
+          <YAxis axisLine={false} tickLine={false} />
+          <Tooltip />
+          <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  };
 
   return (
     <Card className={`relative group hover:shadow-md transition-shadow ${
@@ -70,6 +159,27 @@ function CanvasComponent({ component, onRemove }: { component: any; onRemove: ()
             <p className="text-xs text-muted-foreground mt-3">{component.description}</p>
           )}
         </div>
+      ) : isSavedVisualization ? (
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <Icon className="h-6 w-6 text-primary" />
+            <div>
+              <h3 className="font-medium text-sm">{title}</h3>
+              {component.type && (
+                <p className="text-xs text-muted-foreground">{component.type}</p>
+              )}
+            </div>
+          </div>
+          
+          {/* Actual chart visualization for saved visualizations */}
+          <div className="w-full">
+            {renderChart()}
+          </div>
+          
+          {component.description && (
+            <p className="text-xs text-muted-foreground mt-2">{component.description}</p>
+          )}
+        </div>
       ) : (
         <div>
           <div className="flex items-center gap-3 mb-4">
@@ -82,7 +192,7 @@ function CanvasComponent({ component, onRemove }: { component: any; onRemove: ()
             </div>
           </div>
           
-          {/* Mock chart visualization */}
+          {/* Mock chart visualization for new components */}
           <div className="h-32 bg-gradient-to-br from-primary/10 to-primary/20 rounded border-2 border-dashed border-primary/30 flex items-center justify-center">
             <div className="text-center">
               <Icon className="h-8 w-8 text-primary mx-auto mb-2" />
