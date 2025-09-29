@@ -103,7 +103,8 @@ export function Canvas({ components, onRemoveComponent, onVisualizationDrop }: C
   const [{ isOver, canDrop }, drop] = useDrop(() => ({
     accept: ['component', 'visualization'],
     drop: (item: any) => {
-      if ((item.id === 'visualization' || item.componentType === 'visualization' || item.componentType === 'saved-visualization') && onVisualizationDrop) {
+      // Only open visualization builder for new visualizations, not saved ones
+      if ((item.id === 'visualization' || item.componentType === 'visualization') && item.componentType !== 'saved-visualization' && onVisualizationDrop) {
         onVisualizationDrop();
         return { dropped: true };
       }
