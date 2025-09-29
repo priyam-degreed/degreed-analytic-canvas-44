@@ -687,12 +687,12 @@ export default function LearningEngagement() {
               r: 4
             }} name="Learning Activities (In Period)" />
               
-              {/* Rating Areas */}
-              <Area yAxisId="right" type="monotone" dataKey="peerRating" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} strokeWidth={2} name="Average Peer Rating" />
+              {/* Rating Lines */}
+              <Line yAxisId="right" type="monotone" dataKey="peerRating" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }} name="Average Peer Rating" />
               
-              <Area yAxisId="right" type="monotone" dataKey="managerRating" stroke="#60a5fa" fill="#60a5fa" fillOpacity={0.3} strokeWidth={2} name="Average Manager Rating" />
+              <Line yAxisId="right" type="monotone" dataKey="managerRating" stroke="#60a5fa" strokeWidth={2} dot={{ fill: '#60a5fa', strokeWidth: 2, r: 3 }} name="Average Manager Rating" />
               
-              <Area yAxisId="right" type="monotone" dataKey="selfRating" stroke="#93c5fd" fill="#93c5fd" fillOpacity={0.3} strokeWidth={2} name="Average Self Rating" />
+              <Line yAxisId="right" type="monotone" dataKey="selfRating" stroke="#93c5fd" strokeWidth={2} dot={{ fill: '#93c5fd', strokeWidth: 2, r: 3 }} name="Average Self Rating" />
             </ComposedChart>
           </ResponsiveContainer>
           
