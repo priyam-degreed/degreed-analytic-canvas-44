@@ -688,11 +688,23 @@ export default function LearningEngagement() {
             }} name="Learning Activities (In Period)" />
               
               {/* Rating Lines */}
-              <Line yAxisId="right" type="monotone" dataKey="peerRating" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }} name="Average Peer Rating" />
+              <Line yAxisId="right" type="monotone" dataKey="peerRating" stroke="#3b82f6" strokeWidth={2} dot={{
+              fill: '#3b82f6',
+              strokeWidth: 2,
+              r: 3
+            }} name="Average Peer Rating" />
               
-              <Line yAxisId="right" type="monotone" dataKey="managerRating" stroke="#60a5fa" strokeWidth={2} dot={{ fill: '#60a5fa', strokeWidth: 2, r: 3 }} name="Average Manager Rating" />
+              <Line yAxisId="right" type="monotone" dataKey="managerRating" stroke="#60a5fa" strokeWidth={2} dot={{
+              fill: '#60a5fa',
+              strokeWidth: 2,
+              r: 3
+            }} name="Average Manager Rating" />
               
-              <Line yAxisId="right" type="monotone" dataKey="selfRating" stroke="#93c5fd" strokeWidth={2} dot={{ fill: '#93c5fd', strokeWidth: 2, r: 3 }} name="Average Self Rating" />
+              <Line yAxisId="right" type="monotone" dataKey="selfRating" stroke="#93c5fd" strokeWidth={2} dot={{
+              fill: '#93c5fd',
+              strokeWidth: 2,
+              r: 3
+            }} name="Average Self Rating" />
             </ComposedChart>
           </ResponsiveContainer>
           
@@ -1199,11 +1211,15 @@ export default function LearningEngagement() {
               </div>
               <div className="text-center">
                 <div className="text-sm text-muted-foreground">Completed</div>
-                <div className="text-2xl font-bold" style={{ color: '#3b82f6' }}>1,456</div>
+                <div className="text-2xl font-bold" style={{
+                color: '#3b82f6'
+              }}>1,456</div>
               </div>
               <div className="text-center">
                 <div className="text-sm text-muted-foreground">Overdue</div>
-                <div className="text-2xl font-bold" style={{ color: '#1e40af' }}>89</div>
+                <div className="text-2xl font-bold" style={{
+                color: '#1e40af'
+              }}>89</div>
               </div>
             </div>
 
@@ -1546,22 +1562,7 @@ export default function LearningEngagement() {
           </div>
 
           {/* Key Insights */}
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg">
-                <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <div className="font-medium text-amber-800 dark:text-amber-200 mb-1">Key Insight</div>
-                <div className="text-sm text-amber-700 dark:text-amber-300">
-                  External learning adoption is increasing, suggesting employees prefer diverse, external content sources. 
-                  Consider expanding partnerships with top-rated external providers.
-                </div>
-              </div>
-            </div>
-          </div>
+          
 
           {/* Trend Chart with Enhanced Styling */}
           <div className="space-y-4">
@@ -1678,8 +1679,16 @@ export default function LearningEngagement() {
                 }
                 return null;
               }} />
-                <Line type="monotone" dataKey="external" stroke="#3b82f6" strokeWidth={3} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }} />
-                <Line type="monotone" dataKey="internal" stroke="#1e40af" strokeWidth={3} dot={{ fill: '#1e40af', strokeWidth: 2, r: 4 }} />
+                <Line type="monotone" dataKey="external" stroke="#3b82f6" strokeWidth={3} dot={{
+                fill: '#3b82f6',
+                strokeWidth: 2,
+                r: 4
+              }} />
+                <Line type="monotone" dataKey="internal" stroke="#1e40af" strokeWidth={3} dot={{
+                fill: '#1e40af',
+                strokeWidth: 2,
+                r: 4
+              }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
