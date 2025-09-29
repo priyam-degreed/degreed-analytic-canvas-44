@@ -1184,7 +1184,7 @@ export default function LearningEngagement() {
             </BarChart>
           </ResponsiveContainer>
           <div className="mt-4 p-3 bg-muted/20 rounded-lg">
-            <div className="text-sm font-medium text-green-600">🏆 Highest Satisfaction: LinkedIn Learning (92%)</div>
+            
           </div>
         </ChartCard>
 
@@ -1254,14 +1254,7 @@ export default function LearningEngagement() {
               </PieChart>
             </ResponsiveContainer>
             
-            <div className="text-sm bg-red-50 dark:bg-red-950/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
-              <div className="font-medium text-red-800 dark:text-red-200 mb-1">⚠️ Overdue Analysis</div>
-              <div className="text-red-700 dark:text-red-300">
-                • 62 assignments overdue by &lt; 7 days
-                <br />
-                • 27 assignments overdue by 15+ days
-              </div>
-            </div>
+            
           </div>
         </ChartCard>
 
@@ -1344,16 +1337,7 @@ export default function LearningEngagement() {
               <Bar dataKey="completionRate" fill="#3b82f6" />
             </BarChart>
           </ResponsiveContainer>
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="text-sm font-medium text-green-700 dark:text-green-300">🏆 Highest</div>
-              <div className="text-lg font-bold text-green-600 dark:text-green-400">Engineering (92%)</div>
-            </div>
-            <div className="p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
-              <div className="text-sm font-medium text-red-700 dark:text-red-300">⚠️ Lowest</div>
-              <div className="text-lg font-bold text-red-600 dark:text-red-400">Operations (74%)</div>
-            </div>
-          </div>
+          
         </ChartCard>
 
         {/* Completion Rate Drivers */}
@@ -1409,21 +1393,7 @@ export default function LearningEngagement() {
             </div>
             
             {/* Key Recommendations */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-                  <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="font-medium text-blue-800 dark:text-blue-200 mb-1">💡 Key Recommendations</div>
-                  <div className="text-sm text-blue-700 dark:text-blue-300">
-                    Focus on manager training and support programs. Operations team needs targeted intervention with clear deadlines and dedicated learning time allocation.
-                  </div>
-                </div>
-              </div>
-            </div>
+            
           </div>
         </ChartCard>
 
