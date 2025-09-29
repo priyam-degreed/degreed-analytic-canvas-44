@@ -73,7 +73,7 @@ export function RecordsListDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[80vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {getRecordIcon(category)}
@@ -81,10 +81,10 @@ export function RecordsListDialog({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="mt-4">
+        <div className="mt-4 max-h-[60vh] overflow-y-auto">
           {records.length > 0 ? (
             <Table>
-              <TableHeader>
+              <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>
                   <TableHead className="w-[50px]">#</TableHead>
                   <TableHead>Name</TableHead>
