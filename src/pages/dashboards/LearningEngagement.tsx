@@ -35,7 +35,7 @@ import {
   ComposedChart
 } from "recharts";
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', '#8884d8'];
+const COLORS = ['#3b82f6', '#60a5fa', '#1e40af', '#93c5fd', '#1d4ed8']; // Blue color palette
 
 export default function LearningEngagement() {
   console.log("LearningEngagement component rendering"); // Debug log
@@ -441,19 +441,19 @@ export default function LearningEngagement() {
                         borderRadius: '6px'
                       }}
                     />
-                    <Bar dataKey="current" fill="#60A5FA" name="Aug 31 2025" />
-                    <Bar dataKey="previous" fill="#A78BFA" name="Previous Period" />
+                    <Bar dataKey="current" fill="#3b82f6" name="Aug 31 2025" />
+                    <Bar dataKey="previous" fill="#60a5fa" name="Previous Period" />
                   </BarChart>
                 </ResponsiveContainer>
                 
                 <div className="flex justify-center gap-8">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#60A5FA]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#3b82f6]"></div>
                     <span className="text-sm">Aug 31 2025</span>
                     <span className="font-semibold">{currentVsPrevComparison.current.completions}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#A78BFA]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#60a5fa]"></div>
                     <span className="text-sm">Jul 31 2025</span>
                     <span className="font-semibold">{currentVsPrevComparison.previous.completions}</span>
                   </div>
@@ -485,19 +485,19 @@ export default function LearningEngagement() {
                         borderRadius: '6px'
                       }}
                     />
-                    <Bar dataKey="current" fill="hsl(var(--primary))" name="Current Period" />
-                    <Bar dataKey="previous" fill="hsl(var(--accent))" name="Previous Period" />
+                    <Bar dataKey="current" fill="#3b82f6" name="Current Period" />
+                    <Bar dataKey="previous" fill="#60a5fa" name="Previous Period" />
                   </BarChart>
                 </ResponsiveContainer>
                 
                 <div className="flex justify-center gap-8">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-primary"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#3b82f6]"></div>
                     <span className="text-sm">Current Period (Aug 31 2025)</span>
                     <span className="font-semibold">{currentVsPrevComparison.current.completions}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-accent"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#60a5fa]"></div>
                     <span className="text-sm">Previous Period (Jul 31 2025)</span>
                     <span className="font-semibold">{currentVsPrevComparison.previous.completions}</span>
                   </div>
@@ -674,8 +674,8 @@ export default function LearningEngagement() {
                   borderRadius: '6px'
                 }} 
               />
-              <Bar dataKey="currentPeriod" fill="hsl(var(--primary))" name="Current Period" />
-              <Bar dataKey="previousPeriod" fill="hsl(var(--muted))" name="Previous Period" />
+              <Bar dataKey="currentPeriod" fill="#3b82f6" name="Current Period" />
+              <Bar dataKey="previousPeriod" fill="#60a5fa" name="Previous Period" />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -733,9 +733,9 @@ export default function LearningEngagement() {
                 yAxisId="left"
                 type="monotone" 
                 dataKey="learningActivities" 
-                stroke="#3B82F6" 
+                stroke="#1e40af" 
                 strokeWidth={3}
-                dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+                dot={{ fill: '#1e40af', strokeWidth: 2, r: 4 }}
                 name="Learning Activities (In Period)"
               />
               
@@ -744,8 +744,8 @@ export default function LearningEngagement() {
                 yAxisId="right"
                 type="monotone" 
                 dataKey="peerRating" 
-                stroke="#84CC16" 
-                fill="#84CC16" 
+                stroke="#3b82f6" 
+                fill="#3b82f6" 
                 fillOpacity={0.3}
                 strokeWidth={2}
                 name="Average Peer Rating"
@@ -755,8 +755,8 @@ export default function LearningEngagement() {
                 yAxisId="right"
                 type="monotone" 
                 dataKey="managerRating" 
-                stroke="#8B5CF6" 
-                fill="#8B5CF6" 
+                stroke="#60a5fa" 
+                fill="#60a5fa" 
                 fillOpacity={0.3}
                 strokeWidth={2}
                 name="Average Manager Rating"
@@ -766,8 +766,8 @@ export default function LearningEngagement() {
                 yAxisId="right"
                 type="monotone" 
                 dataKey="selfRating" 
-                stroke="#EC4899" 
-                fill="#EC4899" 
+                stroke="#93c5fd" 
+                fill="#93c5fd" 
                 fillOpacity={0.3}
                 strokeWidth={2}
                 name="Average Self Rating"
@@ -779,34 +779,34 @@ export default function LearningEngagement() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-[#3B82F6]"></div>
+                <div className="w-3 h-3 rounded-full bg-[#1e40af]"></div>
                 <span className="text-sm font-medium">Learning Activities (In Period)</span>
               </div>
-              <div className="text-3xl font-bold text-[#3B82F6]">5.44k</div>
+              <div className="text-3xl font-bold text-[#1e40af]">5.44k</div>
             </div>
             
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-[#84CC16]"></div>
+                <div className="w-3 h-3 rounded-full bg-[#3b82f6]"></div>
                 <span className="text-sm font-medium">Average Peer Rating</span>
               </div>
-              <div className="text-3xl font-bold text-[#84CC16]">3.83</div>
+              <div className="text-3xl font-bold text-[#3b82f6]">3.83</div>
             </div>
             
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-[#8B5CF6]"></div>
+                <div className="w-3 h-3 rounded-full bg-[#60a5fa]"></div>
                 <span className="text-sm font-medium">Average Manager Rating</span>
               </div>
-              <div className="text-3xl font-bold text-[#8B5CF6]">5.06</div>
+              <div className="text-3xl font-bold text-[#60a5fa]">5.06</div>
             </div>
             
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full bg-[#EC4899]"></div>
+                <div className="w-3 h-3 rounded-full bg-[#93c5fd]"></div>
                 <span className="text-sm font-medium">Average Self Rating</span>
               </div>
-              <div className="text-3xl font-bold text-[#EC4899]">3.93</div>
+              <div className="text-3xl font-bold text-[#93c5fd]">3.93</div>
             </div>
           </div>
         </div>
@@ -833,8 +833,8 @@ export default function LearningEngagement() {
                   borderRadius: '6px'
                 }}
               />
-              <Area type="monotone" dataKey="completions" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" />
-              <Area type="monotone" dataKey="activeUsers" stackId="2" stroke="hsl(var(--secondary))" fill="hsl(var(--secondary))" />
+              <Area type="monotone" dataKey="completions" stackId="1" stroke="#3b82f6" fill="#3b82f6" />
+              <Area type="monotone" dataKey="activeUsers" stackId="2" stroke="#60a5fa" fill="#60a5fa" />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -917,7 +917,7 @@ export default function LearningEngagement() {
                     borderRadius: '6px'
                   }}
                 />
-                <Bar dataKey="learners" fill="hsl(var(--primary))" />
+                <Bar dataKey="learners" fill="#3b82f6" />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -938,7 +938,7 @@ export default function LearningEngagement() {
                   <span className="text-sm font-semibold">81%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div className="bg-green-500 h-3 rounded-full transition-all duration-300" style={{ width: '81%' }} />
+                  <div className="bg-blue-500 h-3 rounded-full transition-all duration-300" style={{ width: '81%' }} />
                 </div>
               </div>
               
@@ -958,7 +958,7 @@ export default function LearningEngagement() {
                   <span className="text-sm font-semibold">65%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div className="bg-orange-500 h-3 rounded-full transition-all duration-300" style={{ width: '65%' }} />
+                  <div className="bg-blue-600 h-3 rounded-full transition-all duration-300" style={{ width: '65%' }} />
                 </div>
               </div>
             </CardContent>
@@ -1012,8 +1012,8 @@ export default function LearningEngagement() {
             ));
             const percentage = maxHours > 0 ? Math.round((avgCurrentHours / maxHours) * 100) : 0;
             
-            // Color mapping for different roles
-            const colors = ['bg-blue-500', 'bg-green-500', 'bg-orange-500', 'bg-purple-500', 'bg-pink-500', 'bg-teal-500'];
+            // Color mapping for different roles - blue variants
+            const colors = ['bg-blue-500', 'bg-blue-600', 'bg-blue-400', 'bg-blue-700', 'bg-blue-300', 'bg-blue-800'];
             const color = colors[index % colors.length];
 
             return (
@@ -1139,7 +1139,7 @@ export default function LearningEngagement() {
                   borderRadius: '6px'
                 }}
               />
-              <Line type="monotone" dataKey="satisfaction" stroke="hsl(var(--primary))" strokeWidth={3} />
+              <Line type="monotone" dataKey="satisfaction" stroke="#3b82f6" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -1183,9 +1183,9 @@ export default function LearningEngagement() {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '6px'
               }} />
-              <Bar yAxisId="left" dataKey="assigned" fill="hsl(var(--muted))" name="Assignments Created" />
-              <Bar yAxisId="left" dataKey="completed" fill="hsl(var(--primary))" name="Completions" />
-              <Line yAxisId="right" type="monotone" dataKey="rate" stroke="hsl(var(--accent))" strokeWidth={3} name="Completion Rate %" />
+              <Bar yAxisId="left" dataKey="assigned" fill="#93c5fd" name="Assignments Created" />
+              <Bar yAxisId="left" dataKey="completed" fill="#3b82f6" name="Completions" />
+              <Line yAxisId="right" type="monotone" dataKey="rate" stroke="#1e40af" strokeWidth={3} name="Completion Rate %" />
             </ComposedChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -1212,10 +1212,10 @@ export default function LearningEngagement() {
                 borderRadius: '6px'
               }}
             />
-            <Bar yAxisId="left" dataKey="learningActivities" fill="hsl(var(--muted))" name="Learning Activities" />
-            <Line yAxisId="right" type="monotone" dataKey="peerRating" stroke="hsl(var(--primary))" strokeWidth={2} name="Peer Rating" />
-            <Line yAxisId="right" type="monotone" dataKey="managerRating" stroke="hsl(var(--accent))" strokeWidth={2} name="Manager Rating" />
-            <Line yAxisId="right" type="monotone" dataKey="selfRating" stroke="hsl(var(--secondary))" strokeWidth={2} name="Self Rating" />
+            <Bar yAxisId="left" dataKey="learningActivities" fill="#93c5fd" name="Learning Activities" />
+            <Line yAxisId="right" type="monotone" dataKey="peerRating" stroke="#3b82f6" strokeWidth={2} name="Peer Rating" />
+            <Line yAxisId="right" type="monotone" dataKey="managerRating" stroke="#60a5fa" strokeWidth={2} name="Manager Rating" />
+            <Line yAxisId="right" type="monotone" dataKey="selfRating" stroke="#1e40af" strokeWidth={2} name="Self Rating" />
           </LineChart>
         </ResponsiveContainer>
         <div className="mt-4 p-4 bg-muted/30 rounded-lg">
@@ -1287,7 +1287,7 @@ export default function LearningEngagement() {
                   return null;
                 }}
               />
-              <Bar dataKey="satisfaction" fill="hsl(var(--primary))" />
+              <Bar dataKey="satisfaction" fill="#3b82f6" />
             </BarChart>
           </ResponsiveContainer>
           <div className="mt-4 p-3 bg-muted/20 rounded-lg">
@@ -1446,7 +1446,7 @@ export default function LearningEngagement() {
                   return null;
                 }}
               />
-              <Bar dataKey="completionRate" fill="hsl(var(--primary))" />
+              <Bar dataKey="completionRate" fill="#3b82f6" />
             </BarChart>
           </ResponsiveContainer>
           <div className="mt-4 grid grid-cols-2 gap-4">
@@ -1487,13 +1487,13 @@ export default function LearningEngagement() {
                     <div className="text-xs text-muted-foreground">{item.description}</div>
                     <div className="w-full bg-muted rounded-full h-2 mt-2">
                       <div 
-                        className="bg-primary h-2 rounded-full transition-all duration-300" 
+                        className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
                         style={{ width: `${item.impact}%` }}
                       ></div>
                     </div>
                   </div>
                   <div className="ml-4 text-right">
-                    <div className="text-lg font-bold text-primary">{item.impact}%</div>
+                    <div className="text-lg font-bold text-blue-600">{item.impact}%</div>
                     <div className="text-xs text-muted-foreground">Impact Score</div>
                   </div>
                 </div>
@@ -1751,7 +1751,7 @@ export default function LearningEngagement() {
                           <div className="space-y-2">
                             <div className="flex items-center justify-between gap-4">
                               <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full bg-primary"></div>
+                                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                                 <span className="text-sm">External Learning</span>
                               </div>
                               <div className="text-right">
@@ -1798,19 +1798,19 @@ export default function LearningEngagement() {
           
           {/* Enhanced Legend with Statistics */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
+            <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded-full bg-primary animate-pulse"></div>
+                <div className="w-4 h-4 rounded-full bg-blue-500 animate-pulse"></div>
                 <span className="font-medium">External Learning</span>
               </div>
               <div className="text-right">
-                <div className="font-bold text-primary">68%</div>
+                <div className="font-bold text-blue-600">68%</div>
                 <div className="text-xs text-muted-foreground">Trending up</div>
               </div>
             </div>
-            <div className="flex items-center justify-between p-3 bg-secondary/5 rounded-lg border border-secondary/20">
+            <div className="flex items-center justify-between p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg border border-blue-300 dark:border-blue-700">
               <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded-full bg-secondary animate-pulse"></div>
+                <div className="w-4 h-4 rounded-full bg-blue-600 animate-pulse"></div>
                 <span className="font-medium">Internal Learning</span>
               </div>
               <div className="text-right">
