@@ -56,7 +56,13 @@ export default function LearningEngagement() {
   };
 
   const handleDrillDownToRecords = (category: string, title: string) => {
-    const records = generateRecords(category, title);
+    // Get the actual count from the drill-down data
+    const actualCount = drillDownData?.additionalData?.ratingDistribution?.[category] || 
+                       drillDownData?.additionalData?.skillBreakdown?.[category] || 
+                       drillDownData?.additionalData?.progressionTiers?.[category] || 
+                       10; // fallback
+    
+    const records = generateRecords(category, title, actualCount);
     setRecordsDialogData({
       isOpen: true,
       title,
