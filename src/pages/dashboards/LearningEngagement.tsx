@@ -1502,13 +1502,10 @@ export default function LearningEngagement() {
           <div className="grid grid-cols-2 gap-6">
             <div className="relative p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800 hover-scale">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-blue-500 rounded-lg text-white">
+                <div className="p-3 bg-blue-400 rounded-lg text-white">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
                   </svg>
-                </div>
-                <div className="text-sm bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full">
-                  ↗ +5% vs last quarter
                 </div>
               </div>
               <div className="space-y-2">
@@ -1518,32 +1515,29 @@ export default function LearningEngagement() {
                 
                 {/* Progress Bar */}
                 <div className="w-full bg-blue-200 dark:bg-blue-800/30 rounded-full h-2 mt-3">
-                  <div className="bg-blue-500 h-2 rounded-full animate-fade-in" style={{
+                  <div className="bg-blue-400 h-2 rounded-full animate-fade-in" style={{
                   width: '68%'
                 }}></div>
                 </div>
               </div>
             </div>
 
-            <div className="relative p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/20 rounded-xl border border-green-200 dark:border-green-800 hover-scale">
+            <div className="relative p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950/30 dark:to-gray-900/20 rounded-xl border border-gray-200 dark:border-gray-800 hover-scale">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-green-500 rounded-lg text-white">
+                <div className="p-3 bg-gray-500 rounded-lg text-white">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                 </div>
-                <div className="text-sm bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 px-2 py-1 rounded-full">
-                  ↘ -3% vs last quarter
-                </div>
               </div>
               <div className="space-y-2">
-                <div className="text-sm font-medium text-green-700 dark:text-green-300">Internal Learning</div>
-                <div className="text-4xl font-bold text-green-600 dark:text-green-400">32%</div>
-                <div className="text-sm text-green-600/70 dark:text-green-400/70">1,987 completions</div>
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Internal Learning</div>
+                <div className="text-4xl font-bold text-gray-600 dark:text-gray-400">32%</div>
+                <div className="text-sm text-gray-600/70 dark:text-gray-400/70">1,987 completions</div>
                 
                 {/* Progress Bar */}
-                <div className="w-full bg-green-200 dark:bg-green-800/30 rounded-full h-2 mt-3">
-                  <div className="bg-green-500 h-2 rounded-full animate-fade-in" style={{
+                <div className="w-full bg-gray-200 dark:bg-gray-800/30 rounded-full h-2 mt-3">
+                  <div className="bg-gray-500 h-2 rounded-full animate-fade-in" style={{
                   width: '32%'
                 }}></div>
                 </div>
