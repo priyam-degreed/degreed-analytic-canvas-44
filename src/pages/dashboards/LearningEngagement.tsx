@@ -1573,7 +1573,7 @@ export default function LearningEngagement() {
           <div className="space-y-4">
             <div className="text-lg font-semibold text-foreground">Adoption Trends Over Time</div>
             <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={[{
+              <LineChart data={[{
               month: 'Jan',
               external: 25,
               internal: 75,
@@ -1646,16 +1646,6 @@ export default function LearningEngagement() {
               externalUsers: 3600,
               internalUsers: 1400
             }]}>
-                <defs>
-                  <linearGradient id="externalGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1} />
-                  </linearGradient>
-                  <linearGradient id="internalGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--secondary))" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="hsl(var(--secondary))" stopOpacity={0.1} />
-                  </linearGradient>
-                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.3} />
                 <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
                 <YAxis domain={[0, 100]} stroke="hsl(var(--muted-foreground))" />
@@ -1681,7 +1671,7 @@ export default function LearningEngagement() {
                             </div>
                             <div className="flex items-center justify-between gap-4">
                               <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full bg-secondary"></div>
+                                <div className="w-3 h-3 rounded-full bg-blue-900"></div>
                                 <span className="text-sm">Internal Learning</span>
                               </div>
                               <div className="text-right">
@@ -1694,9 +1684,9 @@ export default function LearningEngagement() {
                 }
                 return null;
               }} />
-                <Area type="monotone" dataKey="external" stackId="1" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#externalGradient)" />
-                <Area type="monotone" dataKey="internal" stackId="1" stroke="hsl(var(--secondary))" strokeWidth={2} fill="url(#internalGradient)" />
-              </AreaChart>
+                <Line type="monotone" dataKey="external" stroke="#3b82f6" strokeWidth={3} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }} />
+                <Line type="monotone" dataKey="internal" stroke="#1e40af" strokeWidth={3} dot={{ fill: '#1e40af', strokeWidth: 2, r: 4 }} />
+              </LineChart>
             </ResponsiveContainer>
           </div>
           
@@ -1714,11 +1704,11 @@ export default function LearningEngagement() {
             </div>
             <div className="flex items-center justify-between p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg border border-blue-300 dark:border-blue-700">
               <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded-full bg-blue-600 animate-pulse"></div>
+                <div className="w-4 h-4 rounded-full bg-blue-900 animate-pulse"></div>
                 <span className="font-medium">Internal Learning</span>
               </div>
               <div className="text-right">
-                <div className="font-bold text-secondary">32%</div>
+                <div className="font-bold text-blue-900">32%</div>
                 <div className="text-xs text-muted-foreground">Stable</div>
               </div>
             </div>
