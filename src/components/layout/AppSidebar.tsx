@@ -217,7 +217,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                     )}
                   >
                     <BarChart3 className="h-4 w-4 shrink-0" />
-                    <span className="flex-1 font-medium">{dashboard.id} {dashboard.name}</span>
+                    <span className="flex-1 font-medium">{dashboard.name}</span>
                     <Button
                       variant="ghost"
                       size="sm"
