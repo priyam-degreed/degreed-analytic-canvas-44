@@ -12,6 +12,7 @@ import { MultiSelectFilter } from "@/components/filters/MultiSelectFilter";
 import { VisualizationBuilder } from "@/components/ai/VisualizationBuilder";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
+import { useDashboards } from "@/contexts/DashboardContext";
 
 interface DashboardBuilderProps {
   mode?: "create" | "edit";
@@ -21,6 +22,7 @@ interface DashboardBuilderProps {
 export default function DashboardBuilder({ mode = "create", dashboardId }: DashboardBuilderProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { addDashboard, updateDashboard, getDashboard } = useDashboards();
   const [dashboardName, setDashboardName] = useState(mode === "edit" ? "01 Learning Dashboard" : "");
   const [isPublic, setIsPublic] = useState(false);
   const [isVisualizationBuilderOpen, setIsVisualizationBuilderOpen] = useState(false);
@@ -89,6 +91,22 @@ export default function DashboardBuilder({ mode = "create", dashboardId }: Dashb
     if (!dashboardName.trim()) {
       toast.error("Please enter a dashboard name");
       return;
+    }
+    
+    if (mode === "create") {
+      // Add the new dashboard to the list
+      addDashboard({
+        name: dashboardName,
+        isPublic,
+        components: canvasComponents
+      });
+    } else if (mode === "edit" && dashboardId) {
+      // Update existing dashboard
+      updateDashboard(dashboardId, {
+        name: dashboardName,
+        isPublic,
+        components: canvasComponents
+      });
     }
     
     toast.success(`Dashboard ${mode === "edit" ? "updated" : "created"} successfully!`);

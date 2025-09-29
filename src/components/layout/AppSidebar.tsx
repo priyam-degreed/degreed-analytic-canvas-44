@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { ShareDashboardDialog } from "@/components/dashboard/ShareDashboardDialog";
 import { useViewMode } from "@/contexts/ViewModeContext";
+import { useDashboards } from "@/contexts/DashboardContext";
 import {
   BarChart3,
   BookOpen,
@@ -70,10 +71,11 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { isManagerView } = useViewMode();
+  const { dashboards: allDashboards, deleteDashboard } = useDashboards();
   
   // Dynamic navigation and dashboard items based on view mode
   const navigationItems = isManagerView ? managerNavigationItems : adminNavigationItems;
-  const dashboards = isManagerView ? managerDashboards : adminDashboards;
+  const dashboards = isManagerView ? managerDashboards : allDashboards;
   
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "Overview": false,
@@ -134,7 +136,10 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         // Create a copy of the dashboard (admin only)
         break;
       case 'delete':
-        // Show confirmation dialog and delete (admin only)
+        // Delete custom dashboard (admin only)
+        if (confirm(`Are you sure you want to delete "${dashboard.name}"?`)) {
+          deleteDashboard(dashboard.id);
+        }
         break;
     }
   };
