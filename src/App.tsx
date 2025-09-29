@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ViewModeProvider } from "@/contexts/ViewModeContext";
 import { FilterProvider } from "@/contexts/FilterContext";
+import { DashboardProvider } from "@/contexts/DashboardContext";
 import Dashboard from "./pages/Dashboard";
 import { ManagerView } from "./pages/manager/ManagerView";
 import { ManagerDashboard } from "./pages/manager/ManagerDashboard";
@@ -34,8 +35,9 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <FilterProvider>
-        <ViewModeProvider>
+      <DashboardProvider>
+        <FilterProvider>
+          <ViewModeProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -77,9 +79,10 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-      </ViewModeProvider>
-    </FilterProvider>
-  </TooltipProvider>
+          </ViewModeProvider>
+        </FilterProvider>
+      </DashboardProvider>
+    </TooltipProvider>
 </QueryClientProvider>
 );
 
